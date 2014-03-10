@@ -1,0 +1,50 @@
+<style>
+/*Prevent the text contents of draggable elements from
+ * being selectable
+ */
+[draggable]{
+	-moz-user-select: none;
+	-kkhtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+	/*Required to make elements draggable in old
+	 * WebKit
+	 */
+	-khtml-user-drag: element;
+	-webkit-user-drag: element;
+}
+.dragMe{
+	/*height: 225px;*/
+	width: 100%;
+	float: top;
+	border: 2px solid #666666;
+	background-color: #ccc;
+	margin: 5px;
+	-webkit-border-radius: 10px;
+	-ms-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 3px #000;
+	-ms-box-shadow: inset 0 0 3px #000;
+	box-shadow: inset 0 0 3px #000;
+	cursor: move;
+}
+.dragBtn{
+	position:relative;
+	left: 0px;
+	top: 0px;
+	color:3fff;
+	text-shadow: #000 0 1px;
+	box-shadow: 5px;
+	padding: 5px;
+}
+.dragCont{
+	background-color: blue;
+}
+.dragMe.over{
+	border: 2px dashed #000;
+}
+#mapview{
+	height: 250px;
+}
+</style>
