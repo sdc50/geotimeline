@@ -1,0 +1,45 @@
+header{
+	background-color:gray;
+	float: top;
+	height: 5em;
+	text-align: center;
+	width: 100em;
+}
+
+body{
+	/*background-color:black;*/
+}
+.rightStay{
+	float:right;
+	background-color:red;
+	height:100%;
+	width: 80%;
+}
+
+.leftHide{
+	background-color: blue;
+	float:left;
+	height: 100%;
+	width: 20%;
+}
+
+.compressible{
+	height:30em;
+	width:100em;
+}
+
+#mapview{
+	background-color:green;
+}
+
+#friends{
+	background-color:yellow;
+}
+
+#blogview{
+	background-color:purple;
+}
+
+#timeline{
+	background-color:orange;
+}
