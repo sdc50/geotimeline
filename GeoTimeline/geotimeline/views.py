@@ -12,6 +12,7 @@ from pyramid.httpexceptions import (
 from pyramid.security import (
     remember,
     forget,
+    authenticated_userid,
     )
 
 from .security import USERS
@@ -26,15 +27,15 @@ from .models import (
 
 @view_config(route_name='home', renderer='index.html', permission='view')
 def my_view(request):
-  return {}
+  return dict(logged_in = authenticated_userid(request))
 
-@view_config(route_name='map', renderer='map.html', permission='edit')
+@view_config(route_name='map', renderer='timemap.html', permission='edit')
 def geotimeline(request):
     try:
         one = DBSession.query(Event).filter(Event.name == 'one').first()
     except DBAPIError:
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'one': one, 'project': 'GeoTimeline'}
+    return {'one': one, 'project': 'GeoTimeline', 'logged_in': authenticated_userid(request)}
   
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem

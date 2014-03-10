@@ -4,6 +4,8 @@
     {% block head %}
     <title>{% block title %}GeoTimeline{% endblock %} - GeoTimeline</title>
     
+    <link rel="shortcut icon" href="{{request.static_url('geotimeline:static/img/map_48x48.ico')}}">
+    
     <!-- Jquery CDN -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     
@@ -24,6 +26,23 @@
       {% block header %}
         <!-- <button id='friends' type="button" class="btn btn-default">Friends</button> -->
         <a class='title' href="{{request.application_url}}/">GeoTimeline</a>
+        {% if logged_in %}
+          <div id='usr-group' class="btn-group">
+            <button type="button" class="btn btn-default btn-lg">User Name</button>
+            <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="{{request.application_url}}/">New Event</a></li>
+              <li><a href="{{request.application_url}}/">Another action</a></li>
+              <li class="divider"></li>
+              <li><a href="{{request.application_url}}/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+            </ul>
+          </div>
+        {% else %}
+          <a id='usr-group' href="{{request.application_url}}/timemap" class="btn btn-default btn-lg" role="button">Login</a>
+        {% endif %}
         <!-- <button type="button" class="btn btn-default">Login</button> -->
       {% endblock %}
     </header>
