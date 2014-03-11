@@ -88,3 +88,7 @@ div.timeline-axis-text-major{
 div.timeline-frame{
   border-left:none;
 }
+
+.modal-body{
+  height:2000px;
+}
