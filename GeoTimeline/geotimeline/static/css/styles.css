@@ -6,7 +6,7 @@ html,body{
   min-height:100%;
   position:relative;
   padding-top:100px; /*height of header*/
-  padding-bottom: 20px; /*height of footer*/
+  padding-bottom: 40px; /*height of footer*/
 }
 
 header{
@@ -15,6 +15,7 @@ header{
   left:0;
   height:100px;
   width:100%;
+  z-index:1;
   background-color:#BE2939;
   color:white;
   text-align:center;
@@ -51,12 +52,51 @@ header a:hover{
   width:100%;
 }
 
-.index-section{
-  border-radius:10px;
-  background-color:gray;
+section{
+  margin:0 auto;
+}
+
+.map-img{
+  overflow:hidden;
+  position:relative;
+  height:500px;
+  background-image: url('../img/bgmap.jpg');
+}
+
+#timeline-img{
+  height:50%;
+  position:absolute;
+  top:25%;
+  right:-100px;
+}
+.bucket{
   width:80%;
-  margin:20px auto;
-  padding:20px;
+  margin: 20px auto; 
+}
+
+.feature{
+  width:33%;
+  display: inline-block;
+  text-align:center;
+  padding:10px;
+}
+
+div.feature img{
+  border-radius:50%;
+}
+
+.get-started{
+  position:relative;
+  height:300px;
+  background-color:#dddddd;
+}
+
+.get-started a{
+  position:absolute;
+  top:50%;
+  left:50%;
+  margin-top:-20px;
+  margin-left:-65px;
 }
 
 footer{
@@ -66,4 +106,5 @@ footer{
   position:absolute;
   bottom:0;
   width:100%;
+  padding:10px;
 }

@@ -49,7 +49,7 @@ var btn =  ' <div class="btn-group" id="usr-group">'
          + ' </div>';
 
 $(function(){
-  $('header').addClass('map-header').find('a').first().toggle();
+  $('header').addClass('map-header').find('a').first().fadeOut('slow');
   $('footer').slideToggle();
   timeline = new links.Timeline($('#timeline')[0]);
   resize();

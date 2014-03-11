@@ -9,7 +9,6 @@
   background-color: transparent;
   border-radius:5px;
   margin:5px;
-    z-index:1;
   -webkit-transition: width 1s .5s, height 1s .5s, background-color 1s .5s, margin 1s .5s, border-radius 1s .5s;
 }
 
