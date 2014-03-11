@@ -52,7 +52,39 @@
   height:500px;
 }
 
-#timeline{
+#timeline-container{
+  position:absolute;
+  bottom:0;
   width:100%;
-  height:200px;
+  height:20%;
+}
+
+#timeline{
+  margin-left:2%;
+}
+
+#left-fade{
+  z-index:1;
+  position: absolute;
+  left:0;
+  height:100%;
+  width:10%;
+  background: -webkit-linear-gradient(left, #FFFFFF, transparent);
+}
+
+#right-fade{
+  z-index:1;
+  position:absolute;
+  right:0;
+  height:100%;
+  width:20%;
+  background: -webkit-linear-gradient(right, #FFFFFF, transparent);
+}
+
+div.timeline-axis-text-major{
+  margin-left:2%;
+}
+
+div.timeline-frame{
+  border-left:none;
 }

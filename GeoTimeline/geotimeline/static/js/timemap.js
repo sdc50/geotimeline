@@ -59,7 +59,6 @@ $(window).resize(resize);
 
 function resize(e){
   var height = $(window).height();
-  $('#timeline').height(height * .2);
   $('#map').height(height * .8);
   timeline.setSize('100%', height * .2 + 'px');
 }
