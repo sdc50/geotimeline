@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drawing tools</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas{
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+      #map-canvas{
+      	width: 50%;
+      	display: inline-block;
+      }
+      #eventFormDiv{
+      	height: 100%;
+      	width: 48%;
+      	display: inline-block;
+      	background-color:#008000;
+      	vertical-align: top;
+      	margin: 0px;
+      	padding: 0px;
+      }
+      #postText{
+      	width: 80%;
+      	height: 300px;
+      	
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=drawing"></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script>
+    var drawingManager;
+    var drawingsArray = [];
+    var drawingsCount = -1;
+    var loginName = 'testUser';
+    
+    
+    
+function initialize() {
+  var mapOptions = {
+    center: new google.maps.LatLng(-34.397, 150.644),
+    zoom: 8
+  };
+
+
+  var map = new google.maps.Map(document.getElementById('map-canvas'),
+    mapOptions);
+
+  drawingManager = new google.maps.drawing.DrawingManager({
+    drawingMode: google.maps.drawing.OverlayType.MARKER,
+    drawingControl: true,
+    drawingControlOptions: {
+      position: google.maps.ControlPosition.TOP_CENTER,
+      drawingModes: [
+        google.maps.drawing.OverlayType.MARKER,
+        google.maps.drawing.OverlayType.CIRCLE,
+        google.maps.drawing.OverlayType.POLYGON,
+        google.maps.drawing.OverlayType.POLYLINE,
+        google.maps.drawing.OverlayType.RECTANGLE
+      ]
+    },
+    markerOptions: {
+      icon: 'flagPoint.jpg'
+    },
+    circleOptions: {
+      fillColor: '#ffff00',
+      fillOpacity: 0.5,
+      strokeWeight: 2,
+      clickable: false,
+      editable: true,
+      zIndex: 1
+    }
+  });
+ 
+  drawingManager.setMap(map);
+  $('#eventFormForm').hide();
+  //After creating 'drawingManager' object in if block 
+  google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
+	//this was the original code example I got from:
+	///(http://stackoverflow.com/questions/9853861/getting-list-of-overlay-shapes-currently-on-a-google-map-api-v3)
+      /*if (event.type == google.maps.drawing.OverlayType.CIRCLE) {
+         //Add 'event.overlay', which is Circle, to array
+         drawingsArray.push(event.overlay);
+      }*/
+     //I altered it to a switch statement to get all of our shapes
+     switch(event.type)
+     {
+     	case google.maps.drawing.OverlayType.CIRCLE:
+     	drawingsArray.push({
+     		eventGroup: loginName,
+     		eventTime: null,
+     		eventCategory: null,
+     		eventOverlay: event.overlay,
+     		eventShape: 'circle',
+     		eventTitle: null
+     	});
+     	drawingsCount++;
+     	break;
+     	case google.maps.drawing.OverlayType.MARKER:
+     	drawingsArray.push({
+     		eventGroup: loginName,
+     		eventTime: null,
+     		eventCategory: null,
+     		eventOverlay: event.overlay,
+     		eventShape: 'marker',
+     		eventTitle: null
+ 		});
+ 		drawingsCount++;
+     	break;
+     	case google.maps.drawing.OverlayType.POLYGON:
+     	drawingsArray.push({
+     		eventGroup: loginName,
+     		eventTime: null,
+     		eventCategory: null,
+     		eventOverlay: event.overlay,
+     		eventShape: 'polygon',
+     		eventTitle: null
+     	});
+     	drawingsCount++;
+     	break;
+     	case google.maps.drawing.OverlayType.POLYLINE:
+     	drawingsArray.push({
+     		eventGroup: loginName,
+     		eventTime: null,
+     		eventCategory: null,
+     		eventOverlay: event.overlay,
+     		eventShape: 'polyline',
+     		eventTitle: null
+     	});
+     	drawingsCount++;
+     	break;
+     	case google.maps.drawing.OverlayType.RECTANGLE:
+     	drawingsArray.push({
+     		eventGroup: loginName,
+     		eventTime: null,
+     		eventCategory: null,
+     		eventOverlay: event.overlay,
+     		eventShape: 'rectangle',
+     		eventTitle: null
+     	});
+     	drawingsCount++;
+     	break;
+     }
+     //then I wrote this to bring up a form to make more additions to the event
+     showEventForm();
+  });
+
+}
+
+function showEventForm(){
+	$('#eventFormForm').show();
+	$('#group').val(loginName);
+	var geom = drawingsArray[drawingsCount].eventShape;
+	$('#geometry').val(geom);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+
+
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas">
+    	<!--map goes here-->
+    </div>
+    <div id="eventFormDiv">
+    	<form id="eventFormForm">
+    		<label for="group">Login: </label>
+    		<input type="text" id="group" /><br />
+    		<label for="title">Event Title: </label>
+    		<input type="text" id="title" /><br />
+    		<label for="time">Date/Time: </label>
+    		<input type="datetime" id="time"/><br />
+    		<label for="geometry">Event Geometry: </label>
+    		<select id="geometry">
+    			<option value="prompt">Please Select A Geometry</option>
+    			<option value="circle">circle</option>
+    			<option value="marker">marker</option>
+    			<option value="polyline">polyline</option>
+    			<option value="polygon">polygon</option>
+    			<option value="rectangle">rectangle</option>
+    			<option value="none">none</option>
+    		</select>
+    		<label for="category">Category: </label>
+    		<select id="category">
+    			<option value="prompt">Please Select A Category</option>
+    			<option value="cat1">category 1</option>
+    			<option value="cat2">category 2</option>
+    			<option value="cat3">category 3</option>
+    			<option value="new">NEW</option>
+    		</select>
+    		<input type="text" /><br />
+    		<label for="postText">Enter your event description here:</label><br />
+    		<textarea id="postText">
+    		</textarea><br />
+    		<input type="submit" value="Add Event"/>
+    	</form>
+    </div>
+  </body>
+</html>
