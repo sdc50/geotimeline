@@ -8,8 +8,43 @@
 
 
 {% block content %}
-  <section class='index-section'>
-    <a href="{{request.application_url}}/timemap" class="btn btn-default btn-lg" role="button">Get Started</a>
+  <section class='map-img'>
+    <img id='timeline-img' src="{{request.static_url('geotimeline:static/img/timeline.png')}}">
   </section>
   
+  <section class='blank'></section>
+  
+  
+  <section class="features">
+    <div class="bucket">
+      <div class="feature one">
+        <img src="http://placehold.it/250x250" alt="">
+        <h4>Mapping</h4>
+        <span>Map your life events</span>
+      </div>
+      <div class="feature two">
+        <img src="http://placehold.it/250x250" alt="">
+        <h4>Timeline</h4>
+        <span>See your life's conology</span>
+      </div>
+      <div class="feature three">
+        <img src="http://placehold.it/250x250" alt="">
+        <h4>Blog</h4>
+        <span>Keep a travel log of your adventures</span>
+      </div>
+    </div>
+  </section>
+  
+  <section class='get-started'>
+    <a href="{{request.application_url}}/timemap" class="btn btn-default btn-lg" role="button">Get Started</a>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(window).scroll(function(e){
+      var top = $(this).scrollTop();
+      $('#timeline-img').css('right',top*2 - 100);
+    });
+  </script>
 {% endblock %}
