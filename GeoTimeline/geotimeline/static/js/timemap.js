@@ -51,7 +51,7 @@ $(window).resize(resize);
 
 function resize(e){
   var height = $(window).height();
-  $('#map').height(height * 1);
+  $('#map').height(height * .8);
   timeline.checkResize();
 }
 
@@ -97,13 +97,13 @@ function resize(e){
         // specify options
         var options = {
             width:  "100%",
-            height: "auto",
+            height: "100%",
             axisOnTop: true,
             eventMargin: 10,  // minimal margin between events
             eventMarginAxis: 0, // minimal margin beteen events and the axis
             editable: false,
-            showNavigation: false,
-            stackEvents: true
+            showNavigation: true,
+            stackEvents: false
         };
 
         // Instantiate our timeline object.
