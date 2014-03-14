@@ -37,17 +37,18 @@
     var drawingsArray = [];
     var drawingsCount = -1;
     var loginName = 'testUser';
-    
+    var map;
+    var mapOptions;
     
     
 function initialize() {
-  var mapOptions = {
+  mapOptions = {
     center: new google.maps.LatLng(-34.397, 150.644),
     zoom: 8
   };
 
 
-  var map = new google.maps.Map(document.getElementById('map-canvas'),
+  map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
 
   drawingManager = new google.maps.drawing.DrawingManager({
@@ -57,10 +58,10 @@ function initialize() {
       position: google.maps.ControlPosition.TOP_CENTER,
       drawingModes: [
         google.maps.drawing.OverlayType.MARKER,
-        google.maps.drawing.OverlayType.CIRCLE,
+        //google.maps.drawing.OverlayType.CIRCLE,
         google.maps.drawing.OverlayType.POLYGON,
         google.maps.drawing.OverlayType.POLYLINE,
-        google.maps.drawing.OverlayType.RECTANGLE
+        //google.maps.drawing.OverlayType.RECTANGLE
       ]
     },
     markerOptions: {
@@ -73,6 +74,14 @@ function initialize() {
       clickable: false,
       editable: true,
       zIndex: 1
+    },
+    polygonOptions: {
+		//path:myTrip,
+  		strokeColor:"#0000FF",
+  		strokeOpacity:0.8,
+  		strokeWeight:2,
+  		fillColor:"#0000FF",
+  		fillOpacity:0.4
     }
   });
  
@@ -89,51 +98,76 @@ function initialize() {
      //I altered it to a switch statement to get all of our shapes
      switch(event.type)
      {
-     	case google.maps.drawing.OverlayType.CIRCLE:
+     	/*case google.maps.drawing.OverlayType.CIRCLE:
+     	var newOv = event.overlay;
+     	var newPath = newOv.getPath();
+     	var encPath = google.maps.geometry.encoding.encodePath(newPath);
      	drawingsArray.push({
      		eventGroup: loginName,
      		eventTime: null,
      		eventCategory: null,
      		eventOverlay: event.overlay,
      		eventShape: 'circle',
-     		eventTitle: null
+     		eventTitle: null,
+     		eventEncodedPath: newPath,
      	});
      	drawingsCount++;
-     	break;
+     	break;*/
      	case google.maps.drawing.OverlayType.MARKER:
+     	var newOv = event.overlay;
+     	var newPos = newOv.getPosition();
+     	var posArr = [];
+     	var newLatLng = new google.maps.LatLng(newPos.k,newPos.A);
+     	posArr.push(newLatLng);
+     	var encPos = google.maps.geometry.encoding.encodePath(posArr);
      	drawingsArray.push({
      		eventGroup: loginName,
-     		eventTime: null,
+     		eventStart: null,
+     		eventEnd: null,
      		eventCategory: null,
+     		eventColor: null,
      		eventOverlay: event.overlay,
      		eventShape: 'marker',
-     		eventTitle: null
- 		});
+     		eventTitle: null,
+     		eventGeometry: encPos,
+     	});
  		drawingsCount++;
      	break;
      	case google.maps.drawing.OverlayType.POLYGON:
+     	var newOv = event.overlay;
+     	var newPath = newOv.getPath();
+     	var encPath = google.maps.geometry.encoding.encodePath(newPath);
      	drawingsArray.push({
      		eventGroup: loginName,
-     		eventTime: null,
+     		eventStart: null,
+     		eventEnd: null,
      		eventCategory: null,
+     		eventColor: null,
      		eventOverlay: event.overlay,
      		eventShape: 'polygon',
-     		eventTitle: null
+     		eventTitle: null,
+     		eventGeometry: encPath,
      	});
      	drawingsCount++;
      	break;
      	case google.maps.drawing.OverlayType.POLYLINE:
+     	var newOv = event.overlay;
+     	var newPath = newOv.getPath();
+     	var encPath = google.maps.geometry.encoding.encodePath(newPath);
      	drawingsArray.push({
      		eventGroup: loginName,
-     		eventTime: null,
+     		eventStart: null,
+     		eventEnd: null,
      		eventCategory: null,
+     		eventColor: null,
      		eventOverlay: event.overlay,
      		eventShape: 'polyline',
-     		eventTitle: null
+     		eventTitle: null,
+     		eventGeometry: encPath,
      	});
      	drawingsCount++;
      	break;
-     	case google.maps.drawing.OverlayType.RECTANGLE:
+     	/*case google.maps.drawing.OverlayType.RECTANGLE:
      	drawingsArray.push({
      		eventGroup: loginName,
      		eventTime: null,
@@ -143,7 +177,7 @@ function initialize() {
      		eventTitle: null
      	});
      	drawingsCount++;
-     	break;
+     	break;*/
      }
      //then I wrote this to bring up a form to make more additions to the event
      showEventForm();
