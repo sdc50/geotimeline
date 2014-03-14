@@ -21,21 +21,57 @@ from sqlalchemy.exc import DBAPIError
 
 from .models import (
     DBSession,
+    User,
     Event,
+    Collection,
+    Tag,
     )
 
+from pyramid.renderers import JSON
+
+import datetime
+
+json_renderer = JSON()
+def datetime_adapter(obj, request):
+    return obj.isoformat()
+json_renderer.add_adapter(datetime.datetime, datetime_adapter)
 
 @view_config(route_name='home', renderer='index.html', permission='view')
-def my_view(request):
+def home(request):
   return dict(logged_in = authenticated_userid(request))
 
 @view_config(route_name='map', renderer='timemap.html', permission='edit')
 def geotimeline(request):
+    if request.method == 'POST':
+      print(request.POST)
+      #add event to database
+      success = True
+      return {'success':success}
+    else:
+      saveEventUrl = request.route_url('map')
+      getCollectionsUrl = request.route_url('events')
+      return {'saveEventUrl': saveEventUrl, 'getCollectionsUrl':getCollectionsUrl, 'logged_in': authenticated_userid(request)}
+
+@view_config(route_name='events', renderer='json', permission='edit')
+def getUserEvents(request):
     try:
-        one = DBSession.query(Event).filter(Event.name == 'one').first()
+        userid = authenticated_userid(request)
+        user = DBSession.query(User).filter(User.userName==userid).first()
+        collections = user.collections
     except DBAPIError:
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'one': one, 'project': 'GeoTimeline', 'logged_in': authenticated_userid(request)}
+    return {'collections': collections}
+  
+@view_config(route_name='friends-events', renderer='json', permission='edit')
+def getFriendsEvents(request):
+    try:
+        userid = authenticated_userid(request)
+        user = DBSession.query(User).filter(User.userName==userid).first()
+        collections = user.collections
+    except DBAPIError:
+        return Response(conn_err_msg, content_type='text/plain', status_int=500)
+    return {'collections': collections}
+        
   
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem
@@ -67,7 +103,9 @@ def login(request):
     if 'form.submitted' in request.params:
         login = request.params['login']
         password = request.params['password']
-        if USERS.get(login) == password:
+        user = DBSession.query(User).filter_by(userName=login).first()
+        #if USERS.get(login) == password:
+        if user and user.password == password:
             headers = remember(request, login)
             return HTTPFound(location = came_from,
                              headers = headers)

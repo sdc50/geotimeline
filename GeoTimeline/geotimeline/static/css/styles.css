@@ -6,7 +6,7 @@ html,body{
   min-height:100%;
   position:relative;
   padding-top:100px; /*height of header*/
-  padding-bottom: 40px; /*height of footer*/
+  padding-bottom: 60px; /*height of footer*/
 }
 
 header{
@@ -42,14 +42,12 @@ header a:hover{
 
 #usr-group button, #usr-group{
   border-color:#C94D5A;
-  background-color:#C94D5A;
-  background-color:#BE2939;
   background-color:transparent;
   color:#FFFFFF;
 }
 
 #usr-group:hover, #usr-group:hover button{
-  background-color:#C94D5A;
+  background-color:#BE2939;
   border-color:#96000B;
 }
 
@@ -57,12 +55,8 @@ header a:hover{
   width:100%;
 }
 
-section{
-  margin:0 auto;
-}
 
 .map-img{
-  overflow:hidden;
   position:fixed;
   top:0;
   z-index:-1;
