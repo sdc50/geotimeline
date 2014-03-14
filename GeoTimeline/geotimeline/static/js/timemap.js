@@ -51,7 +51,7 @@ $(window).resize(resize);
 
 function resize(e){
   var height = $(window).height();
-  $('#map').height(height * 1);
+  $('#map').height(height * .8);
   timeline.checkResize();
 }
 
@@ -71,7 +71,7 @@ function resize(e){
         data.addColumn('datetime', 'start');
         data.addColumn('datetime', 'end');
         data.addColumn('string', 'content');
-        data.addColumn('string', 'group');
+        // data.addColumn('string', 'group');
         data.addColumn('string', 'className');
 
         // create some random data
@@ -81,29 +81,31 @@ function resize(e){
             var name = getRandomName();
             var now = new Date();
             var end = new Date(now.getTime() - 12 * 60 * 60 * 1000);
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < 10; i++) {
                 var start = new Date(end.getTime() + Math.round(Math.random() * 5) * 60 * 60 * 1000);
                 var end = new Date(start.getTime() + Math.round(4 + Math.random() * 5) * 60 * 60 * 1000);
 
                 var r = Math.round(Math.random() * 2);
-                var availability = (r === 0 ? "Unavailable" : (r === 1 ? "Available" : "Maybe"));
+                var availability = (r === 0 ? "WithBob" : (r === 1 ? "WithKids" : "Alone"));
                 var className = availability.toLowerCase();
-                var content = availability;
+                var content = getRandomVacation();
                 var group = name;
-                data.addRow([start, end, content, group, className]);
+                data.addRow([start, end, content,  className]);
             }
         }
 
         // specify options
         var options = {
             width:  "100%",
-            height: "auto",
+            height: "100%",
             axisOnTop: true,
             eventMargin: 10,  // minimal margin between events
             eventMarginAxis: 0, // minimal margin beteen events and the axis
-            editable: false,
-            showNavigation: false,
-            stackEvents: true
+            editable: true,
+            showNavigation: true,
+            stackEvents: true,
+            zoomMin: 54000000,
+            zoomMax: 3153600000000
         };
 
         // Instantiate our timeline object.
@@ -118,11 +120,32 @@ function resize(e){
         // Set a customized visible range
         var start = new Date(now.getTime() - 4 * 60 * 60 * 1000);
         var end = new Date(now.getTime() + 8 * 60 * 60 * 1000);
-        timeline.setVisibleChartRange(start, end);
+        timeline.setVisibleChartRangeAuto();
+        
+		bindHoverEvents();
+		
     }
-
+	
+	function bindHoverEvents() {
+		$('.timeline-event').each(function(){
+			$(this).hover(
+				  function(){
+				  	$(this).addClass('event_hover');
+				  }, function(){
+				  	$(this).removeClass('event_hover');
+				  });
+		});
+	}
+		
     function getRandomName() {
         var names = ["Algie", "Barney", "Grant", "Mick", "Langdon"];
+
+        var r = Math.round(Math.random() * (names.length - 1));
+        return names[r];
+    }
+    
+	function getRandomVacation() {
+        var names = ["Hawaii", "Germany", "Washington, D.C.", "Dominican Republic", "London"];
 
         var r = Math.round(Math.random() * (names.length - 1));
         return names[r];
