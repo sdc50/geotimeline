@@ -43,7 +43,6 @@ $(function(){
   $('footer').slideToggle();
   timeline = new links.Timeline($('#timeline-container')[0]);
   resize();
-  getCollections();
   validate();
 });
 
@@ -87,7 +86,17 @@ function saveEvent(data){
   });
 }
 
+
+google.setOnLoadCallback(getCollections);
+
 function getCollections(){
+  var data = new google.visualization.DataTable();
+  data.addColumn('datetime', 'start');
+  data.addColumn('datetime', 'end');
+  data.addColumn('string', 'content');
+  // data.addColumn('string', 'group');
+  data.addColumn('string', 'className');
+  
   $.ajax({
     url: getCollectionsUrl,
     cache: false
@@ -96,8 +105,49 @@ function getCollections(){
       userCollections = json.collections;
       for(i=0, len = userCollections.length; i<len; i++){
         console.log(userCollections[i]);
+        start = userCollections[i].events[0].start;
+		start = new Date(start);
+		console.log(start); 
+		
+		end = userCollections[i].events[0].end;
+		end = new Date(end);
+		console.log(end);  
+
+		content = userCollections[i].name;
+		console.log(content);
+		
+		className = userCollections[i].class;
+		console.log(className)
+		
+		data.addRow([start, end, content, className]);	
+		console.log(data)	//Can add group if desired
       }
     });
+
+     // specify options
+     var options = {
+         width:  "100%",
+         height: "100%",
+         axisOnTop: true,
+         eventMargin: 10,  // minimal margin between events
+         eventMarginAxis: 0, // minimal margin beteen events and the axis
+         editable: false,
+         showNavigation: true,
+         stackEvents: true,
+         zoomMin: 54000000,
+         zoomMax: 3153600000000
+     };
+
+     // register event listeners
+     google.visualization.events.addListener(timeline, 'edit', onEdit);
+
+     // Draw our timeline with the created data and options
+     timeline.draw(data, options);
+     
+	// Set visibility on load
+     timeline.setVisibleChartRangeAuto();
+        
+	 bindHoverEvents();
 }
 
 
@@ -106,71 +156,86 @@ function getCollections(){
 //  Random Data Code
 //*********************************************************************************************
 // Set callback to run when API is loaded
-    google.setOnLoadCallback(drawVisualization);
+    // google.setOnLoadCallback(drawVisualization);
+// 
+    // // Called when the Visualization API is loaded.
+    // function drawVisualization() {
+        // // Create and populate a data table.
+        // data = new google.visualization.DataTable();
+        // data.addColumn('datetime', 'start');
+        // data.addColumn('datetime', 'end');
+        // data.addColumn('string', 'content');
+        // // data.addColumn('string', 'group');
+        // data.addColumn('string', 'className');
+// 
+        // // create some random data
+        // //var names = ["Algie", "Barney", "Chris"];
+        // var name = getRandomName();
+        // for (var n = 0, len = 1; n < len; n++) {
+            // var name = getRandomName();
+            // var now = new Date();
+            // var end = new Date(now.getTime() - 12 * 60 * 60 * 1000);
+            // for (var i = 0; i < 10; i++) {
+                // var start = new Date(end.getTime() + Math.round(Math.random() * 5) * 60 * 60 * 1000);
+                // var end = new Date(start.getTime() + Math.round(4 + Math.random() * 5) * 60 * 60 * 1000);
+// 
+                // var r = Math.round(Math.random() * 2);
+                // var availability = (r === 0 ? "WithBob" : (r === 1 ? "WithKids" : "Alone"));
+                // var className = availability.toLowerCase();
+                // var content = getRandomVacation();
+                // var group = name;
+                // data.addRow([start, end, content,  className]);
+//                 
+            // }
+          // console.log(data)
+        // }
+// 
+        // // specify options
+        // var options = {
+            // width:  "100%",
+            // height: "100%",
+            // axisOnTop: true,
+            // eventMargin: 10,  // minimal margin between events
+            // eventMarginAxis: 0, // minimal margin beteen events and the axis
+            // editable: false,
+            // showNavigation: true,
+            // stackEvents: true,
+            // zoomMin: 54000000,
+            // zoomMax: 3153600000000
+// 
+        // };
+// 
+        // // Instantiate our timeline object.
+        // //timeline = new links.Timeline(document.getElementById('mytimeline'));
+// 
+        // // register event listeners
+        // google.visualization.events.addListener(timeline, 'edit', onEdit);
+// 
+        // // Draw our timeline with the created data and options
+        // timeline.draw(data, options);
+// 
+        // // Set a customized visible range
+        // var start = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+        // var end = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+        // timeline.setVisibleChartRangeAuto();
+//         
+		// bindHoverEvents();		
+    // }
+// 		
+    // function getRandomName() {
+        // var names = ["Algie", "Barney", "Grant", "Mick", "Langdon"];
+// 
+        // var r = Math.round(Math.random() * (names.length - 1));
+        // return names[r];
+    // }
+//     
+	// function getRandomVacation() {
+        // var names = ["Hawaii", "Germany", "Washington, D.C.", "Dominican Republic", "London"];
+// 
+        // var r = Math.round(Math.random() * (names.length - 1));
+        // return names[r];
+    // }
 
-    // Called when the Visualization API is loaded.
-    function drawVisualization() {
-        // Create and populate a data table.
-        data = new google.visualization.DataTable();
-        data.addColumn('datetime', 'start');
-        data.addColumn('datetime', 'end');
-        data.addColumn('string', 'content');
-        // data.addColumn('string', 'group');
-        data.addColumn('string', 'className');
-
-        // create some random data
-        //var names = ["Algie", "Barney", "Chris"];
-        var name = getRandomName();
-        for (var n = 0, len = 1; n < len; n++) {
-            var name = getRandomName();
-            var now = new Date();
-            var end = new Date(now.getTime() - 12 * 60 * 60 * 1000);
-            for (var i = 0; i < 10; i++) {
-                var start = new Date(end.getTime() + Math.round(Math.random() * 5) * 60 * 60 * 1000);
-                var end = new Date(start.getTime() + Math.round(4 + Math.random() * 5) * 60 * 60 * 1000);
-
-                var r = Math.round(Math.random() * 2);
-                var availability = (r === 0 ? "WithBob" : (r === 1 ? "WithKids" : "Alone"));
-                var className = availability.toLowerCase();
-                var content = getRandomVacation();
-                var group = name;
-                data.addRow([start, end, content,  className]);
-            }
-        }
-
-        // specify options
-        var options = {
-            width:  "100%",
-            height: "100%",
-            axisOnTop: true,
-            eventMargin: 10,  // minimal margin between events
-            eventMarginAxis: 0, // minimal margin beteen events and the axis
-            editable: false,
-            showNavigation: true,
-            stackEvents: true,
-            zoomMin: 54000000,
-            zoomMax: 3153600000000
-
-        };
-
-        // Instantiate our timeline object.
-        //timeline = new links.Timeline(document.getElementById('mytimeline'));
-
-        // register event listeners
-        google.visualization.events.addListener(timeline, 'edit', onEdit);
-
-        // Draw our timeline with the created data and options
-        timeline.draw(data, options);
-
-        // Set a customized visible range
-        var start = new Date(now.getTime() - 4 * 60 * 60 * 1000);
-        var end = new Date(now.getTime() + 8 * 60 * 60 * 1000);
-        timeline.setVisibleChartRangeAuto();
-        
-		bindHoverEvents();
-		
-    }
-	
 	function bindHoverEvents() {
 		$('.timeline-event').each(function(){
 			$(this).hover(
@@ -181,20 +246,6 @@ function getCollections(){
 				  });
 		});
 	}
-		
-    function getRandomName() {
-        var names = ["Algie", "Barney", "Grant", "Mick", "Langdon"];
-
-        var r = Math.round(Math.random() * (names.length - 1));
-        return names[r];
-    }
-    
-	function getRandomVacation() {
-        var names = ["Hawaii", "Germany", "Washington, D.C.", "Dominican Republic", "London"];
-
-        var r = Math.round(Math.random() * (names.length - 1));
-        return names[r];
-    }
 
     function getSelectedRow() {
         var row = undefined;
