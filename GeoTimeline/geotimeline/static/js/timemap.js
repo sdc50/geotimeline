@@ -2,8 +2,6 @@ google.load("visualization", "1");
 google.maps.event.addDomListener(window, 'load', initialize);
 
 
-
-
 function initialize() {
   var mapDiv = $('#map')[0];
   var map = new google.maps.Map(mapDiv, {
@@ -45,6 +43,8 @@ $(function(){
   $('footer').slideToggle();
   timeline = new links.Timeline($('#timeline-container')[0]);
   resize();
+  getCollections();
+  validate();
 });
 
 $(window).resize(resize);
@@ -55,6 +55,50 @@ function resize(e){
   timeline.checkResize();
 }
 
+function validate(){
+  
+  //get name from name field
+  //get all fields
+  
+  //validate code 
+  
+  data = {name: 'test',
+          content: 'text', 
+          shape: 'point', 
+          geometry: 'encodedString', 
+          start: 'date', 
+          end: 'date',
+          collection: 'My Test Vacation',
+          newCollection: false
+          }; //get event data from form
+      saveEvent(data);
+  //else
+      //send invalid input message
+}
+
+function saveEvent(data){
+  $.ajax({
+    type: "POST",
+    url: saveEventUrl,
+    data: data
+  })
+    .done(function( msg ) {
+      console.log( "Data Saved: " + msg );
+  });
+}
+
+function getCollections(){
+  $.ajax({
+    url: getCollectionsUrl,
+    cache: false
+  })
+    .done(function( json ) {
+      userCollections = json.collections;
+      for(i=0, len = userCollections.length; i<len; i++){
+        console.log(userCollections[i]);
+      }
+    });
+}
 
 
 
@@ -103,7 +147,7 @@ function resize(e){
             eventMarginAxis: 0, // minimal margin beteen events and the axis
             editable: false,
             showNavigation: true,
-            stackEvents: false
+            stackEvents: true
         };
 
         // Instantiate our timeline object.

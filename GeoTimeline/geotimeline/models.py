@@ -4,10 +4,17 @@ from pyramid.security import (
     )
 
 from sqlalchemy import (
+    Table,
     Column,
     Index,
     Integer,
     Text,
+    DateTime,
+    ForeignKey,
+    )
+
+from sqlalchemy.orm import (
+    relationship,
     )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -29,11 +36,100 @@ class RootFactory(object):
     def __init__(self, request):
         pass
 
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    userName = Column('user_name', Text, unique=True)
+    firstName = Column('first_name', Text)
+    lastName = Column('last_name', Text)
+    password = Column(Text)
+    email = Column(Text)
+    collections = relationship('Collection', back_populates='user')
+    
+    def __init__(self,userName, firstName, lastName, password, email):
+        self.userName = userName
+        self.firstName = firstName
+        self.lastName = lastName
+        self.password = password
+        self.email = email
+        
+    def __repr__(self):
+        return "<User(name='%s', first='%s', last='%s', password='%s', email='%s')>" % (
+                                self.userName, self.firstName, self.lastName, self.password, self.email)
+        
+    def __json__(self,request):
+        return {'name':self.userName, 
+                'first':self.firstName, 
+                'last':self.lastName, 
+                'email':self.email}
+    
+
 class Event(Base):
-    __tablename__ = 'event'
+    __tablename__ = 'events'
     id = Column(Integer, primary_key=True)
     name = Column(Text)
-    value = Column(Integer)
+    content = Column(Text)
+    shape = Column(Text)
+    geometry = Column(Text)
+    start = Column(DateTime)
+    end = Column(DateTime)
+    collectionId = Column('collection_id', Integer, ForeignKey('collections.id'))
+    collection = relationship('Collection', back_populates='events')
+    tags = relationship('Tag', secondary='association', back_populates='events')
+    
+    def __init__(self,name, content, shape, geometry, start, end=None):
+        self.name = name
+        self.content = content
+        self.shape = shape
+        self.geometry = geometry
+        self.start = start
+        self.end = end
+        
+    def __repr__(self):
+        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__)
+    
+    def __json__(self,request):
+        return {'name':self.name, 
+                'content':self.content, 
+                'shape':self.shape,
+                'geometry':self.geometry,
+                'start':self.start,
+                'end':self.end}
+    
+    
+class Collection(Base):
+    __tablename__ = 'collections'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    className = Column('class_name', Text)
+    userId = Column('user_id', Integer, ForeignKey('users.id'))
+    user = relationship('User', back_populates='collections')
+    events = relationship('Event', back_populates='collection')
+    
+    def __init__(self, name, className):
+        self.name = name
+        self.className = className
+        
+    def __repr__(self):
+        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__)
+        
+    def __json__(self,request):
+        return {'name':self.name, 
+                'class':self.className, 
+                'user':self.user,
+                'events':self.events}
+    
+class Tag(Base):
+    __tablename__ = 'tags'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    events = relationship('Event', secondary='association', back_populates='tags')
+     
+association_table = Table('association', Base.metadata,
+    Column('event_id', Integer, ForeignKey('events.id')),
+    Column('tag_id', Integer, ForeignKey('tags.id'))
+)
+
 
 
 #Index('my_index', MyModel.name, unique=True, mysql_length=255)
