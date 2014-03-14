@@ -6,7 +6,7 @@ html,body{
   min-height:100%;
   position:relative;
   padding-top:100px; /*height of header*/
-  padding-bottom: 40px; /*height of footer*/
+  padding-bottom: 60px; /*height of footer*/
 }
 
 header{
@@ -17,10 +17,11 @@ header{
   width:100%;
   z-index:1;
   background-color:#BE2939;
+  background: -webkit-linear-gradient(top,  #BE2939,  #96000B);
   color:white;
   text-align:center;
   font-size:50px;
-  box-shadow: 0 1px 10px #888888;
+  box-shadow: 0 1px 10px #96000B;
 }
 
 header a{
@@ -36,28 +37,26 @@ header a:hover{
   position:absolute;
   right:50px;
   top:25px;
+  border-radius: 5px;
 }
 
 #usr-group button, #usr-group{
-  background-color:#C94D5A;
-  background-color:#BE2939;
+  border-color:#C94D5A;
+  background-color:transparent;
   color:#FFFFFF;
 }
 
 #usr-group:hover, #usr-group:hover button{
   background-color:#BE2939;
+  border-color:#96000B;
 }
 
 #content{
   width:100%;
 }
 
-section{
-  margin:0 auto;
-}
 
 .map-img{
-  overflow:hidden;
   position:fixed;
   top:0;
   z-index:-1;
@@ -77,11 +76,20 @@ section{
   height:400px;
 }
 
+.color{
+  height:200px;
+  background-color:#BE2939;
+  background: -webkit-linear-gradient(top,  #BE2939,  #96000B);
+  box-shadow: 0 1px 10px #96000B inset;
+}
+
 .features{
   margin-top:-20px;
-  padding-top:20px;
+  padding-top:50px;
   background-color:#FFFFFF;
-  height:400px;
+  height:500px;
+  z-index:1;
+  box-shadow: 0 1px 10px #888888;
 }
 
 .bucket{
@@ -102,7 +110,7 @@ div.feature img{
 
 .get-started{
   position:relative;
-  height:200px;
+  height:300px;
   background-color:#dddddd;
 }
 
@@ -116,10 +124,12 @@ div.feature img{
 
 footer{
   background-color:#BE2939;
+  background: -webkit-linear-gradient(top,  #BE2939,  #96000B);
   color:white;
   text-align:center;
   position:absolute;
   bottom:0;
   width:100%;
-  padding:10px;
+  padding:20px;
+  box-shadow: 0 1px 10px #96000B;
 }
