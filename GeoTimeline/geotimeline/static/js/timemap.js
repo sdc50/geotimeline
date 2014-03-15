@@ -111,6 +111,7 @@ function getCollections(){
       collectionList = userCollections.map(function(item){return {'name':item.name, 'id':item.id}});
       console.log(collectionList);
       for(i=0, len = userCollections.length; i<len; i++){
+        start = userCollections[i].events[0].start;
     		start = new Date(start);
     		console.log(start); 
     		
