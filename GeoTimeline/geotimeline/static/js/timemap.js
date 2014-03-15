@@ -62,14 +62,18 @@ function validate(){
   
   //validate code 
   
+  var start = new Date();
+  var end = new Date(start.getTime() + Math.round(4 + Math.random() * 5) * 60 * 60 * 1000);
+  
   data = {name: 'test',
           content: 'text', 
           shape: 'point', 
           geometry: 'encodedString', 
-          start: 'date', 
-          end: 'date',
-          collection: 'My Test Vacation',
-          newCollection: false
+          start: start.toJSON(),
+          end: end.toJSON(),
+          collectionId: 1,
+          collection: null,//'My Test Vacation3',
+          color: null//'#aabbcc' 
           }; //get event data from form
       saveEvent(data);
   //else
@@ -83,7 +87,7 @@ function saveEvent(data){
     data: data
   })
     .done(function( msg ) {
-      console.log( "Data Saved: " + msg );
+      console.log( "Data Saved: " + msg.msg );
   });
 }
 
@@ -94,9 +98,20 @@ function getCollections(){
   })
     .done(function( json ) {
       userCollections = json.collections;
+      
+      collectionList = userCollections.map(function(item){return {'name':item.name, 'id':item.id}});
+      console.log(collectionList);
       for(i=0, len = userCollections.length; i<len; i++){
-        console.log(userCollections[i]);
+        collection = userCollections[i];
+        name = collection.name;
+        color = collection.color;
+        events = collection.events;
+        date = new Date(events[0].start);
+        console.log(date);
       }
+    })
+    .fail(function( textStatus ) {
+      console.log( "Request failed: " + textStatus.toString() );
     });
 }
 

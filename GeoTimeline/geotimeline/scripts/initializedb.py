@@ -40,7 +40,7 @@ def main(argv=sys.argv):
     Base.metadata.create_all(engine)
     with transaction.manager:
         testUser = User('test','Mr.','Test', 'test', 'test@example.com')
-        collection = Collection('My Test Vacation', 'test-vacation')
+        collection = Collection('My Test Vacation', '#112233')
         startTime = datetime(2014, 1, 21, 16, 30)
         endTime = datetime(2014, 1, 22, 6, 30)
         event = Event(name='Travel', content='I test traveled to the test location.', shape='polyline', geometry='encodedstring', start=startTime, end=endTime)

@@ -86,7 +86,7 @@ class Event(Base):
         self.end = end
         
     def __repr__(self):
-        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__)
+        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__( None))
     
     def __json__(self,request):
         return {'name':self.name, 
@@ -101,21 +101,22 @@ class Collection(Base):
     __tablename__ = 'collections'
     id = Column(Integer, primary_key=True)
     name = Column(Text)
-    className = Column('class_name', Text)
+    color = Column(Text)
     userId = Column('user_id', Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='collections')
     events = relationship('Event', back_populates='collection')
     
-    def __init__(self, name, className):
+    def __init__(self, name, color):
         self.name = name
-        self.className = className
+        self.color = color
         
     def __repr__(self):
-        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__)
+        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__(None))
         
     def __json__(self,request):
-        return {'name':self.name, 
-                'class':self.className, 
+        return {'name':self.name,
+                'id':self.id, 
+                'color':self.color, 
                 'user':self.user,
                 'events':self.events}
     

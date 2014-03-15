@@ -31,6 +31,7 @@ from pyramid.renderers import JSON
 
 import datetime
 
+
 json_renderer = JSON()
 def datetime_adapter(obj, request):
     return obj.isoformat()
@@ -42,18 +43,12 @@ def home(request):
 
 @view_config(route_name='map', renderer='timemap.html', permission='edit')
 def geotimeline(request):
-    if request.method == 'POST':
-      print(request.POST)
-      #add event to database
-      success = True
-      return {'success':success}
-    else:
-      saveEventUrl = request.route_url('map')
-      getCollectionsUrl = request.route_url('events')
-      return {'saveEventUrl': saveEventUrl, 'getCollectionsUrl':getCollectionsUrl, 'logged_in': authenticated_userid(request)}
+    saveEventUrl = request.route_url('save')
+    getCollectionsUrl = request.route_url('collections')
+    return {'saveEventUrl': saveEventUrl, 'getCollectionsUrl':getCollectionsUrl, 'logged_in': authenticated_userid(request)}
 
-@view_config(route_name='events', renderer='json', permission='edit')
-def getUserEvents(request):
+@view_config(route_name='collections', renderer='json', permission='edit')
+def getUserCollections(request):
     try:
         userid = authenticated_userid(request)
         user = DBSession.query(User).filter(User.userName==userid).first()
@@ -62,16 +57,39 @@ def getUserEvents(request):
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
     return {'collections': collections}
   
-@view_config(route_name='friends-events', renderer='json', permission='edit')
-def getFriendsEvents(request):
+@view_config(route_name='save', renderer='json', permission='edit')
+def saveEvent(request):
     try:
         userid = authenticated_userid(request)
         user = DBSession.query(User).filter(User.userName==userid).first()
-        collections = user.collections
+        
+        params = request.POST
+        name = params['name']
+        content = params['content'] 
+        shape = params['shape']
+        geometry = params['geometry']
+        start = params['start'] 
+        end = params['end']
+        startDate = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S.%fZ')
+        endDate = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
+        collectionId = params['collectionId']
+        #print('****************************', start, startDate)
+        if collectionId:
+            c = DBSession.query(Collection).filter(Collection.id==collectionId).first()
+        else:
+            collection = params['collection']
+            color = params['color']
+            c = Collection(collection, color)
+            user.collections.append(c)
+        
+        event = Event(name, content, shape, geometry, startDate, endDate)
+        c.events.append(event)
+        DBSession.add(c)
+        return {'msg':'success'}
     except DBAPIError:
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
     return {'collections': collections}
-        
+    
   
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem
