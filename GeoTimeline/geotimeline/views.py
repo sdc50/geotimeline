@@ -44,18 +44,19 @@ def home(request):
 @view_config(route_name='map', renderer='timemap.html', permission='edit')
 def geotimeline(request):
     saveEventUrl = request.route_url('save')
-    getCollectionsUrl = request.route_url('collections')
-    return {'saveEventUrl': saveEventUrl, 'getCollectionsUrl':getCollectionsUrl, 'logged_in': authenticated_userid(request)}
+    getEventsUrl = request.route_url('events')
+    return {'saveEventUrl': saveEventUrl, 'getEventsUrl':getEventsUrl, 'logged_in': authenticated_userid(request)}
 
-@view_config(route_name='collections', renderer='json', permission='edit')
-def getUserCollections(request):
+@view_config(route_name='events', renderer='json', permission='edit')
+def getUserEvents(request):
     try:
         userid = authenticated_userid(request)
         user = DBSession.query(User).filter(User.userName==userid).first()
         collections = user.collections
+        events = user.events
     except DBAPIError:
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'collections': collections}
+    return {'collections': collections, 'events': events}
   
 @view_config(route_name='save', renderer='json', permission='edit')
 def saveEvent(request):
@@ -84,6 +85,7 @@ def saveEvent(request):
         
         event = Event(name, content, shape, geometry, startDate, endDate)
         c.events.append(event)
+        user.events.append(event) #TODO - sqlalchemy? (see initializedb)
         DBSession.add(c)
         return {'msg':'success'}
     except DBAPIError:

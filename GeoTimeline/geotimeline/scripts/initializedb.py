@@ -41,9 +41,11 @@ def main(argv=sys.argv):
     with transaction.manager:
         testUser = User('test','Mr.','Test', 'test', 'test@example.com')
         collection = Collection('My Test Vacation', '#112233')
-        startTime = datetime(2014, 1, 21, 16, 30)
-        endTime = datetime(2014, 1, 22, 6, 30)
+        startTime = datetime(2014, 3, 15, 16, 30)
+        endTime = datetime(2014, 3, 16, 6, 30)
         event = Event(name='Travel', content='I test traveled to the test location.', shape='polyline', geometry='encodedstring', start=startTime, end=endTime)
+        
         collection.events.append(event)
         testUser.collections.append(collection)
+        testUser.events.append(event) #TODO sqlalchemy should take care of this.  I need to figure out how to keep it in sync.
         DBSession.add(testUser)
