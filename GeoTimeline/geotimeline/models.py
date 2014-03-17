@@ -12,7 +12,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     )
-
+ 
 from sqlalchemy.orm import (
     relationship,
     )
@@ -86,7 +86,7 @@ class Event(Base):
         self.end = end
         
     def __repr__(self):
-        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__( None))
+        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__(None))
     
     def __json__(self,request):
         return {'name':self.name, 
