@@ -193,7 +193,7 @@ function showEventForm(){
 }
 google.maps.event.addDomListener(window, 'load', initialize);
 
-/*write function which accepts a collection array of this type
+/*write function which accepts a collection array of this type and creates all of the map overlays
  * name
  * color
  * user
@@ -205,7 +205,87 @@ google.maps.event.addDomListener(window, 'load', initialize);
  * geometry
  * start
  * end
- * 
+ */
+function drawCollection(collectionArray){ //? is this supposed to handle an array of collections or just one collection?
+	//set variables for the collection
+	var collName = collectionArray[0];
+	var collColor = collectionArray[1];
+	var collUser = collectionArray[2];
+	var collEvents = collectionArray[3]; //this is an array of events
+	//now draw each event in the collection
+	for (var i=0; i<collEvents.length; i++){
+		var evtName = collEvents[i].name;
+		var evtShape = collEvents[i].shape;
+		var evtStart = collEvents[i].start;
+		var evtEnd = collEvents[i].end;
+		//decode the geometry
+		var evtGeometry = collEvents[i].geometry;
+		var decodedGeom = google.maps.geometry.encoding.decodePath(evtGeometry);
+		//draw event-i
+		var eventi;
+		switch(evtShape){
+			case 'marker':
+			//do it here
+			eventi = new google.maps.Polyline({
+				map: map,
+				//the position is a special case here. The markers have an array of only one item which is a LatLng google maps object
+				//the markers do not accept an array for the position like the polyline and polygon so you need to refer to the LatLng
+				//object directly which is index 0.
+				position: decodedGeom[0],
+				title: evtName,
+				collection: collName,
+				user: collUser,
+				start: evtStart,
+				end: evtEnd,
+			});
+			break;
+			case 'polygon':
+			//draw it
+			eventi = new google.maps.Polyline({
+				map: map,
+				//the polygon overlays accept an array of LatLng google maps objects for the path
+				//the polygon uses paths incase there are more than one. If only one array of LatLng objects 
+				//exists you could put the array in the paths or path attribute and it wouldn't matter
+				//we use paths make sure we are correct in either instance.
+				paths: decodedGeom,
+				geodesic: true,
+				strokeColor: collColor,
+				fillColor: collColor,
+				strokeOpacity: 1.0,
+				fillOpacity: 0.5,
+				strokeWeight: 2.0,
+				title: evtName,
+				collection: collName,
+				user: collUser,
+				start: evtStart,
+				end: evtEnd,
+			});
+			break;
+			case 'polyline':
+			//draw it
+			eventi = new google.maps.Polyline({
+				map: map,
+				//this is similar to the paths attribute in the polygons. See above.
+				path: decodedGeom,
+				geodesic: true,
+				strokeColor: collColor,
+				strokeOpacity: 1.0,
+				strokeWeight: 2.0,
+				title: evtName,
+				collection: collName,
+				user: collUser,
+				start: evtStart,
+				end: evtEnd,
+			});
+			break;
+			default:
+			//do something else to show that the geometry was not recognized
+		}
+	}
+}
+
+
+/*
  * write a function to send event information with this data:
  * name: string
  * content: string
