@@ -125,22 +125,11 @@ div.timeline-content{
     background-color:white;
 }
 
-div.withbob {
-    background-color: #F03030; /* red */
-    border-color: #bd2828;     /* red */
-}
-div.withkids {
-    background-color: #1AA11A; /* green */
-    border-color: #136e13;     /* green */
-}
-div.alone {
-    background-color: #FFA500; /* orange */
-    border-color: #cc8100;     /* orange */
-}
 
 div.event_hover{
-	background-color:#666666 ; 
-    border-color:#888888 ;     
+	/*background-color:#666666 ; 
+    border-color:#888888 ;*/ 
+    opacity:1;    
 }
 
 /*div.timeline-content div:nth-child(5)>div:hover{

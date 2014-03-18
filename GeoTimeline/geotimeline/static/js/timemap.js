@@ -86,7 +86,7 @@ function addEventsToTimeline(events){
               'end': new Date(item.end),
               'content': item.name,
               //'group': item.user,
-              'className': item.collection.name,  //TODO - assign classes to collections
+              'className': item.collection.color,  //TODO - assign classes to collections
               'id':item.id} 
     });
     
@@ -96,17 +96,35 @@ function addEventsToTimeline(events){
      
     // Set visibility on load
     timeline.setVisibleChartRangeAuto();
-        
+    
+    addColorStyle();  
+      
     bindHoverEvents();
+}
+
+function addColorStyle () {
+	$('.timeline-event').each(function(){
+		$(this).filter(function(){
+			var classes = this.className.split(" ");
+			for (var i=0, len = classes.length; i<len; i++){
+				if (/^#/.test(classes[i])){
+					$(this).css({"background-color": classes[i], "border-color": classes[i], "opacity": "0.5"})
+				}
+			}
+		})
+	})
 }
 
 function bindHoverEvents() {
   $('.timeline-event').each(function(){
     $(this).hover(
         function(){
-          $(this).addClass('event_hover');
+        	$(this).css({"opacity":"1"});
+        	// $(this).addClass('event_hover');
         }, function(){
-          $(this).removeClass('event_hover');
+        	$(this).css({"opacity":"0.5"});
+        	// $(this).removeClass('event_hover');
+        	addColorStyle();
         });
   });
 }
