@@ -38,7 +38,7 @@ def main(global_config, **settings):
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('map', '/timemap')
-    config.add_route('collections', '/getCollections')
+    config.add_route('events', '/getCollections')
     config.add_route('save', '/saveEvent')
     #config.add_route('friends-events', '/getFriendsEvents')
     config.scan()

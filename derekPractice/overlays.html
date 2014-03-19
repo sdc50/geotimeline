@@ -216,7 +216,80 @@ google.maps.event.addDomListener(window, 'load', initialize);
  * start
  * end
  */
-function drawCollection(collectionArray){ //? is this supposed to handle an array of collections or just one collection?
+//this is going to contain all the overlay events added from the database
+var userEvents = [];
+function addEventsToMap(events){
+	for (var e=0; e<events.length; e++){
+		var evente;
+		var sColl = events[e].collection;
+		var sColor = events[e].color;
+		var sUser = events[e].user;
+		var sShape = events[e].shape;
+		var tStart = events[e].start;
+		var tEnd = events[e].end;
+		var sTitle = events[e].title;
+		var aCodedGeom = events[e].geometry;
+		var aDecodGeom = google.maps.geometry.encoding.decodePath(aCodedGeom);
+		switch(sShape){
+			case 'marker':
+			//make marker
+			evente = new google.maps.Marker({
+				//map:map,
+				color: sColor,
+				position: aDecodGeom[0],
+				title: sTitle,
+				collection: sColl,
+				user: sUser,
+				start: tStart,
+				end: tEnd,
+			});
+			userEvents.push(evente);
+			break;
+			case 'polygon':
+			//make polygon
+			evente = new google.maps.Polygon({
+				//map:map,
+				paths: aDecodGeom,
+				geodesic: true,
+				strokeColor: sColor,
+				fillColor: sColor,
+				strokeOpacity: 1.0,
+				fillOpacity: 0.5,
+				strokeWeight: 2.0,
+				title: sTitle,
+				collection: sColl,
+				user: sUser,
+				start: tStart,
+				end: tEnd,
+			});
+			userEvents.push(evente);
+			break;
+			case 'polyline':
+			//make polyline
+			evente = new google.maps.Polyline({
+				//map:map,
+				path: aDecodGeom,
+				geodesic: true,
+				strokeColor: sColor,
+				strokeOpacity: 1.0,
+				strokeWeight: 2.0,
+				title: sTitle,
+				collection: sColl,
+				user: sUser,
+				start: tStart,
+				end: tEnd,
+			});
+			userEvents.push(evente);
+			break;
+		}
+	}
+	//now add all of the events in the evente array to the map
+	for (var o=0; o<userEvents.length; o++){
+		userEvents[o].setMap(map);
+	}
+}
+//this is the old one
+/*function drawCollection(collectionArray){ //? is this supposed to handle an array of collections or just one collection?
 	//set variables for the collection
 	var collName = collectionArray[0];
 	var collColor = collectionArray[1];
@@ -292,7 +365,7 @@ function drawCollection(collectionArray){ //? is this supposed to handle an arra
 			//do something else to show that the geometry was not recognized
 		}
 	}
-}
+}*/
 
 
 /*
@@ -346,4 +419,5 @@ function drawCollection(collectionArray){ //? is this supposed to handle an arra
     	</form>
     </div>
   </body>
+  <script src="mockData.js"></script>
 </html>

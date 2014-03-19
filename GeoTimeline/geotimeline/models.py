@@ -12,7 +12,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     )
-
+ 
 from sqlalchemy.orm import (
     relationship,
     )
@@ -45,6 +45,7 @@ class User(Base):
     password = Column(Text)
     email = Column(Text)
     collections = relationship('Collection', back_populates='user')
+    events = relationship('Event', back_populates='user')
     
     def __init__(self,userName, firstName, lastName, password, email):
         self.userName = userName
@@ -75,7 +76,10 @@ class Event(Base):
     end = Column(DateTime)
     collectionId = Column('collection_id', Integer, ForeignKey('collections.id'))
     collection = relationship('Collection', back_populates='events')
+    userId = Column('user_id', Integer, ForeignKey('users.id'))
+    user = relationship('User', back_populates='events')
     tags = relationship('Tag', secondary='association', back_populates='events')
+    
     
     def __init__(self,name, content, shape, geometry, start, end=None):
         self.name = name
@@ -86,7 +90,7 @@ class Event(Base):
         self.end = end
         
     def __repr__(self):
-        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__( None))
+        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__(None))
     
     def __json__(self,request):
         return {'name':self.name, 
@@ -94,7 +98,8 @@ class Event(Base):
                 'shape':self.shape,
                 'geometry':self.geometry,
                 'start':self.start,
-                'end':self.end}
+                'end':self.end,
+                'collection':self.collection}
     
     
 class Collection(Base):
@@ -117,8 +122,8 @@ class Collection(Base):
         return {'name':self.name,
                 'id':self.id, 
                 'color':self.color, 
-                'user':self.user,
-                'events':self.events}
+                'user':self.user}
+                #'events':self.events}
     
 class Tag(Base):
     __tablename__ = 'tags'
