@@ -14,7 +14,7 @@ $(function(){
   
   getEvents();
 
-  //validate();
+  // validate();
   
   $(window).resize(resize);
 });
@@ -86,7 +86,7 @@ function addEventsToTimeline(events){
               'end': new Date(item.end),
               'content': item.name,
               //'group': item.user,
-              'className': item.collection.color,  //TODO - assign classes to collections
+              'className': "row" + item.id,  //TODO - assign classes to collections
               'id':item.id} 
     });
     
@@ -99,35 +99,48 @@ function addEventsToTimeline(events){
     
     addColorStyle();  
       
-    bindHoverEvents();
+    // bindHoverEvents();
 }
 
 function addColorStyle () {
+	var overlay;
 	$('.timeline-event').each(function(){
 		$(this).filter(function(){
 			var classes = this.className.split(" ");
 			for (var i=0, len = classes.length; i<len; i++){
-				if (/^#/.test(classes[i])){
-					$(this).css({"background-color": classes[i], "border-color": classes[i], "opacity": "0.5"})
+				if (/row\d+/.test(classes[i])){
+					// $(this).css({"background-color": classes[i], "border-color": classes[i], "opacity": "0.5"})
+					var id = classes[i].split("row")[1];
+					console.log(id);
+					overlay = userEvents[id-1]
+					var color = overlay.collection.color;
+					$(this).css({"background-color": color, "opacity": "0.75"})
+					//TODO change the userEvents to just use the id that is passed from the object and remove the "-1"
+					console.log(color);
 				}
 			}
 		})
-	})
+		.hover(function(){
+        	overlay.highlightOn();
+        }, function(){
+        	overlay.hightlightOff();
+        });
+	});
 }
 
-function bindHoverEvents() {
-  $('.timeline-event').each(function(){
-    $(this).hover(
-        function(){
-        	$(this).css({"opacity":"1"});
-        	// $(this).addClass('event_hover');
-        }, function(){
-        	$(this).css({"opacity":"0.5"});
-        	// $(this).removeClass('event_hover');
-        	addColorStyle();
-        });
-  });
-}
+// function bindHoverEvents() {
+  // $('.timeline-event').each(function(){
+    // $(this).hover(
+        // function(){
+        	// $(this).css({"opacity":"1"});
+        	// console.log(this);
+        	// // $(this).addClass('event_hover');
+        // }, function(){
+        	// $(this).css({"opacity":"0.5"});
+        	// // $(this).removeClass('event_hover');
+        // });
+  // });
+// }
 
 function resize(e){
   var height = $(window).height();
@@ -141,8 +154,8 @@ function validate(){
   //get all fields
   
   //validate code 
-  
-  var start = new Date();
+  var base = new Date()
+  var start = new Date(base.getTime() + Math.round(4 + Math.random() * 5) * 60 * 60 * 1000);
   var end = new Date(start.getTime() + Math.round(4 + Math.random() * 5) * 60 * 60 * 1000);
   
   data = {name: 'test',
