@@ -131,7 +131,19 @@ function addEventsToMap(events){
 				user: sUser,
 				start: tStart,
 				end: tEnd,
-			});
+				highlightOn: function(){
+						this.setAnimation(google.maps.Animation.BOUNCE);
+					},
+					highlightOff: function(){
+						this.setAnimation(null);
+					},
+				});
+				google.maps.event.addListener(evente, 'mouseover', function(){
+					this.highlightOn();
+				});
+				google.maps.event.addListener(evente, 'mouseout', function(){
+					this.highlightOff();
+				});
 			userEvents.push(evente);
 			break;
 			case 'polygon':
@@ -150,6 +162,18 @@ function addEventsToMap(events){
 				user: sUser,
 				start: tStart,
 				end: tEnd,
+				highlightOn: function(){
+					this.setValues({fillOpacity:1.0});
+				},
+				highlightOff: function(){
+					this.setValues({fillOpacity:0.5});
+				},
+			});
+			google.maps.event.addListener(evente, 'mouseover', function(){
+				this.highlightOn();
+			});
+			google.maps.event.addListener(evente, 'mouseout', function(){
+				this.highlightOff();
 			});
 			userEvents.push(evente);
 			break;
@@ -161,17 +185,30 @@ function addEventsToMap(events){
 				geodesic: true,
 				strokeColor: sColor,
 				strokeOpacity: 1.0,
-				strokeWeight: 2.0,
+				strokeWeight: 5.0,
 				title: sTitle,
 				collection: sColl,
 				user: sUser,
 				start: tStart,
 				end: tEnd,
+				highlightOn: function(){
+						this.setValues({strokeWeight:8.0});
+					},
+					highlightOff: function(){
+						this.setValues({strokeWeight:5.0});
+					},
+				});
+				google.maps.event.addListener(evente, 'mouseover', function(){
+					this.highlightOn();
+				});
+				google.maps.event.addListener(evente, 'mouseout', function(){
+					this.highlightOff();
 			});
 			userEvents.push(evente);
 			break;
 		}
 	}
+	
 	//now add all of the events in the evente array to the map
 	for (var o=0; o<userEvents.length; o++){
 		userEvents[o].setMap(map);

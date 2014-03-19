@@ -30,7 +30,7 @@ function initialize() {
     zoom: 14,
     center: new google.maps.LatLng(59.322506, 18.010025)
   };
-
+  
   map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
 
@@ -50,6 +50,21 @@ function initialize() {
   google.maps.event.addListener(layer, 'mouseout', function(event) {
     style = layer.getFeatureStyle(event.featureId).resetAll();
   });
+  
+  //now add your own listeners
+  
+  var myLayer = userEvents[3];
+  google.maps.event.addListener(myLayer, 'mouseover', function(event){
+  		myLayer.fillOpacity = 0.8;
+  		myLayer.setMap(null);
+  		myLayer.setMap(map);
+  });
+  google.maps.event.addListener(myLayer, 'mouseout', function(event){
+  		myLayer.fillOpacity = 0.5;
+  		myLayer.setMap(null);
+  		myLayer.setMap(map);
+  });
+  
 }
 google.maps.event.addDomListener(window, 'load', initialize);
 

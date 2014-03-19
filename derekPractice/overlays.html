@@ -106,6 +106,8 @@ function initialize() {
          drawingsArray.push(event.overlay);
       }*/
      //I altered it to a switch statement to get all of our shapes
+     drawingManager.setOptions({drawingControl:false});
+     drawingManager.setDrawingMode(null);
      switch(event.type)
      {
      	/*case google.maps.drawing.OverlayType.CIRCLE:
