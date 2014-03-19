@@ -3,7 +3,7 @@
 {% block head %}
     {{ super() }}
     <!-- Add to head here -->
-    <script type="text/javascript" src="//maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="//maps.google.com/maps/api/js?v=3.exp&sensor=false&libraries=drawing"></script>
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script src="{{request.static_url('geotimeline:static/js/timeline-2.6.1/timeline.js')}}"></script>
     <link rel="stylesheet" type="text/css" href="{{request.static_url('geotimeline:static/js/timeline-2.6.1/timeline.css')}}">
@@ -13,7 +13,7 @@
 {% block content %}
   <div id='map'></div>
   <div id='timeline-container'></div>
-  <!--write submit for for new events here-->
+  <!--write submit form for new events here-->
   <div class="modal fade event-post-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
