@@ -99,6 +99,7 @@ class Event(Base):
                 'geometry':self.geometry,
                 'start':self.start,
                 'end':self.end,
+                'id':self.id,
                 'collection':self.collection}
     
     
