@@ -122,6 +122,7 @@ div.timeline-event-content {
 
 div.timeline-content{
     background-color:white;
+    overflow-y:scroll;
 }
 
 

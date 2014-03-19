@@ -23,8 +23,9 @@ $(function(){
 function initializeMap() {
   var mapDiv = $('#map')[0];
   map = new google.maps.Map(mapDiv, {
-    center: new google.maps.LatLng(37.4419, -122.1419),
-    zoom: 13,
+    //center: new google.maps.LatLng(37.4419, -122.1419),
+    center: new google.maps.LatLng(-34.397, 150.644),
+    zoom: 8,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControl: true,
     mapTypeControlOptions:{
@@ -49,6 +50,42 @@ function initializeMap() {
         position: google.maps.ControlPosition.RIGHT_TOP
     }
   });
+  
+  // drawingManager = new google.maps.drawing.DrawingManager({
+    // drawingMode: google.maps.drawing.OverlayType.MARKER,
+    // drawingControl: true,
+    // drawingControlOptions: {
+      // position: google.maps.ControlPosition.TOP_CENTER,
+      // drawingModes: [
+        // google.maps.drawing.OverlayType.MARKER,
+        // //google.maps.drawing.OverlayType.CIRCLE,
+        // google.maps.drawing.OverlayType.POLYGON,
+        // google.maps.drawing.OverlayType.POLYLINE,
+        // //google.maps.drawing.OverlayType.RECTANGLE
+      // ]
+    // },
+    // markerOptions: {
+      // icon: 'flagPoint.jpg',
+    // },
+    // circleOptions: {
+      // fillColor: '#ffff00',
+      // fillOpacity: 0.5,
+      // strokeWeight: 2,
+      // clickable: false,
+      // editable: true,
+      // zIndex: 1
+    // },
+    // polygonOptions: {
+		// //path:myTrip,
+  		// strokeColor:"#0000FF",
+  		// strokeOpacity:0.8,
+  		// strokeWeight:2,
+  		// fillColor:"#0000FF",
+  		// fillOpacity:0.4
+    // }
+  // });
+//  
+  // drawingManager.setMap(map);
 }
 
 function initializeTimeline(){
@@ -77,35 +114,51 @@ function initializeTimeline(){
 //use global variable to represent event overlays just drawn
 var userOverlays = [];
 function addEventsToMap(events){
+	
 	for (var e=0; e<events.length; e++){
 		var evente;
-		var sColl = events[e].collection;
-		var sColor = events[e].color;
+		var sColl = events[e].collection.name;
+		var sColor = events[e].collection.color;
 		var sUser = events[e].user;
 		var sShape = events[e].shape;
-		var tStart = events[e].start;
-		var tEnd = events[e].end;
-		var sTitle = events[e].title;
+		var tStart = new Date(events[e].start);
+		var tEnd = new Date(events[e].end);
+		var tcontent = events[e].name;
+		var tclassName = "row" + e;
+		var tbody = events[e].content;
+		var sTitle = events[e].name;
 		var aCodedGeom = events[e].geometry;
+		console.log(google.maps.geometry);
 		var aDecodGeom = google.maps.geometry.encoding.decodePath(aCodedGeom);
 		switch(sShape){
 			case 'marker':
 			//make marker
 			evente = new google.maps.Marker({
 				//map:map,
-				color: sColor,
+				strokeColor: sColor,
 				position: aDecodGeom[0],
 				title: sTitle,
 				collection: sColl,
 				user: sUser,
 				start: tStart,
 				end: tEnd,
+				content: tcontent,
+				body: tbody,
+				className: tclassName,
 				highlightOn: function(){
 						this.setAnimation(google.maps.Animation.BOUNCE);
+						this.timelineDiv.css({"opacity":"1"});
 					},
 					highlightOff: function(){
 						this.setAnimation(null);
+						this.timelineDiv.css({"opacity":"0.75"});
 					},
+					clicked: function(){
+						console.log("clicked")
+					}
+				});
+				google.maps.event.addListener(evente, 'click', function(){
+					this.clicked();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
 					this.highlightOn();
@@ -131,13 +184,24 @@ function addEventsToMap(events){
 				user: sUser,
 				start: tStart,
 				end: tEnd,
+				content: tcontent,
+				body: tbody,
+				className: tclassName,
 				highlightOn: function(){
 					this.setValues({fillOpacity:1.0});
+					this.timelineDiv.css({"opacity":"1"});
 				},
 				highlightOff: function(){
 					this.setValues({fillOpacity:0.5});
+					this.timelineDiv.css({"opacity":"0.75"});
 				},
+				clicked: function(){
+					console.log("clicked")
+				}
 			});
+			google.maps.event.addListener(evente, 'click', function(){
+					this.clicked();
+				});
 			google.maps.event.addListener(evente, 'mouseover', function(){
 				this.highlightOn();
 			});
@@ -160,12 +224,23 @@ function addEventsToMap(events){
 				user: sUser,
 				start: tStart,
 				end: tEnd,
+				content: tcontent,
+				body: tbody,
+				className: tclassName,
 				highlightOn: function(){
 						this.setValues({strokeWeight:8.0});
+						this.timelineDiv.css({"opacity":"1"});
 					},
 					highlightOff: function(){
 						this.setValues({strokeWeight:5.0});
+						this.timelineDiv.css({"opacity":"0.75"});
 					},
+					clicked: function(){
+						console.log("clicked")
+					}
+				});
+				google.maps.event.addListener(evente, 'click', function(){
+					this.clicked();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
 					this.highlightOn();
@@ -177,7 +252,7 @@ function addEventsToMap(events){
 			break;
 		}
 	}
-	
+	console.log('adding to map');
 	//now add all of the events in the evente array to the map
 	for (var o=0; o<userOverlays.length; o++){
 		userOverlays[o].setMap(map);
@@ -185,106 +260,13 @@ function addEventsToMap(events){
 }
 //end addEventsToMap()
 
-//this is a mock data set for the map overlays
-var mockOverlayData = [{
-	title: 'marker1',
-	collection: 'first collection',
-	color: '#008000',//green
-	user: 'user1',
-	shape: 'marker',
-	geometry: 'd_ehE}`}l[',
-	start: '2014-03-18 14:59:23',
-	end: '2014-03-18 15:00:00'
-},
-{
-	title: 'marker2',
-	collection: 'second collection',
-	color: '#003D80',
-	user: 'user1',
-	shape: 'marker',
-	geometry: '`i`jEac|~[',
-	start: '2014-03-18 15:47:12',
-	end: '2014-03-18 15:50:12'
-},
-{
-	title: 'marker3',
-	collection: 'third collection',
-	color: '#DF1D03',
-	user: 'user1',
-	shape: 'marker',
-	geometry: 'zf~lEgmqm[',
-	start: '2014-03-18 15:51:59',
-	end: '2014-03-18 16:00:00'
-},
-//polygons
-{
-title: 'polygon1',
-	collection: 'first collection',
-	color: '#008000',//green
-	user: 'user1',
-	shape: 'polygon',
-	geometry: 'vvyfEmmsr[vjgBq{aCq_oAspd@',
-	start: '2014-04-18 14:59:23',
-	end: '2014-04-18 15:00:00'
-},
-{
-	title: 'polygon2',
-	collection: 'second collection',
-	color: '#003D80',
-	user: 'user1',
-	shape: 'polygon',
-	geometry: 'hxjoE_cck[qpR{`sCbt`AtfQh[zsoB',
-	start: '2014-04-18 15:47:12',
-	end: '2014-04-18 15:50:12'
-},
-{
-	title: 'polygon3',
-	collection: 'third collection',
-	color: '#DF1D03',
-	user: 'user1',
-	shape: 'polygon',
-	geometry: 'rewmEiwmv[{vY}~eBje^ikS|fe@tfQf{G||x@',
-	start: '2014-04-18 15:51:59',
-	end: '2014-04-18 16:00:00'
-},
-//polylines
-{
-title: 'polyline1',
-	collection: 'first collection',
-	color: '#008000',//green
-	user: 'user1',
-	shape: 'polyline',
-	geometry: '|s{oEysgr[sieB}}[vqkAig`@of_BgimA_}Gi|i@',
-	start: '2014-05-18 14:59:23',
-	end: '2014-05-18 15:00:00'
-},
-{
-	title: 'polyline2',
-	collection: 'second collection',
-	color: '#003D80',
-	user: 'user1',
-	shape: 'polyline',
-	geometry: 'zelkEenk{[vioAsia@okwA}xeArwb@irV',
-	start: '2014-05-18 15:47:12',
-	end: '2014-05-18 15:50:12'
-},
-{
-	title: 'polyline3',
-	collection: 'third collection',
-	color: '#DF1D03',
-	user: 'user1',
-	shape: 'polyline',
-	geometry: '`choEaou}[dijAtcjGmlCzv_C',
-	start: '2014-05-18 15:51:59',
-	end: '2014-05-18 16:00:00'
-},
-];
-//end mock dataset for the overlays
+
 
 
 function addEventsToTimeline(events){
-  
-    data = userEvents.map(function(item){
+	console.log(events);
+  	
+    data = events.map(function(item){
       return {'start': new Date(item.start),
               'end': new Date(item.end),
               'content': item.name,
@@ -294,7 +276,7 @@ function addEventsToTimeline(events){
     });
     
     // Draw our timeline with the created data
-    timeline.setData(data);
+    timeline.setData(events);
     timeline.redraw();
      
     // Set visibility on load
@@ -302,9 +284,6 @@ function addEventsToTimeline(events){
     
     addColorStyle();  
     
-    
-      
-    // bindHoverEvents();
 }
 
 function addColorStyle () {
@@ -317,59 +296,34 @@ function addColorStyle () {
 				if (/row\d+/.test(classes[i])){
 					// $(this).css({"background-color": classes[i], "border-color": classes[i], "opacity": "0.5"})
 					var id = classes[i].split("row")[1];
-					overlay = userEvents[id-1];
-					var color = overlay.collection.color;
+					overlay = userOverlays[id];
+					overlay.timelineDiv = $(this);
+					console.log(overlay);
+					var color = overlay.strokeColor;
 					$(this).css({"background-color": color, "opacity": "0.75"})
 					//TODO change the userEvents to just use the id that is passed from the object and remove the "-1"
 				}
 			}
 		});
-		$(this).hover(function(){
-        	//overlay.highlightOn();
-        	highlightOn(overlay);
-        }, function(){
-        	highlightOff(overlay);
-        })
-		.click(function(){
-			onClick(overlay);
-		})
+		$(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
+			$.proxy(function(){this.highlightOff()}, overlay)
+        )
+		.click($.proxy(onClick, overlay))
 	});
 }
 
 
-function onClick(overlay){
+function onClick(){
+	console.log(this);
+	overlay = this;
 	console.log(overlay);
-	content = "<p>Event Collection: " + overlay.collection.name + "</p> <p>Dates: " + overlay.start + " - " + overlay.end + "</p> <p>Description: " + overlay.content + "</p>";
-	$('.modal-title').text(overlay.name);
+	content = "<p>Event Collection: " + overlay.collection + "</p> <p>Dates: " + overlay.start + " - " + overlay.end + "</p> <p>Description: " + overlay.body + "</p>";
+	$('.modal-name').text(overlay.content);
+	//TODO fix the title of the modal
 	$('.modal-body').html(content);
 	$('.modal').modal('show');
 }
 
-function highlightOn(overlay){
-	console.log("Hovered!")
-	className = "row" + (overlay.id + 1);
-	console.log(className);
-	$("."+className).css({"opacity":"1"});
-}
-
-function highlightOff(overlay){
-	className = "row" + (overlay.id + 1);
-	$("."+className).css({"opacity":"0.75"});
-}
-
-// function bindHoverEvents() {
-  // $('.timeline-event').each(function(){
-    // $(this).hover(
-        // function(){
-        	// $(this).css({"opacity":"1"});
-        	// console.log(this);
-        	// // $(this).addClass('event_hover');
-        // }, function(){
-        	// $(this).css({"opacity":"0.5"});
-        	// // $(this).removeClass('event_hover');
-        // });
-  // });
-// }
 
 function resize(e){
   var height = $(window).height();
@@ -422,12 +376,110 @@ function getEvents(){
     .done(function( json ) {
       userCollections = json.collections;
       //TODO - make css classes for collections
-      userEvents = json.events;
+      userEvents = mockOverlayData; //json.events;
       console.log(userEvents);
-      addEventsToTimeline(userEvents);
+      //addEventsToTimeline(userEvents);
       addEventsToMap(userEvents);
+      addEventsToTimeline(userOverlays);
     })
     .fail(function( textStatus ) {
       console.log( "Request failed: " + textStatus.toString() );
     });
 }
+
+
+//this is a mock data set for the map overlays
+var mockOverlayData = [{
+	name: 'marker1',
+	content: 'content content',
+	collection: {name:'first collection', color: '#008000'},//green
+	user: 'user1',
+	shape: 'marker',
+	geometry: 'd_ehE}`}l[',
+	start: '2014-03-18 14:59:23',
+	end: '2014-05-18 15:00:00'
+},
+{
+	name: 'marker2',
+	content: 'content content',
+	collection: {name:'second collection', color: '#003D80'},
+	user: 'user1',
+	shape: 'marker',
+	geometry: '`i`jEac|~[',
+	start: '2014-01-18 15:47:12',
+	end: '2014-03-18 15:50:12'
+},
+{
+	name: 'marker3',
+	content: 'content content',
+	collection: {name:'third collection', color: '#DF1D03'},
+	user: 'user1',
+	shape: 'marker',
+	geometry: 'zf~lEgmqm[',
+	start: '2014-01-18 15:51:59',
+	end: '2014-03-18 16:00:00'
+},
+//polygons
+{
+	name: 'polygon1',
+	content: 'content content',
+	collection: {name:'first collection', color: '#008000'},//green
+	user: 'user1',
+	shape: 'polygon',
+	geometry: 'vvyfEmmsr[vjgBq{aCq_oAspd@',
+	start: '2014-02-18 14:59:23',
+	end: '2014-04-18 15:00:00'
+},
+{
+	name: 'polygon2',
+	content: 'content content',
+	collection: {name:'second collection', color: '#003D80'},
+	user: 'user1',
+	shape: 'polygon',
+	geometry: 'hxjoE_cck[qpR{`sCbt`AtfQh[zsoB',
+	start: '2014-03-18 15:47:12',
+	end: '2014-04-18 15:50:12'
+},
+{
+	name: 'polygon3',
+	content: 'content content',
+	collection: {name:'third collection', color: '#DF1D03'},
+	user: 'user1',
+	shape: 'polygon',
+	geometry: 'rewmEiwmv[{vY}~eBje^ikS|fe@tfQf{G||x@',
+	start: '2014-04-18 15:51:59',
+	end: '2014-05-18 16:00:00'
+},
+//polylines
+{
+	name: 'polyline1',
+	content: 'content content',
+	collection: {name:'first collection', color: '#008000'},//green
+	user: 'user1',
+	shape: 'polyline',
+	geometry: '|s{oEysgr[sieB}}[vqkAig`@of_BgimA_}Gi|i@',
+	start: '2014-05-18 14:59:23',
+	end: '2014-06-18 15:00:00'
+},
+{
+	name: 'polyline2',
+	content: 'content content',
+	collection: {name:'second collection', color: '#003D80'},
+	user: 'user1',
+	shape: 'polyline',
+	geometry: 'zelkEenk{[vioAsia@okwA}xeArwb@irV',
+	start: '2014-05-18 15:47:12',
+	end: '2014-06-18 15:50:12'
+},
+{
+	name: 'polyline3',
+	content: 'content content',
+	collection: {name:'third collection', color: '#DF1D03'},
+	user: 'user1',
+	shape: 'polyline',
+	geometry: '`choEaou}[dijAtcjGmlCzv_C',
+	start: '2014-05-18 15:51:59',
+	end: '2014-05-30 16:00:00'
+},
+];
+//end mock dataset for the overlays
