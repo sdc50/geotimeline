@@ -106,7 +106,7 @@ title: 'polyline1',
  * end
  */
 //this is going to contain all the overlay events added from the database
-var userEvents = [];
+var userOverlays = [];
 function addEventsToMap(events){
 	for (var e=0; e<events.length; e++){
 		var evente;
@@ -144,7 +144,7 @@ function addEventsToMap(events){
 				google.maps.event.addListener(evente, 'mouseout', function(){
 					this.highlightOff();
 				});
-			userEvents.push(evente);
+			userOverlays.push(evente);
 			break;
 			case 'polygon':
 			//make polygon
@@ -175,7 +175,7 @@ function addEventsToMap(events){
 			google.maps.event.addListener(evente, 'mouseout', function(){
 				this.highlightOff();
 			});
-			userEvents.push(evente);
+			userOverlays.push(evente);
 			break;
 			case 'polyline':
 			//make polyline
@@ -204,13 +204,13 @@ function addEventsToMap(events){
 				google.maps.event.addListener(evente, 'mouseout', function(){
 					this.highlightOff();
 			});
-			userEvents.push(evente);
+			userOverlays.push(evente);
 			break;
 		}
 	}
 	
 	//now add all of the events in the evente array to the map
-	for (var o=0; o<userEvents.length; o++){
-		userEvents[o].setMap(map);
+	for (var o=0; o<userOverlays.length; o++){
+		userOverlays[o].setMap(map);
 	}
 }
