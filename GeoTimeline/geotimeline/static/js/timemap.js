@@ -66,7 +66,8 @@ function initializeTimeline(){
       showNavigation: true,
       stackEvents: true,
       zoomMin: 54000000,
-      zoomMax: 3153600000000
+      zoomMax: 3153600000000,
+      cluster: true
     };
  
     // Draw our timeline with the created data and options
@@ -98,11 +99,14 @@ function addEventsToTimeline(events){
     timeline.setVisibleChartRangeAuto();
     
     addColorStyle();  
+    
+    
       
     // bindHoverEvents();
 }
 
 function addColorStyle () {
+	links.events.addListener(timeline, 'select', onClick);
 	var overlay;
 	$('.timeline-event').each(function(){
 		$(this).filter(function(){
@@ -111,21 +115,44 @@ function addColorStyle () {
 				if (/row\d+/.test(classes[i])){
 					// $(this).css({"background-color": classes[i], "border-color": classes[i], "opacity": "0.5"})
 					var id = classes[i].split("row")[1];
-					console.log(id);
-					overlay = userEvents[id-1]
+					overlay = userEvents[id-1];
 					var color = overlay.collection.color;
 					$(this).css({"background-color": color, "opacity": "0.75"})
 					//TODO change the userEvents to just use the id that is passed from the object and remove the "-1"
-					console.log(color);
 				}
 			}
-		})
-		.hover(function(){
-        	overlay.highlightOn();
+		});
+		$(this).hover(function(){
+        	//overlay.highlightOn();
+        	highlightOn(overlay);
         }, function(){
-        	overlay.hightlightOff();
-        });
+        	highlightOff(overlay);
+        })
+		.click(function(){
+			onClick(overlay);
+		})
 	});
+}
+
+
+function onClick(overlay){
+	console.log(overlay);
+	content = "<p>Event Collection: " + overlay.collection.name + "</p> <p>Dates: " + overlay.start + " - " + overlay.end + "</p> <p>Description: " + overlay.content + "</p>";
+	$('.modal-title').text(overlay.name);
+	$('.modal-body').html(content);
+	$('.modal').modal('show');
+}
+
+function highlightOn(overlay){
+	console.log("Hovered!")
+	className = "row" + (overlay.id + 1);
+	console.log(className);
+	$("."+className).css({"opacity":"1"});
+}
+
+function highlightOff(overlay){
+	className = "row" + (overlay.id + 1);
+	$("."+className).css({"opacity":"0.75"});
 }
 
 // function bindHoverEvents() {
