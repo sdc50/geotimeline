@@ -51,41 +51,41 @@ function initializeMap() {
     }
   });
   
-  // drawingManager = new google.maps.drawing.DrawingManager({
-    // drawingMode: google.maps.drawing.OverlayType.MARKER,
-    // drawingControl: true,
-    // drawingControlOptions: {
-      // position: google.maps.ControlPosition.TOP_CENTER,
-      // drawingModes: [
-        // google.maps.drawing.OverlayType.MARKER,
-        // //google.maps.drawing.OverlayType.CIRCLE,
-        // google.maps.drawing.OverlayType.POLYGON,
-        // google.maps.drawing.OverlayType.POLYLINE,
-        // //google.maps.drawing.OverlayType.RECTANGLE
-      // ]
-    // },
-    // markerOptions: {
-      // icon: 'flagPoint.jpg',
-    // },
-    // circleOptions: {
-      // fillColor: '#ffff00',
-      // fillOpacity: 0.5,
-      // strokeWeight: 2,
-      // clickable: false,
-      // editable: true,
-      // zIndex: 1
-    // },
-    // polygonOptions: {
-		// //path:myTrip,
-  		// strokeColor:"#0000FF",
-  		// strokeOpacity:0.8,
-  		// strokeWeight:2,
-  		// fillColor:"#0000FF",
-  		// fillOpacity:0.4
-    // }
-  // });
-//  
-  // drawingManager.setMap(map);
+  drawingManager = new google.maps.drawing.DrawingManager({
+    drawingMode: google.maps.drawing.OverlayType.MARKER,
+    drawingControl: true,
+    drawingControlOptions: {
+      position: google.maps.ControlPosition.TOP_CENTER,
+      drawingModes: [
+        google.maps.drawing.OverlayType.MARKER,
+        //google.maps.drawing.OverlayType.CIRCLE,
+        google.maps.drawing.OverlayType.POLYGON,
+        google.maps.drawing.OverlayType.POLYLINE,
+        //google.maps.drawing.OverlayType.RECTANGLE
+      ]
+    },
+    markerOptions: {
+      icon: 'flagPoint.jpg',
+    },
+    circleOptions: {
+      fillColor: '#ffff00',
+      fillOpacity: 0.5,
+      strokeWeight: 2,
+      clickable: false,
+      editable: true,
+      zIndex: 1
+    },
+    polygonOptions: {
+		//path:myTrip,
+  		strokeColor:"#0000FF",
+  		strokeOpacity:0.8,
+  		strokeWeight:2,
+  		fillColor:"#0000FF",
+  		fillOpacity:0.4
+    }
+  });
+ 
+  drawingManager.setMap(map);
 }
 
 function initializeTimeline(){
@@ -114,7 +114,7 @@ function initializeTimeline(){
 //use global variable to represent event overlays just drawn
 var userOverlays = [];
 function addEventsToMap(events){
-	
+	var startIndex = userOverlays.length
 	for (var e=0; e<events.length; e++){
 		var evente;
 		var sColl = events[e].collection.name;
@@ -124,7 +124,8 @@ function addEventsToMap(events){
 		var tStart = new Date(events[e].start);
 		var tEnd = new Date(events[e].end);
 		var tcontent = events[e].name;
-		var tclassName = "row" + e;
+		var tclassName = "row" + (startIndex + e);
+		console.log(tclassName);
 		var tbody = events[e].content;
 		var sTitle = events[e].name;
 		var aCodedGeom = events[e].geometry;
@@ -153,12 +154,9 @@ function addEventsToMap(events){
 						this.setAnimation(null);
 						this.timelineDiv.css({"opacity":"0.75"});
 					},
-					clicked: function(){
-						console.log("clicked")
-					}
 				});
 				google.maps.event.addListener(evente, 'click', function(){
-					this.clicked();
+					this.onClick();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
 					this.highlightOn();
@@ -194,13 +192,10 @@ function addEventsToMap(events){
 				highlightOff: function(){
 					this.setValues({fillOpacity:0.5});
 					this.timelineDiv.css({"opacity":"0.75"});
-				},
-				clicked: function(){
-					console.log("clicked")
 				}
 			});
 			google.maps.event.addListener(evente, 'click', function(){
-					this.clicked();
+					this.onClick();
 				});
 			google.maps.event.addListener(evente, 'mouseover', function(){
 				this.highlightOn();
@@ -235,12 +230,9 @@ function addEventsToMap(events){
 						this.setValues({strokeWeight:5.0});
 						this.timelineDiv.css({"opacity":"0.75"});
 					},
-					clicked: function(){
-						console.log("clicked")
-					}
 				});
 				google.maps.event.addListener(evente, 'click', function(){
-					this.clicked();
+					this.onClick();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
 					this.highlightOn();
@@ -250,31 +242,24 @@ function addEventsToMap(events){
 			});
 			userOverlays.push(evente);
 			break;
-		}
+		}	userOverlays[userOverlays.length-1].setMap(map);
 	}
 	console.log('adding to map');
 	//now add all of the events in the evente array to the map
-	for (var o=0; o<userOverlays.length; o++){
-		userOverlays[o].setMap(map);
-	}
+	// for (var o=0; o<userOverlays.length; o++){
+		// userOverlays[o].setMap(map);
+	// }
 }
 //end addEventsToMap()
 
+google.maps.MVCObject.prototype.onClick = function(){
+	body_content = "<p>Event Collection: " + this.collection + "</p> <p>Dates: " + this.start + " - " + this.end + "</p> <p>Description: " + this.body + "</p>";
+	$('.modal-title').text(this.content);
+	$('.modal-body').html(body_content);
+	$('.modal').modal('show');
+}
 
-
-
-function addEventsToTimeline(events){
-	console.log(events);
-  	
-    data = events.map(function(item){
-      return {'start': new Date(item.start),
-              'end': new Date(item.end),
-              'content': item.name,
-              //'group': item.user,
-              'className': "row" + item.id,  //TODO - assign classes to collections
-              'id':item.id} 
-    });
-    
+function addEventsToTimeline(events){    
     // Draw our timeline with the created data
     timeline.setData(events);
     timeline.redraw();
@@ -282,12 +267,11 @@ function addEventsToTimeline(events){
     // Set visibility on load
     timeline.setVisibleChartRangeAuto();
     
-    addColorStyle();  
+    timelineManager();  
     
 }
 
-function addColorStyle () {
-	links.events.addListener(timeline, 'select', onClick);
+function timelineManager () {
 	var overlay;
 	$('.timeline-event').each(function(){
 		$(this).filter(function(){
@@ -308,22 +292,10 @@ function addColorStyle () {
 		$(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
 			$.proxy(function(){this.highlightOff()}, overlay)
         )
-		.click($.proxy(onClick, overlay))
+		.click($.proxy(function(){this.onClick()}, overlay))
+		
 	});
 }
-
-
-function onClick(){
-	console.log(this);
-	overlay = this;
-	console.log(overlay);
-	content = "<p>Event Collection: " + overlay.collection + "</p> <p>Dates: " + overlay.start + " - " + overlay.end + "</p> <p>Description: " + overlay.body + "</p>";
-	$('.modal-name').text(overlay.content);
-	//TODO fix the title of the modal
-	$('.modal-body').html(content);
-	$('.modal').modal('show');
-}
-
 
 function resize(e){
   var height = $(window).height();
