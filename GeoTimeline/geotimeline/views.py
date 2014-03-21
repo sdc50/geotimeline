@@ -117,10 +117,12 @@ def login(request):
     if referrer == login_url:
         referrer = '/' # never use the login form itself as came_from
     came_from = request.params.get('came_from', referrer)
-    message = ''
+    messages = ['','']
     login = ''
     password = ''
-    if 'form.submitted' in request.params:
+    if 'signup.submitted' in request.params:
+      messages[0] = 'Failed sign up'
+    elif 'login.submitted' in request.params:
         login = request.params['login']
         password = request.params['password']
         user = DBSession.query(User).filter_by(userName=login).first()
@@ -129,10 +131,10 @@ def login(request):
             headers = remember(request, login)
             return HTTPFound(location = came_from,
                              headers = headers)
-        message = 'Failed login'
+        messages[1] = 'Failed login'
 
     return dict(
-        message = message,
+        messages = messages,
         url = request.application_url + '/login',
         came_from = came_from,
         login = login,

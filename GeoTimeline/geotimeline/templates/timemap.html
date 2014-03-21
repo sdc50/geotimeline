@@ -18,16 +18,16 @@
   <!--write submit form for new events here-->
 
   
-  <div class="modal fade event-post-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div id="view-modal" class="modal fade event-post-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 
-          <h4 class="modal-title" id="myModalLabel">Event Title</h4>
+          <h4 id="view-modal-title" class="modal-title" id="myModalLabel">Event Title</h4>
         </div>
-        <div class="modal-body">
-          ...
+        <div id="view-modal-body" class="modal-body">
+          
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary">Edit</button>
@@ -38,14 +38,15 @@
     </div>
   </div>
   
-  <div class="modal fade new-event-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div id="new-modal" class="modal fade new-event-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 
-          <h4 class="modal-title" id="myModalLabel">Event Title</h4>
+          <h4 id="new-modal-title" class="modal-title" id="myModalLabel">Event Title</h4>
         </div>
+<<<<<<< HEAD
         <div class="modal-body">
         	<!--
         		new event form elements
@@ -67,6 +68,10 @@
         			cancel
         	-->
         	
+=======
+        <div id="new-modal-body" class="modal-body">
+          ...
+>>>>>>> 75a7e18db5049a584a2131ac4f0041b5fe33b195
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -76,15 +81,15 @@
     </div>
   </div>
   
-  <div class="modal fade edit-event-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div id="edit-modal" class="modal fade edit-event-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 
-          <h4 class="modal-title" id="myModalLabel">Event Title</h4>
+          <h4 id="edit-modal-title" class="modal-title" id="myModalLabel">Event Title</h4>
         </div>
-        <div class="modal-body">
+        <div id="edit-modal-body" class="modal-body">
           ...
         </div>
         <div class="modal-footer">
