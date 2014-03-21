@@ -64,28 +64,31 @@ function initializeMap() {
         //google.maps.drawing.OverlayType.RECTANGLE
       ]
     },
-    markerOptions: {
-      icon: 'flagPoint.jpg',
-    },
-    circleOptions: {
-      fillColor: '#ffff00',
-      fillOpacity: 0.5,
-      strokeWeight: 2,
-      clickable: false,
-      editable: true,
-      zIndex: 1
-    },
-    polygonOptions: {
-		//path:myTrip,
-  		strokeColor:"#0000FF",
-  		strokeOpacity:0.8,
-  		strokeWeight:2,
-  		fillColor:"#0000FF",
-  		fillOpacity:0.4
-    }
+    // markerOptions: {
+      // // icon: 'flagPoint.jpg',
+    // },
+    // circleOptions: {
+      // fillColor: '#ffff00',
+      // fillOpacity: 0.5,
+      // strokeWeight: 2,
+      // clickable: false,
+      // editable: true,
+      // zIndex: 1
+    // },
+    // polygonOptions: {
+		// //path:myTrip,
+  		// strokeColor:"#0000FF",
+  		// strokeOpacity:0.8,
+  		// strokeWeight:2,
+  		// fillColor:"#0000FF",
+  		// fillOpacity:0.4
+    // }
   });
  
   drawingManager.setMap(map);
+  drawingManager.setOptions({drawingControl:false});  //hides drawing controls
+  drawingManager.setDrawingMode(null); //sets control to pan mode
+  
 }
 
 function initializeTimeline(){
@@ -112,6 +115,7 @@ function initializeTimeline(){
 }
 
 //use global variable to represent event overlays just drawn
+var userCollections;
 var userOverlays = [];
 function addEventsToMap(events){
 	var startIndex = userOverlays.length
