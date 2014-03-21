@@ -250,6 +250,23 @@ function createDatalist(mockList){
     </div>
     <div id="eventFormDiv">
     	<form id="eventFormForm">
+    		<!--  date time picker -->
+    			<div id="datetimepicker" class="input-append date">
+				    <input data-format="dd/MM/yyyy hh:mm:ss" type="text"></input>
+				    <span class="add-on">
+				      <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+				      </i>
+				    </span>
+				  </div>
+				  <script type="text/javascript">
+				  $(function() {
+				    $('#datetimepicker').datetimepicker({
+				      language: 'en',
+				      pick12HourFormat: true
+				    });
+				  });
+				</script>
+    		<!--  end date time picker  -->
     		<label for="group">Login: </label>
     		<input type="text" id="group" /><br />
     		<label for="title">Event Title: </label>
