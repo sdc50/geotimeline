@@ -255,9 +255,9 @@ function addEventsToMap(events){
 
 google.maps.MVCObject.prototype.onClick = function(){
 	body_content = "<p>Event Collection: " + this.collection + "</p> <p>Dates: " + this.start + " - " + this.end + "</p> <p>Description: " + this.body + "</p>";
-	$('.modal-title').text(this.content);
-	$('.modal-body').html(body_content);
-	$('.modal').modal('show');
+	$('#view-modal-title').text(this.content);
+	$('#view-modal-body').html(body_content);
+	$('#view-modal').modal('show');
 }
 
 function addEventsToTimeline(events){    
@@ -279,14 +279,12 @@ function timelineManager () {
 			var classes = this.className.split(" ");
 			for (var i=0, len = classes.length; i<len; i++){
 				if (/row\d+/.test(classes[i])){
-					// $(this).css({"background-color": classes[i], "border-color": classes[i], "opacity": "0.5"})
 					var id = classes[i].split("row")[1];
 					overlay = userOverlays[id];
 					overlay.timelineDiv = $(this);
 					console.log(overlay);
 					var color = overlay.strokeColor;
 					$(this).css({"background-color": color, "opacity": "0.75"})
-					//TODO change the userEvents to just use the id that is passed from the object and remove the "-1"
 				}
 			}
 		});
