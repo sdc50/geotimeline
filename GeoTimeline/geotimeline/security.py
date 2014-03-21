@@ -8,9 +8,9 @@ from .models import (
 
 USERS = {'editor':'editor',
          'viewer':'viewer',
-         'test'  :'test'}
+         'test@test.com'  :'test'}
 GROUPS = {'editor':['group:editors'],
-          'test':['group:editors']}
+          'test@test.com':['group:editors']}
 
 def groupfinder(userid, request):
     user = DBSession.query(User).filter_by(userName=userid).first()

@@ -43,26 +43,38 @@ class User(Base):
     firstName = Column('first_name', Text)
     lastName = Column('last_name', Text)
     password = Column(Text)
-    email = Column(Text)
     collections = relationship('Collection', back_populates='user')
     events = relationship('Event', back_populates='user')
+    groups = relationship('Group', secondary='group_association', back_populates='users')
     
-    def __init__(self,userName, firstName, lastName, password, email):
-        self.userName = userName
+    def __init__(self,email, firstName, lastName, password):
+        self.userName = email
         self.firstName = firstName
         self.lastName = lastName
         self.password = password
-        self.email = email
+        
         
     def __repr__(self):
-        return "<User(name='%s', first='%s', last='%s', password='%s', email='%s')>" % (
-                                self.userName, self.firstName, self.lastName, self.password, self.email)
+        return "<'%s''%s'>" % (self.__class__.__name__, self.__json__(None))
         
     def __json__(self,request):
-        return {'name':self.userName, 
+        return {'email':self.userName, 
                 'first':self.firstName, 
-                'last':self.lastName, 
-                'email':self.email}
+                'last':self.lastName
+                }
+    
+
+class Group(Base):
+    __tablename__ = 'groups'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text, unique=True)
+    users = relationship('User', secondary='group_association', back_populates='groups')
+    
+
+association_table = Table('group_association', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('group_id', Integer, ForeignKey('groups.id'))
+)
     
 
 class Event(Base):

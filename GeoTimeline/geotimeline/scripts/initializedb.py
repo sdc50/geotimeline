@@ -39,7 +39,7 @@ def main(argv=sys.argv):
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
     with transaction.manager:
-        testUser = User('test','Mr.','Test', 'test', 'test@example.com')
+        testUser = User('test@test.com','Mr.','Test', 'test')
         collection = Collection('My Test Vacation', '#112233')
         startTime = datetime(2014, 3, 15, 16, 30)
         endTime = datetime(2014, 3, 16, 6, 30)
