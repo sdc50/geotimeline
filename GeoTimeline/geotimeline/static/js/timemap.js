@@ -144,7 +144,11 @@ function addColorStyle () {
 
 function resize(e){
   var height = $(window).height();
+  var width = $(window).width();
   $('#map').height(height * .8);
+  $('#map').width(width);
+  $('#map-form').width(width + 500);
+  $('#content').width(width);
   timeline.checkResize();
 }
 
