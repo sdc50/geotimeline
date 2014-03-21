@@ -82,6 +82,11 @@ function initializeMap() {
     userOverlays.push(event.overlay);
     console.log(userOverlays);
 	});
+
+  drawingManager.setMap(map);
+  drawingManager.setOptions({drawingControl:false});  //hides drawing controls
+  drawingManager.setDrawingMode(null); //sets control to pan mode
+  
 }
 
 function initializeTimeline(){
@@ -98,8 +103,9 @@ function initializeTimeline(){
       editable: false,
       showNavigation: true,
       stackEvents: true,
-      zoomMin: 54000000,
-      zoomMax: 3153600000000,
+      zoomMin: 54000000, // one hour
+      // zoomMin: 2592000000, // 1 day
+      zoomMax: 3153600000000, // 100 years
       cluster: true
     };
  
@@ -108,6 +114,7 @@ function initializeTimeline(){
 }
 
 //use global variable to represent event overlays just drawn
+var userCollections;
 var userOverlays = [];
 function addEventsToMap(events){
 	var startIndex = userOverlays.length
@@ -376,12 +383,31 @@ $(".new-close").click(function(){
     deletedOverlay.setMap(null);
     resize;
     
-})
+});
 
 
 // When submit run resize function and toggle the timeline in
 
+function showSubmission(){
+	var x = $('#collectionInput').val();
+	var z = $('#collections');
+	var val = $(z).find('option[value="' + x + '"]');
+	var endval = val.attr('id');
+	//x is the name
+	//endval is the id
+	alert("x: " + x + " z: " + z + " val: " + val + " endval: " + endval);
+}
 
+
+
+function createDatalist(){
+	for(var l=0; l<userCollections.length; l++){
+		var listElement = userCollections[l];
+		var optionString = '<option value="' + listElement.name + '" id="' + listElement.id + '">';
+		$('#collections').append(optionString);
+	}
+	
+}
 
 //this is a mock data set for the map overlays
 var mockOverlayData = [{

@@ -122,6 +122,35 @@ div.feature img{
   margin-left:-65px;
 }
 
+/********************************
+ * 
+ * Login Styles
+ * 
+ * ******************************/
+
+#login-container{
+  margin:50px auto;
+  padding: 20px;
+  width:80%;
+  box-shadow: 0 1px 10px #888888;
+}
+
+.login-block{
+  display: inline-block;
+  vertical-align: top;
+  padding:20px 30px;
+  width: 49%;
+  height: 100%;
+}
+
+.login-block input{
+  margin:5px;
+}
+
+#signup{
+  border-right: 1px solid #888888;
+}
+
 footer{
   background-color:#BE2939;
   background: -webkit-linear-gradient(top,  #BE2939,  #96000B);
