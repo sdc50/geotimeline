@@ -19,7 +19,11 @@ $(function(){
   $(window).resize(resize);
 });
 
+$(document).ready(function() {
+    $('#colorpicker').farbtastic('#color');
+  });
 
+var drawingManager
 function initializeMap() {
   var mapDiv = $('#map')[0];
   map = new google.maps.Map(mapDiv, {
@@ -64,27 +68,21 @@ function initializeMap() {
         //google.maps.drawing.OverlayType.RECTANGLE
       ]
     },
-    // markerOptions: {
-      // // icon: 'flagPoint.jpg',
-    // },
-    // circleOptions: {
-      // fillColor: '#ffff00',
-      // fillOpacity: 0.5,
-      // strokeWeight: 2,
-      // clickable: false,
-      // editable: true,
-      // zIndex: 1
-    // },
-    // polygonOptions: {
-		// //path:myTrip,
-  		// strokeColor:"#0000FF",
-  		// strokeOpacity:0.8,
-  		// strokeWeight:2,
-  		// fillColor:"#0000FF",
-  		// fillOpacity:0.4
-    // }
   });
  
+  drawingManager.setMap(map);
+  
+  drawingManager.setOptions({drawingControl:false});
+  drawingManager.setDrawingMode(null);
+  
+  google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
+	drawingManager.setOptions({drawingControl:false});
+    drawingManager.setDrawingMode(null);
+    $('#new-modal').modal('show');
+    userOverlays.push(event.overlay);
+    console.log(userOverlays);
+	});
+
   drawingManager.setMap(map);
   drawingManager.setOptions({drawingControl:false});  //hides drawing controls
   drawingManager.setDrawingMode(null); //sets control to pan mode
@@ -105,8 +103,9 @@ function initializeTimeline(){
       editable: false,
       showNavigation: true,
       stackEvents: true,
-      zoomMin: 54000000,
-      zoomMax: 3153600000000,
+      zoomMin: 54000000, // one hour
+      // zoomMin: 2592000000, // 1 day
+      zoomMax: 3153600000000, // 100 years
       cluster: true
     };
  
@@ -366,6 +365,49 @@ function getEvents(){
     });
 }
 
+
+// adding a new event
+$("#new-event-click").click(function(){
+	drawingManager.setOptions({drawingControl:true});
+    drawingManager.setDrawingMode(null);
+    $('#timeline-container').slideToggle();
+    $('#map').height($(window).height());
+});
+
+$(".new-close").click(function(){
+	drawingManager.setOptions({drawingControl:false});
+    drawingManager.setDrawingMode(null);
+    $('#timeline-container').slideToggle();
+    deletedOverlay = userOverlays.pop();
+    console.log(deletedOverlay);
+    deletedOverlay.setMap(null);
+    resize;
+    
+});
+
+
+// When submit run resize function and toggle the timeline in
+
+function showSubmission(){
+	var x = $('#collectionInput').val();
+	var z = $('#collections');
+	var val = $(z).find('option[value="' + x + '"]');
+	var endval = val.attr('id');
+	//x is the name
+	//endval is the id
+	alert("x: " + x + " z: " + z + " val: " + val + " endval: " + endval);
+}
+
+
+
+function createDatalist(){
+	for(var l=0; l<userCollections.length; l++){
+		var listElement = userCollections[l];
+		var optionString = '<option value="' + listElement.name + '" id="' + listElement.id + '">';
+		$('#collections').append(optionString);
+	}
+	
+}
 
 //this is a mock data set for the map overlays
 var mockOverlayData = [{
