@@ -151,10 +151,10 @@ function addEventsToMap(events){
 						this.setAnimation(google.maps.Animation.BOUNCE);
 						this.timelineDiv.css({"opacity":"1"});
 					},
-					highlightOff: function(){
-						this.setAnimation(null);
-						this.timelineDiv.css({"opacity":"0.75"});
-					},
+				highlightOff: function(){
+					this.setAnimation(null);
+					this.timelineDiv.css({"opacity":"0.75"});
+				},
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					this.onClick();
