@@ -32,7 +32,7 @@ Base = declarative_base()
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),
-                (Allow, 'group:editors', 'edit') ]
+                (Allow, 'editor', 'edit') ]
     def __init__(self, request):
         pass
 
@@ -52,7 +52,12 @@ class User(Base):
         self.firstName = firstName
         self.lastName = lastName
         self.password = password
-        
+    
+    def getGroups(self):
+        groups = []
+        for group in self.groups:
+          groups.append(str(group))
+        return groups
         
     def __repr__(self):
         return "<'%s''%s'>" % (self.__class__.__name__, self.__json__(None))
@@ -60,7 +65,7 @@ class User(Base):
     def __json__(self,request):
         return {'email':self.userName, 
                 'first':self.firstName, 
-                'last':self.lastName
+                'last':self.lastName,
                 }
     
 
@@ -70,6 +75,11 @@ class Group(Base):
     name = Column(Text, unique=True)
     users = relationship('User', secondary='group_association', back_populates='groups')
     
+    def __init__(self,name):
+        self.name = name
+    
+    def __repr__(self):
+        return self.name
 
 association_table = Table('group_association', Base.metadata,
     Column('user_id', Integer, ForeignKey('users.id')),

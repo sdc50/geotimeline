@@ -15,8 +15,6 @@ from pyramid.security import (
     authenticated_userid,
     )
 
-from .security import USERS
-
 from sqlalchemy.exc import DBAPIError
 
 from .models import (
@@ -126,7 +124,6 @@ def login(request):
         login = request.params['login']
         password = request.params['password']
         user = DBSession.query(User).filter_by(userName=login).first()
-        print('************************',user)
         #if USERS.get(login) == password:
         if user and user.password == password:
             headers = remember(request, login)
