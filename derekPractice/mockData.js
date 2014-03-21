@@ -106,7 +106,7 @@ title: 'polyline1',
  * end
  */
 //this is going to contain all the overlay events added from the database
-var userEvents = [];
+var userOverlays = [];
 function addEventsToMap(events){
 	for (var e=0; e<events.length; e++){
 		var evente;
@@ -131,8 +131,20 @@ function addEventsToMap(events){
 				user: sUser,
 				start: tStart,
 				end: tEnd,
-			});
-			userEvents.push(evente);
+				highlightOn: function(){
+						this.setAnimation(google.maps.Animation.BOUNCE);
+					},
+					highlightOff: function(){
+						this.setAnimation(null);
+					},
+				});
+				google.maps.event.addListener(evente, 'mouseover', function(){
+					this.highlightOn();
+				});
+				google.maps.event.addListener(evente, 'mouseout', function(){
+					this.highlightOff();
+				});
+			userOverlays.push(evente);
 			break;
 			case 'polygon':
 			//make polygon
@@ -150,8 +162,20 @@ function addEventsToMap(events){
 				user: sUser,
 				start: tStart,
 				end: tEnd,
+				highlightOn: function(){
+					this.setValues({fillOpacity:1.0});
+				},
+				highlightOff: function(){
+					this.setValues({fillOpacity:0.5});
+				},
 			});
-			userEvents.push(evente);
+			google.maps.event.addListener(evente, 'mouseover', function(){
+				this.highlightOn();
+			});
+			google.maps.event.addListener(evente, 'mouseout', function(){
+				this.highlightOff();
+			});
+			userOverlays.push(evente);
 			break;
 			case 'polyline':
 			//make polyline
@@ -161,19 +185,32 @@ function addEventsToMap(events){
 				geodesic: true,
 				strokeColor: sColor,
 				strokeOpacity: 1.0,
-				strokeWeight: 2.0,
+				strokeWeight: 5.0,
 				title: sTitle,
 				collection: sColl,
 				user: sUser,
 				start: tStart,
 				end: tEnd,
+				highlightOn: function(){
+						this.setValues({strokeWeight:8.0});
+					},
+					highlightOff: function(){
+						this.setValues({strokeWeight:5.0});
+					},
+				});
+				google.maps.event.addListener(evente, 'mouseover', function(){
+					this.highlightOn();
+				});
+				google.maps.event.addListener(evente, 'mouseout', function(){
+					this.highlightOff();
 			});
-			userEvents.push(evente);
+			userOverlays.push(evente);
 			break;
 		}
 	}
+	
 	//now add all of the events in the evente array to the map
-	for (var o=0; o<userEvents.length; o++){
-		userEvents[o].setMap(map);
+	for (var o=0; o<userOverlays.length; o++){
+		userOverlays[o].setMap(map);
 	}
 }

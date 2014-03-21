@@ -146,6 +146,7 @@ div.timeline-event-content {
 
 div.timeline-content{
     background-color:white;
+    overflow-y:scroll;
 }
 
 
@@ -163,5 +164,5 @@ div.event_hover{
 
 
 .modal-body{
-  height:2000px;
+  
 }
