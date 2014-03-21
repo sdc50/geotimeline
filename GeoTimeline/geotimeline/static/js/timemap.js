@@ -19,7 +19,11 @@ $(function(){
   $(window).resize(resize);
 });
 
+$(document).ready(function() {
+    $('#colorpicker').farbtastic('#color');
+  });
 
+var drawingManager
 function initializeMap() {
   var mapDiv = $('#map')[0];
   map = new google.maps.Map(mapDiv, {
@@ -64,28 +68,20 @@ function initializeMap() {
         //google.maps.drawing.OverlayType.RECTANGLE
       ]
     },
-    markerOptions: {
-      icon: 'flagPoint.jpg',
-    },
-    circleOptions: {
-      fillColor: '#ffff00',
-      fillOpacity: 0.5,
-      strokeWeight: 2,
-      clickable: false,
-      editable: true,
-      zIndex: 1
-    },
-    polygonOptions: {
-		//path:myTrip,
-  		strokeColor:"#0000FF",
-  		strokeOpacity:0.8,
-  		strokeWeight:2,
-  		fillColor:"#0000FF",
-  		fillOpacity:0.4
-    }
   });
  
   drawingManager.setMap(map);
+  
+  drawingManager.setOptions({drawingControl:false});
+  drawingManager.setDrawingMode(null);
+  
+  google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
+	drawingManager.setOptions({drawingControl:false});
+    drawingManager.setDrawingMode(null);
+    $('#new-modal').modal('show');
+    userOverlays.push(event.overlay);
+    console.log(userOverlays);
+	});
 }
 
 function initializeTimeline(){
@@ -361,6 +357,30 @@ function getEvents(){
       console.log( "Request failed: " + textStatus.toString() );
     });
 }
+
+
+// adding a new event
+$("#new-event-click").click(function(){
+	drawingManager.setOptions({drawingControl:true});
+    drawingManager.setDrawingMode(null);
+    $('#timeline-container').slideToggle();
+    $('#map').height($(window).height());
+});
+
+$(".new-close").click(function(){
+	drawingManager.setOptions({drawingControl:false});
+    drawingManager.setDrawingMode(null);
+    $('#timeline-container').slideToggle();
+    deletedOverlay = userOverlays.pop();
+    console.log(deletedOverlay);
+    deletedOverlay.setMap(null);
+    resize;
+    
+})
+
+
+// When submit run resize function and toggle the timeline in
+
 
 
 //this is a mock data set for the map overlays
