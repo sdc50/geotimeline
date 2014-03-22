@@ -27,6 +27,14 @@
        <div class="alert alert-danger">{{messages[0]}}</div>
        {% endif %}
         <form role="form">
+          <div class='form-group'>
+            <label for="first-name">First Name</label>
+            <input type="text" class="form-control" name='first-name' id="first-name" placeholder="Enter first name" value="">
+          </div>
+          <div class='form-group'>
+            <label for="last-name">Last Name</label>
+            <input type="text" class="form-control" name='last-name' id="last-name" placeholder="Enter last name" value="">
+          </div>
           <div class="form-group has-feedback">
             <label for="login">Email address</label>
             <input type="email" class="form-control" id="login" name='login' placeholder="Enter email">
@@ -50,7 +58,7 @@
           <input type="hidden" name="came_from" value="{{came_from}}"/>
           <div class='form-group'>
             <label for="login">Email address</label>
-            <input type="text" class="form-control" name='login' id="login" placeholder="Enter email" value="{{login}}">
+            <input type="text" class="form-control" name='login' id="login" placeholder="the new test user name is test@test.com" value="{{login}}">
           </div>
           <div class="form-group">
             <label for="password">Password</label>
