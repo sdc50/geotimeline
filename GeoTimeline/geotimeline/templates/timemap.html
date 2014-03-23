@@ -57,23 +57,17 @@
 			    <input type="text" class="form-control" id="eventName" placeholder="ex. First Time Parachuting">
 			  </div>
 			  <div class="form-group">
-				  <label for="eventCollection">Collection</label>
-				  <select id="eventCollection" class="form-control">
-					  <option>1</option>
-					  <option>2</option>
-					  <option>3</option>
-					  <option>4</option>
-					  <option>5</option>
-					</select>
-					<input list="collections" id="collectionInput" />
-	    			<datalist id="collections">
-	    			</datalist>
+				  <label for="collectionInput">Collection</label>
+				  <select id="collectionInput" class="form-control">
+				  	<option id='null'>Create new collection</option>
+				  </select>
 			  </div>
-			  <!-- fix Color Picker and populate the dropdown -->
-			  <div class="form-group">
-			    <label for="color">Collection Color</label>
-			    <input type="text" id="color" name="color" value="#123456" />
-			    <div id="colorpicker"></div>
+			  <div id="new-collection">
+				  <div class="form-group">
+				    <label for="color">Collection Color</label>
+				    <input type="text" id="color" name="color" value="#123456" />
+				    <div id="colorpicker"></div>
+				  </div>
 			  </div>
 			  <div class="form-group">
 			    <label for="startDate">Start Date</label>

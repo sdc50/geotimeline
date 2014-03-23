@@ -3,16 +3,10 @@ from sqlalchemy.exc import DBAPIError
 from .models import (
     DBSession,
     User,
+    Group,
     )
-
-
-USERS = {'editor':'editor',
-         'viewer':'viewer',
-         'test'  :'test'}
-GROUPS = {'editor':['group:editors'],
-          'test':['group:editors']}
 
 def groupfinder(userid, request):
     user = DBSession.query(User).filter_by(userName=userid).first()
     if user:
-        return GROUPS.get(userid, [])
+        return user.getGroups()

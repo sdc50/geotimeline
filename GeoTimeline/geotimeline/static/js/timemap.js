@@ -14,6 +14,7 @@ $(function(){
   
   getEvents();
 
+
   // validate();
   
   $(window).resize(resize);
@@ -78,9 +79,10 @@ function initializeMap() {
   google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
 	drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
+    createDatalist();
     $('#new-modal').modal('show');
     userOverlays.push(event.overlay);
-    console.log(userOverlays);
+    console.log(userOverlays);    
 	});
 
   drawingManager.setMap(map);
@@ -374,6 +376,7 @@ $("#new-event-click").click(function(){
     $('#map').height($(window).height());
 });
 
+// Remove event from map and array if new event is cancelled
 $(".new-close").click(function(){
 	drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
@@ -386,7 +389,18 @@ $(".new-close").click(function(){
 });
 
 
-// When submit run resize function and toggle the timeline in
+// Show or hide the color picker and collection label
+$("#collectionInput").change(function(){
+	if ($("#collectionInput option:selected").attr("id")=="null"){
+    	$("#new-collection").show();	
+    }
+    else{
+    	$("#new-collection").hide();
+    }
+})
+
+
+// When submit run resize function and toggle the timeline in, append the new collection if it has a null id
 
 function showSubmission(){
 	var x = $('#collectionInput').val();
@@ -403,8 +417,8 @@ function showSubmission(){
 function createDatalist(){
 	for(var l=0; l<userCollections.length; l++){
 		var listElement = userCollections[l];
-		var optionString = '<option value="' + listElement.name + '" id="' + listElement.id + '">';
-		$('#collections').append(optionString);
+		var optionString = '<option id="' + listElement.id + '">'+ listElement.name +'</option>';
+		$('#collectionInput').append(optionString);
 	}
 	
 }

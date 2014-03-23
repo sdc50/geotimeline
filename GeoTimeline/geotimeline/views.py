@@ -15,8 +15,6 @@ from pyramid.security import (
     authenticated_userid,
     )
 
-from .security import USERS
-
 from sqlalchemy.exc import DBAPIError
 
 from .models import (
