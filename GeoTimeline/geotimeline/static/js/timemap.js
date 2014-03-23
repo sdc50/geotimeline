@@ -518,3 +518,29 @@ var mockOverlayData = [{
 },
 ];
 //end mock dataset for the overlays
+//////////////////////////////////////////////////////////////////
+//this is for the datepicker
+/*
+ * to get the data in a Date object use the date/time string
+ * stored in the 'start' and 'end' variables like this:
+ * 
+ * var dStart = new Date(start.val());
+ * var dEnd = new Date(end.val());
+ */
+$('#datetimepicker1').datetimepicker({
+  language: 'en',
+  pick12HourFormat: true,
+  format: "MM/dd/yyyy HH:mm:ss PP"
+});
+
+$('#datetimepicker2').datetimepicker({
+  language: 'en',
+  pick12HourFormat: true,
+  format: "MM/dd/yyyy HH:mm:ss PP"
+});
+//get value using $('#datetimepicker').data('date')
+var derekStart = $('#startDate');
+var derekEnd = $('#endDate');
+
+//end of scripts for the datepicker
+///////////////////////////////////////////////////////////////////
