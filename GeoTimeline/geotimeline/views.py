@@ -20,6 +20,7 @@ from sqlalchemy.exc import DBAPIError
 from .models import (
     DBSession,
     User,
+    Group,
     Event,
     Collection,
     Tag,
@@ -119,16 +120,34 @@ def login(request):
     login = ''
     password = ''
     if 'signup.submitted' in request.params:
-      messages[0] = 'Failed sign up'
+      print(request.params)
+      
+      firstName = request.params['first-name']
+      lastName = request.params['last-name']
+      login = request.params['login']
+      password = request.params['password']
+      
+      
+      newUser = User(firstName, lastName, login, password)
+      editor = DBSession.query(Group).filter_by(name='editor').first()
+      newUser.groups.append(editor)
+      DBSession.add(newUser)
+      
+      headers = remember(request, login)
+      return HTTPFound(location = came_from,
+                       headers = headers)
     elif 'login.submitted' in request.params:
+        print(request.params)
         login = request.params['login']
         password = request.params['password']
         user = DBSession.query(User).filter_by(userName=login).first()
-        #if USERS.get(login) == password:
+        print(user)
+
         if user and user.password == password:
             headers = remember(request, login)
             return HTTPFound(location = came_from,
                              headers = headers)
+
         messages[1] = 'Failed login'
 
     return dict(
