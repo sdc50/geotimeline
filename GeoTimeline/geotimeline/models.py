@@ -13,15 +13,13 @@ from sqlalchemy import (
     ForeignKey,
     )
  
-from sqlalchemy.orm import (
-    relationship,
-    )
 
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
+    relationship,
     )
 
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -47,7 +45,7 @@ class User(Base):
     events = relationship('Event', back_populates='user')
     groups = relationship('Group', secondary='group_association', back_populates='users')
     
-    def __init__(self,email, firstName, lastName, password):
+    def __init__(self, firstName, lastName, email, password):
         self.userName = email
         self.firstName = firstName
         self.lastName = lastName

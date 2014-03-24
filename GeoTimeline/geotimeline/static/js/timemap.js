@@ -338,7 +338,8 @@ function saveEvent(data){
   $.ajax({
     type: "POST",
     url: saveEventUrl,
-    data: data
+    data: JSON.stringify(data),
+    contentType: 'application/json; charset=utf-8'
   })
     .done(function( msg ) {
       console.log( "Data Saved: " + msg.msg );
@@ -353,6 +354,7 @@ function getEvents(){
   })
     .done(function( json ) {
       userCollections = json.collections;
+      createDatalist();
       //TODO - make css classes for collections
       userEvents = mockOverlayData; //json.events;
       console.log(userEvents);
