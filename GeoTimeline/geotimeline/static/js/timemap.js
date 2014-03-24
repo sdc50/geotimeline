@@ -141,9 +141,12 @@ function addEventsToMap(events){
 			var pinColor = sColor.substring(1);
 			console.log(pinColor);
 			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-				new google.maps.Size(21,34),
-				new google.maps.Point(0,0),
-				new google.maps.Point(10,34));
+				//new google.maps.Point(0,0),
+				//new google.maps.Point(10,34),
+				null,
+				null,
+				null,
+				new google.maps.Size(21,34));
 			var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
 				new google.maps.Size(40,37),
 				new google.maps.Point(0,0),
@@ -166,11 +169,31 @@ function addEventsToMap(events){
 				body: tbody,
 				className: tclassName,
 				highlightOn: function(){
-						this.setAnimation(google.maps.Animation.BOUNCE);
-						this.timelineDiv.css({"opacity":"1"});
+					var color = this.fillColor;
+					color = color.substring(1);
+					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
+					//new google.maps.Point(0,0),
+					//new google.maps.Point(10,34),
+					null,
+					null,
+					null,
+					new google.maps.Size(42,68));
+					this.setIcon(pinImage);
+					//this.setAnimation(google.maps.Animation.BOUNCE);
+					this.timelineDiv.css({"opacity":"1"});
 					},
 				highlightOff: function(){
-					this.setAnimation(null);
+					var color = this.fillColor;
+					color = color.substring(1);
+					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
+					//new google.maps.Point(0,0),
+					//new google.maps.Point(10,34),
+					null,
+					null,
+					null,
+					new google.maps.Size(21,34));
+					this.setIcon(pinImage);
+					//this.setAnimation(null);
 					this.timelineDiv.css({"opacity":"0.75"});
 				},
 				});
