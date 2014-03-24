@@ -38,13 +38,17 @@ json_renderer.add_adapter(datetime.datetime, datetime_adapter)
 
 @view_config(route_name='home', renderer='index.html', permission='view')
 def home(request):
-  return dict(logged_in = authenticated_userid(request))
+    userid = authenticated_userid(request)
+    user = DBSession.query(User).filter(User.userName==userid).first()
+    return dict(logged_in = authenticated_userid(request), user = user)
 
 @view_config(route_name='map', renderer='timemap.html', permission='edit')
 def geotimeline(request):
+    userid = authenticated_userid(request)
+    user = DBSession.query(User).filter(User.userName==userid).first()
     saveEventUrl = request.route_url('save')
     getEventsUrl = request.route_url('events')
-    return {'saveEventUrl': saveEventUrl, 'getEventsUrl':getEventsUrl, 'logged_in': authenticated_userid(request)}
+    return {'saveEventUrl': saveEventUrl, 'getEventsUrl':getEventsUrl, 'logged_in': authenticated_userid(request), 'user': user}
 
 @view_config(route_name='events', renderer='json', permission='edit')
 def getUserEvents(request):
@@ -124,25 +128,31 @@ def login(request):
       
       firstName = request.params['first-name']
       lastName = request.params['last-name']
-      login = request.params['login']
+      login = request.params['email']
       password = request.params['password']
       
-      
-      newUser = User(firstName, lastName, login, password)
-      editor = DBSession.query(Group).filter_by(name='editor').first()
-      newUser.groups.append(editor)
-      DBSession.add(newUser)
-      
-      headers = remember(request, login)
-      return HTTPFound(location = came_from,
-                       headers = headers)
+      if login == '':
+        messages[0] = "Invalid email"
+      else:
+        existing = DBSession.query(User).filter_by(userName=login).first()
+        
+        if existing:
+          messages[0] = "Account already exists for " + login
+        else:
+          newUser = User(firstName, lastName, login, password)
+          editor = DBSession.query(Group).filter_by(name='editor').first()
+          newUser.groups.append(editor)
+          DBSession.add(newUser)
+          
+          headers = remember(request, login)
+          return HTTPFound(location = came_from,
+                           headers = headers)
+          
     elif 'login.submitted' in request.params:
-        print(request.params)
         login = request.params['login']
         password = request.params['password']
         user = DBSession.query(User).filter_by(userName=login).first()
-        print(user)
-
+        
         if user and user.password == password:
             headers = remember(request, login)
             return HTTPFound(location = came_from,
