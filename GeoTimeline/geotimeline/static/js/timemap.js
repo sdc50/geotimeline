@@ -399,10 +399,6 @@ $("#collectionInput").change(function(){
     }
 });
 
-//Disable modal from closing when click outside
-// $('#new-modal').modal({
-	// backdrop: 'static',
-// });
 
 
 // When submit run resize function and toggle the timeline in, append the new collection if it has a null id
