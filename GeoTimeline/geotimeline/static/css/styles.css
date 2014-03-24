@@ -33,6 +33,10 @@ header a:hover{
   text-decoration:none;
 }
 
+a{
+  cursor: pointer;
+}
+
 #usr-group{
   position:absolute;
   right:50px;
@@ -150,6 +154,7 @@ div.feature img{
 #signup{
   border-right: 1px solid #888888;
 }
+
 
 footer{
   background-color:#BE2939;

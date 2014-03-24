@@ -36,10 +36,12 @@
             <label for="last-name">Last Name</label>
             <input type="text" class="form-control" name='last-name' id="last-name" placeholder="Enter last name" value="">
           </div>
-          <div class="form-group has-feedback">
-            <label for="login">Email address</label>
-            <input type="email" class="form-control" id="login" name='login' placeholder="Enter email">
-            <span class="glyphicon glyphicon-ok form-control-feedback"></span>
+          <div class="form-group {% if messages[0] %}has-error has-feedback{% endif%}">
+            <label for="email">Email address</label>
+            <input type="email" class="form-control" id="email" name='email' placeholder="Enter email">
+            {% if messages[0] %}
+            <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+            {% endif%}
           </div>
           <div class="form-group">
             <label for="password">Password</label>
@@ -75,4 +77,16 @@
 {% endblock %}
 
 
-{% block scripts %}{% endblock %}
+{% block scripts %}
+<script>
+  $('#email').blur(function(){
+    var email = this.value;
+    if(email == ""){
+      console.log('not a valid email');
+      $('#email').focus();
+    }
+    //ajax to check if name is unique
+    
+  });
+</script>
+{% endblock %}
