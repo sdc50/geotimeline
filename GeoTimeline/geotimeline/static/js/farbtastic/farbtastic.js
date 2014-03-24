@@ -241,7 +241,8 @@ jQuery._farbtastic = function (container, callback) {
       // Set background/foreground color
       $(fb.callback).css({
         backgroundColor: fb.color,
-        color: fb.hsl[2] > 0.5 ? '#000' : '#fff'
+        // color: fb.hsl[2] > 0.5 ? '#000' : '#fff'
+        color: fb.color
       });
 
       // Change linked value
