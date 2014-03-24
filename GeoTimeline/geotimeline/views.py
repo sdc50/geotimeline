@@ -141,11 +141,13 @@ def login(request):
         login = request.params['login']
         password = request.params['password']
         user = DBSession.query(User).filter_by(userName=login).first()
+        print(user)
 
         if user and user.password == password:
             headers = remember(request, login)
             return HTTPFound(location = came_from,
                              headers = headers)
+
         messages[1] = 'Failed login'
 
     return dict(

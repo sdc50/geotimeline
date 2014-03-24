@@ -79,7 +79,6 @@ function initializeMap() {
   google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
 	drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
-    createDatalist();
     $('#new-modal').modal('show');
     userOverlays.push(event.overlay);
     console.log(userOverlays);    

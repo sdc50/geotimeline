@@ -41,7 +41,7 @@ def main(argv=sys.argv):
     Base.metadata.create_all(engine)
     with transaction.manager:
         editor = Group('editor');
-        testUser = User('test@test.com','Mr.','Test', 'test')
+        testUser = User('Mr.','Test', 'test@test.com', 'test')
         testUser.groups.append(editor)
         collection = Collection('My Test Vacation', '#008000')
         startTime = datetime(2014, 3, 15, 16, 30)
