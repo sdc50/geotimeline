@@ -518,29 +518,31 @@ var mockOverlayData = [{
 },
 ];
 //end mock dataset for the overlays
-//////////////////////////////////////////////////////////////////
-//this is for the datepicker
-/*
- * to get the data in a Date object use the date/time string
- * stored in the 'start' and 'end' variables like this:
- * 
- * var dStart = new Date(start.val());
- * var dEnd = new Date(end.val());
- */
-$('#datetimepicker1').datetimepicker({
-  language: 'en',
-  pick12HourFormat: true,
-  format: "MM/dd/yyyy HH:mm:ss PP"
-});
-
-$('#datetimepicker2').datetimepicker({
-  language: 'en',
-  pick12HourFormat: true,
-  format: "MM/dd/yyyy HH:mm:ss PP"
-});
-//get value using $('#datetimepicker').data('date')
-var derekStart = $('#startDate');
-var derekEnd = $('#endDate');
-
-//end of scripts for the datepicker
 ///////////////////////////////////////////////////////////////////
+//this is for the jquery ui datepicker
+$('#startDate').datetimepicker();
+$('#endDate').datetimepicker();
+var st = $('#startDate');
+var dStart;
+st.on('blur',function(){
+	dStart = new Date(st.val());
+	console.log(dStart);
+	dateTimeValidation();
+});
+var en = $('#endDate');
+var dEnd;
+en.on('blur',function(){
+	dEnd = new Date(en.val());
+	console.log(dEnd);
+	dateTimeValidation();
+});
+//function to check if the start is before the end
+function dateTimeValidation(){
+	if((dEnd-dStart<0) && dStart){
+		alert("The start date must be before the end date.");
+	}
+	else if(dEnd && !dStart){
+		alert("You must choose a beginning date to have an end date.");
+	}
+}
+//end of jquery ui datepicker
