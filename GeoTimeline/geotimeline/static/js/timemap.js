@@ -398,7 +398,8 @@ $("#collectionInput").change(function(){
     else{
     	$("#new-collection").hide();
     }
-})
+});
+
 
 
 // When submit run resize function and toggle the timeline in, append the new collection if it has a null id
