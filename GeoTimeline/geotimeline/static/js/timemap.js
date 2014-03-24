@@ -137,11 +137,25 @@ function addEventsToMap(events){
 		var aDecodGeom = google.maps.geometry.encoding.decodePath(aCodedGeom);
 		switch(sShape){
 			case 'marker':
+			//make variables for the pin color
+			var pinColor = sColor.substring(1);
+			console.log(pinColor);
+			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+				new google.maps.Size(21,34),
+				new google.maps.Point(0,0),
+				new google.maps.Point(10,34));
+			var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
+				new google.maps.Size(40,37),
+				new google.maps.Point(0,0),
+				new google.maps.Point(12,35));
+			//end pin color variables
 			//make marker
 			evente = new google.maps.Marker({
 				//map:map,
 				strokeColor: sColor,
 				fillColor: sColor,
+				icon: pinImage, //this is new for the marker color
+				//shadow: pinShadow, //this is new for the marker shadow
 				position: aDecodGeom[0],
 				title: sTitle,
 				collection: sColl,
