@@ -319,7 +319,7 @@ function addEventsToTimeline(events){
 
 function timelineManager () {
 	var overlay;
-	$('.timeline-event').each(function(){
+	$('.timeline-event, .timeline-event-dot').each(function(){
 		$(this).filter(function(){
 			var classes = this.className.split(" ");
 			for (var i=0, len = classes.length; i<len; i++){
