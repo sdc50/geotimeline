@@ -388,10 +388,25 @@ function saveEvent(data){
     type: "POST",
     url: saveEventUrl,
     data: JSON.stringify(data),
-    contentType: 'application/json; charset=utf-8'
+    //contentType: 'application/json; charset=utf-8'
   })
     .done(function( msg ) {
       console.log( "Data Saved: " + msg.msg );
+  });
+}
+
+function saveCollection(collection){
+  $.ajax({
+    type: "POST",
+    url: saveCollectionUrl,
+    data: collection,
+    //contentType: 'application/json; charset=utf-8'
+  })
+    .done(function( msg ) {
+      collection.id =  msg.id
+      var optionString = '<option value="' + collection.id + '">'+ collection.name +'</option>';
+      $('#collectionInput').append(optionString);
+      
   });
 }
 
@@ -438,7 +453,7 @@ $(".new-close").click(function(){
 
 // Show or hide the color picker and collection label
 $("#collectionInput").change(function(){
-	if ($("#collectionInput option:selected").attr("id")=="null"){
+	if (collectionInput.value=="null"){
     	$("#new-collection").slideToggle();	
     }
     else{
@@ -452,19 +467,21 @@ $(".new-submit").click(function(){
 	$('#timeline-container').slideToggle();
 	$('#new-modal').modal('hide');
 	name = $('#eventName').val();
-	if ($("#collectionInput option:selected").attr("id")=="null"){
+	if (collectionInput.value=="null"){
 		collectionName = $('#newCollection').val();
 		collectionColor = $('#color').val();
-		collection = {name: collectionName, color: collectionColor};
+		collection = {name: collectionName, color: collectionColor};	
+		saveCollection(collection);
+		userCollections.push(collection);
 	}
 	else{
-		collection = {name: userCollections[collectionInput.value].name, color: userCollections[collectionInput.value].color};
+		collection = userCollections[collectionInput.selectedIndex - 1];
 	}
 	start = $('#startDate').val();
 	end = $('#endDate').val();
 	content = $('#eventDescription').val();
 	overlayIndex = userOverlays.length - 1;
-	
+
 	console.log (name, collection, start, end, content);
 		
 	
@@ -486,7 +503,7 @@ function showSubmission(){
 function createDatalist(){
 	for(var l=0; l<userCollections.length; l++){
 		var listElement = userCollections[l];
-		var optionString = '<option id="' + listElement.id + '">'+ listElement.name +'</option>';
+		var optionString = '<option value="' + listElement.id + '">'+ listElement.name +'</option>';
 		$('#collectionInput').append(optionString);
 	}
 	
