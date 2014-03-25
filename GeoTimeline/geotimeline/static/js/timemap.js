@@ -14,11 +14,8 @@ $(function(){
   
   getEvents();
 
-
   // validate();
-  
-  
-  
+
   $(window).resize(windowResize);
   $('.timeline-axis').mousedown(function(){
     $(document).mousemove(function(e){
@@ -431,12 +428,10 @@ $(".new-close").click(function(){
     drawingManager.setDrawingMode(null);
     $('#timeline-container').slideToggle();
     deletedOverlay = userOverlays.pop();
-    console.log(deletedOverlay);
     deletedOverlay.setMap(null);
     resize;
     
 });
-
 
 // Show or hide the color picker and collection label
 $("#collectionInput").change(function(){
@@ -448,9 +443,30 @@ $("#collectionInput").change(function(){
     }
 });
 
+$(".new-submit").click(function(){
+	drawingManager.setOptions({drawingControl:false});
+    drawingManager.setDrawingMode(null);
+	$('#timeline-container').slideToggle();
+	$('#new-modal').modal('hide');
+	name = $('#eventName').val();
+	if ($("#collectionInput option:selected").attr("id")=="null"){
+		collectionName = $('#newCollection').val();
+		collectionColor = $('#color').val();
+		collection = {name: collectionName, color: collectionColor};
+	}
+	else{
+		collection = $('#collectionInput').val();
+	}
+	start = $('#startDate').val();
+	end = $('#endDate').val();
+	content = $('#eventDescription').val();
+	overlayIndex = userOverlays.length - 1;
+	
+	console.log (name, collection, start, end, content);
+		
+	
+});
 
-
-// When submit run resize function and toggle the timeline in, append the new collection if it has a null id
 
 function showSubmission(){
 	var x = $('#collectionInput').val();
@@ -501,7 +517,7 @@ var mockOverlayData = [{
 	user: 'user1',
 	shape: 'marker',
 	geometry: 'zf~lEgmqm[',
-	start: '2014-01-18 15:51:59',
+	start: '2014-03-18 16:00:00',
 	end: '2014-03-18 16:00:00'
 },
 //polygons

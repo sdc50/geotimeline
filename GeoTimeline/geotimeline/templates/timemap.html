@@ -46,11 +46,10 @@
   
   <div id="new-modal" class="modal fade new-event-modal" data-backdrop='static' tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <form role="form">
+      <form role="form" id="new-event" method="post">
 	      <div class="modal-content">
 	        <div class="modal-header">
 	          <button type="button" class="close new-close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	
 	          <h4 id="new-modal-title" class="modal-title" id="myModalLabel">Create New Event</h4>
 	        </div>
 	        <div id="new-modal-body" class="modal-body">
@@ -90,7 +89,7 @@
 	        </div>
 	        <div class="modal-footer">
 	          <button type="button" class="btn btn-primary new-close" data-dismiss="modal">Cancel</button>
-	          <button type="button" class="btn btn-default">Save</button>
+	          <button type="button" class="btn btn-default new-submit" type='submit'>Save</button>
 	        </div>
 	      </div>
       </form>
