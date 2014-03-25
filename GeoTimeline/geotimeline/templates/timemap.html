@@ -60,7 +60,7 @@
 			  <div class="form-group">
 				  <label for="collectionInput">Collection</label>
 				  <select id="collectionInput" class="form-control">
-				  	<option id='null'>Create new collection</option>
+				  	<option value='null'>Create new collection</option>
 				  </select>
 			  </div>
 			  <div id="new-collection">
@@ -122,6 +122,7 @@
   <script>
     saveEventUrl = "{{saveEventUrl}}";
     getEventsUrl = "{{getEventsUrl}}";
+    saveCollectionUrl = "{{saveCollectionUrl}}";
   </script>
   <!-- These are the links for the jquery ui datetime picker -->
   <!-- Do not use this one because we already have jquery loaded in the base.html page -->
