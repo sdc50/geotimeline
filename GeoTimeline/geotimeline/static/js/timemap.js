@@ -458,7 +458,7 @@ $(".new-submit").click(function(){
 		collection = {name: collectionName, color: collectionColor};
 	}
 	else{
-		collection = $('#collectionInput').val();
+		collection = {name: userCollections[collectionInput.value].name, color: userCollections[collectionInput.value].color};
 	}
 	start = $('#startDate').val();
 	end = $('#endDate').val();
