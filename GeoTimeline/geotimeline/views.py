@@ -70,6 +70,7 @@ def saveEvent(request):
         user = DBSession.query(User).filter(User.userName==userid).first()
         
         params = request.POST
+        print(params)
         name = params['name']
         content = params['content'] 
         shape = params['shape']
@@ -78,7 +79,7 @@ def saveEvent(request):
         end = params['end']
         startDate = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S.%fZ')
         endDate = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
-        collectionId = params['collectionId']
+        collectionId = params['collection[id]']
         #print('****************************', start, startDate)
         if collectionId:
             c = DBSession.query(Collection).filter(Collection.id==collectionId).first()

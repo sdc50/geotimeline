@@ -117,19 +117,9 @@ div.timeline-content{
     overflow-y:scroll;
 }
 
-
-div.event_hover{
-	/*background-color:#666666 ; 
-    border-color:#888888 ;*/ 
-    opacity:1;    
+.timeline-event-box:hover{
+	opacity:1 !important;
 }
-
-/*div.timeline-content div:nth-child(5)>div:hover{
-	background-color:#666666 ; 
-    border-color:#888888 ;     
-}*/
-
-
 
 .modal-body{
   
