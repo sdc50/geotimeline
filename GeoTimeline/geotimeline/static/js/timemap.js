@@ -104,7 +104,6 @@ function initializeTimeline(){
       editable: false,
       showNavigation: true,
       stackEvents: true,
-      style: "box",
       zoomMin: 54000000, // one hour
       // zoomMin: 2592000000, // 1 day
       zoomMax: 3153600000000, // 100 years
@@ -127,9 +126,7 @@ function addEventsToMap(events){
 		var sUser = events[e].user;
 		var sShape = events[e].shape;
 		var tStart = new Date(events[e].start);
-		var tEnd = null;
-		if(events[e].end)
-		  tEnd= new Date(events[e].end);
+		var tEnd = new Date(events[e].end);
 		var tcontent = events[e].name;
 		var tclassName = "row" + (startIndex + e);
 		console.log(tclassName);
@@ -433,10 +430,10 @@ $(".new-close").click(function(){
 // Show or hide the color picker and collection label
 $("#collectionInput").change(function(){
 	if ($("#collectionInput option:selected").attr("id")=="null"){
-    	$("#new-collection").slideToggle();	
+    	$("#new-collection").show();	
     }
     else{
-    	$("#new-collection").slideToggle();
+    	$("#new-collection").hide();
     }
 });
 
@@ -525,7 +522,7 @@ var mockOverlayData = [{
 	shape: 'polygon',
 	geometry: 'rewmEiwmv[{vY}~eBje^ikS|fe@tfQf{G||x@',
 	start: '2014-04-18 15:51:59',
-	end: null//'2014-05-18 16:00:00'
+	end: '2014-05-18 16:00:00'
 },
 //polylines
 {
