@@ -14,10 +14,23 @@ $(function(){
   
   getEvents();
 
-
   // validate();
+<<<<<<< HEAD
   
   $(window).resize(resize);
+=======
+
+  $(window).resize(windowResize);
+  $('.timeline-axis').mousedown(function(){
+    $(document).mousemove(function(e){
+      resizeTimeline(e.pageY);
+    });
+    $(document).mouseup(function(e){
+            $(document).off('mousemove');
+    });
+  });
+  
+>>>>>>> e82cf652e9a916df3596b7bb8896471524eff5a4
 });
 
 $(document).ready(function() {
@@ -80,8 +93,25 @@ function initializeMap() {
 	drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
     $('#new-modal').modal('show');
+<<<<<<< HEAD
     userOverlays.push(event.overlay);
     console.log(userOverlays);    
+=======
+    var overlay = event.overlay;
+    overlay.shape = event.type;
+    if(overlay.shape == "marker"){
+    	var newPos = overlay.getPosition();
+     	var posArr = [];
+     	var newLatLng = new google.maps.LatLng(newPos.k,newPos.A);
+     	posArr.push(newLatLng);
+     	overlay.geometry = google.maps.geometry.encoding.encodePath(posArr);
+    }
+    else{
+    	overlay.geometry = google.maps.geometry.encoding.encodePath(overlay.getPath());
+    }
+    
+    userOverlays.push(overlay);   
+>>>>>>> e82cf652e9a916df3596b7bb8896471524eff5a4
 	});
 
   drawingManager.setMap(map);
@@ -117,9 +147,11 @@ function initializeTimeline(){
 //use global variable to represent event overlays just drawn
 var userCollections;
 var userOverlays = [];
+var userEvents = [];
 function addEventsToMap(events){
 	var startIndex = userOverlays.length
 	for (var e=0; e<events.length; e++){
+		var overlayIndex = startIndex + e;
 		var evente;
 		var sColl = events[e].collection.name;
 		var sColor = events[e].collection.color;
@@ -128,8 +160,12 @@ function addEventsToMap(events){
 		var tStart = new Date(events[e].start);
 		var tEnd = new Date(events[e].end);
 		var tcontent = events[e].name;
+<<<<<<< HEAD
 		var tclassName = "row" + (startIndex + e);
 		console.log(tclassName);
+=======
+		var tclassName = "row" + overlayIndex;
+>>>>>>> e82cf652e9a916df3596b7bb8896471524eff5a4
 		var tbody = events[e].content;
 		var sTitle = events[e].name;
 		var aCodedGeom = events[e].geometry;
@@ -284,7 +320,10 @@ function addEventsToMap(events){
 			});
 			userOverlays.push(evente);
 			break;
-		}	userOverlays[userOverlays.length-1].setMap(map);
+		}	
+		
+		userOverlays[overlayIndex].setMap(map);
+		addEventToTimeline(userOverlays[overlayIndex]);
 	}
 	console.log('adding to map');
 	//now add all of the events in the evente array to the map
@@ -301,6 +340,17 @@ google.maps.MVCObject.prototype.onClick = function(){
 	$('#view-modal').modal('show');
 }
 
+function addEventToTimeline(data){    
+    // Draw our timeline with the created data
+    timeline.addItem(data);
+    timeline.redraw();
+     
+    // Set visibility on load
+    timeline.setVisibleChartRangeAuto();
+    
+    timelineManager();    
+}
+
 function addEventsToTimeline(events){    
     // Draw our timeline with the created data
     timeline.setData(events);
@@ -309,13 +359,13 @@ function addEventsToTimeline(events){
     // Set visibility on load
     timeline.setVisibleChartRangeAuto();
     
-    timelineManager();  
-    
+    timelineManager();
+      
 }
 
 function timelineManager () {
 	var overlay;
-	$('.timeline-event').each(function(){
+	$('.timeline-event, .timeline-event-box').each(function(){
 		$(this).filter(function(){
 			var classes = this.className.split(" ");
 			for (var i=0, len = classes.length; i<len; i++){
@@ -376,11 +426,26 @@ function saveEvent(data){
   $.ajax({
     type: "POST",
     url: saveEventUrl,
-    data: JSON.stringify(data),
-    contentType: 'application/json; charset=utf-8'
+    data: data,
+    //contentType: 'application/json; charset=utf-8'
   })
     .done(function( msg ) {
       console.log( "Data Saved: " + msg.msg );
+  });
+}
+
+function saveCollection(collection){
+  $.ajax({
+    type: "POST",
+    url: saveCollectionUrl,
+    data: collection,
+    //contentType: 'application/json; charset=utf-8'
+  })
+    .done(function( msg ) {
+      collection.id =  msg.id
+      var optionString = '<option value="' + collection.id + '">'+ collection.name +'</option>';
+      $('#collectionInput').append(optionString);
+      
   });
 }
 
@@ -398,7 +463,7 @@ function getEvents(){
       console.log(userEvents);
       //addEventsToTimeline(userEvents);
       addEventsToMap(userEvents);
-      addEventsToTimeline(userOverlays);
+      //addEventsToTimeline(userOverlays);
     })
     .fail(function( textStatus ) {
       console.log( "Request failed: " + textStatus.toString() );
@@ -420,26 +485,58 @@ $(".new-close").click(function(){
     drawingManager.setDrawingMode(null);
     $('#timeline-container').slideToggle();
     deletedOverlay = userOverlays.pop();
-    console.log(deletedOverlay);
     deletedOverlay.setMap(null);
     resize;
     
 });
 
-
 // Show or hide the color picker and collection label
 $("#collectionInput").change(function(){
+<<<<<<< HEAD
 	if ($("#collectionInput option:selected").attr("id")=="null"){
     	$("#new-collection").show();	
+=======
+	if (collectionInput.value=="null"){
+    	$("#new-collection").slideToggle();	
+>>>>>>> e82cf652e9a916df3596b7bb8896471524eff5a4
     }
     else{
     	$("#new-collection").hide();
     }
 });
 
+$(".new-submit").click(function(){
+	drawingManager.setOptions({drawingControl:false});
+    drawingManager.setDrawingMode(null);
+	$('#timeline-container').slideToggle();
+	$('#new-modal').modal('hide');
+	var collection;
+	var name = $('#eventName').val();
+	if (collectionInput.value=="null"){
+		collectionName = $('#newCollection').val();
+		collectionColor = $('#color').val();
+		collection = {name: collectionName, color: collectionColor};	
+		saveCollection(collection);
+		userCollections.push(collection);
+	}
+	else{
+		collection = userCollections[collectionInput.selectedIndex - 1];
+	}
+	var start = new Date($('#startDate').val()).toJSON();
+	var end = new Date($('#endDate').val()).toJSON();
+	var content = $('#eventDescription').val();
+	//var overlayIndex = userOverlays.length - 1;
+	var overlay = userOverlays.pop();//[overlayIndex];
+	overlay.setMap(null);
+	overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+	var newEvent = {'name':name, 'content':content, 'collection':collection, 'user':"" ,'shape':overlay.shape, 'geometry':overlay.geometry, 'start':start, 'end':end}
+	userEvents.push(newEvent);
+	addEventsToMap([newEvent]);
+	windowResize();
+	saveEvent(newEvent);
+	console.log (newEvent);
+});
 
-
-// When submit run resize function and toggle the timeline in, append the new collection if it has a null id
 
 function showSubmission(){
 	var x = $('#collectionInput').val();
@@ -456,7 +553,7 @@ function showSubmission(){
 function createDatalist(){
 	for(var l=0; l<userCollections.length; l++){
 		var listElement = userCollections[l];
-		var optionString = '<option id="' + listElement.id + '">'+ listElement.name +'</option>';
+		var optionString = '<option value="' + listElement.id + '">'+ listElement.name +'</option>';
 		$('#collectionInput').append(optionString);
 	}
 	
@@ -490,8 +587,8 @@ var mockOverlayData = [{
 	user: 'user1',
 	shape: 'marker',
 	geometry: 'zf~lEgmqm[',
-	start: '2014-01-18 15:51:59',
-	end: '2014-03-18 16:00:00'
+	start: '2014-03-18 16:00:00',
+	end: '2014-03-20 16:00:00'
 },
 //polygons
 {

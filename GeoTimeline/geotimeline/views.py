@@ -16,6 +16,7 @@ from pyramid.security import (
     )
 
 from sqlalchemy.exc import DBAPIError
+import transaction
 
 from .models import (
     DBSession,
@@ -46,9 +47,10 @@ def home(request):
 def geotimeline(request):
     userid = authenticated_userid(request)
     user = DBSession.query(User).filter(User.userName==userid).first()
-    saveEventUrl = request.route_url('save')
+    saveCollectionUrl = request.route_url('saveCollection')
+    saveEventUrl = request.route_url('saveEvent')
     getEventsUrl = request.route_url('events')
-    return {'saveEventUrl': saveEventUrl, 'getEventsUrl':getEventsUrl, 'logged_in': authenticated_userid(request), 'user': user}
+    return {'saveCollectionUrl': saveCollectionUrl, 'saveEventUrl': saveEventUrl, 'getEventsUrl':getEventsUrl, 'logged_in': authenticated_userid(request), 'user': user}
 
 @view_config(route_name='events', renderer='json', permission='edit')
 def getUserEvents(request):
@@ -61,13 +63,14 @@ def getUserEvents(request):
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
     return {'collections': collections, 'events': events}
   
-@view_config(route_name='save', renderer='json', permission='edit')
+@view_config(route_name='saveEvent', renderer='json', permission='edit')
 def saveEvent(request):
     try:
         userid = authenticated_userid(request)
         user = DBSession.query(User).filter(User.userName==userid).first()
         
         params = request.POST
+        print(params)
         name = params['name']
         content = params['content'] 
         shape = params['shape']
@@ -76,7 +79,7 @@ def saveEvent(request):
         end = params['end']
         startDate = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S.%fZ')
         endDate = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
-        collectionId = params['collectionId']
+        collectionId = params['collection[id]']
         #print('****************************', start, startDate)
         if collectionId:
             c = DBSession.query(Collection).filter(Collection.id==collectionId).first()
@@ -95,7 +98,23 @@ def saveEvent(request):
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
     return {'collections': collections}
     
-  
+@view_config(route_name='saveCollection', renderer='json', permission='edit')
+def saveCollection(request):
+    try:
+        userid = authenticated_userid(request)
+        user = DBSession.query(User).filter(User.userName==userid).first()
+        
+        print(request.params)
+        name = request.params['name']
+        color = request.params['color'] 
+        c = Collection(name, color)
+        user.collections.append(c)
+        DBSession.add(c)
+        DBSession.flush()
+        return {'id':c.id}
+    except DBAPIError:
+        return Response(conn_err_msg, content_type='text/plain', status_int=500)
+ 
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem
 might be caused by one of the following things:
