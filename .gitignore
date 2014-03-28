@@ -34,3 +34,5 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+GeoTimeline/geotimeline/static/js/MapObjects.js
+GeoTimeline/geotimeline/static/js/MapObjects.js

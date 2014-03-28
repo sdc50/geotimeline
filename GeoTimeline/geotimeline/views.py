@@ -79,14 +79,13 @@ def saveEvent(request):
         end = params['end']
         startDate = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S.%fZ')
         endDate = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
-        collectionId = params['collection[id]']
-        #print('****************************', start, startDate)
-        if collectionId:
+        if 'collection[id]' in params:
+            collectionId = params['collection[id]']
             c = DBSession.query(Collection).filter(Collection.id==collectionId).first()
         else:
-            collection = params['collection']
-            color = params['color']
-            c = Collection(collection, color)
+            collectionName = params['collection[name]']
+            color = params['collection[color]']
+            c = Collection(collectionName, color)
             user.collections.append(c)
         
         event = Event(name, content, shape, geometry, startDate, endDate)
