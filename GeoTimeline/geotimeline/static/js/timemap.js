@@ -136,12 +136,13 @@ function initializeTimeline(){
 }
 
 //use global variable to represent event overlays just drawn
-var userCollections;
+var userCollections = [];
 var userOverlays = [];
 var userEvents = [];
 function addEventsToMap(events){
 	var startIndex = userOverlays.length
 	for (var e=0; e<events.length; e++){
+	  var iId = events[e].id;
 		var overlayIndex = startIndex + e;
 		var evente;
 		var sColl = events[e].collection.name;
@@ -153,6 +154,7 @@ function addEventsToMap(events){
 		if(events[e].end)
 		  tEnd= new Date(events[e].end);
 		var tcontent = events[e].name;
+		var iOverlayIndex = overlayIndex;
 		var tclassName = "row" + overlayIndex;
 		var tbody = events[e].content;
 		var sTitle = events[e].name;
@@ -176,8 +178,11 @@ function addEventsToMap(events){
 				new google.maps.Point(12,35));
 			//end pin color variables
 			//make marker
+			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:10}
 			evente = new google.maps.Marker({
 				//map:map,
+				id: iId,
+				index: iOverlayIndex,
 				strokeColor: sColor,
 				fillColor: sColor,
 				icon: pinImage, //this is new for the marker color
@@ -219,6 +224,10 @@ function addEventsToMap(events){
 					//this.setAnimation(null);
 					this.timelineDiv.css({"opacity":"0.75"});
 				},
+				makeEditable: function(){
+				  this.setIcon('http://icons.iconarchive.com/icons/everaldo/kids-icons/32/package-utilities-icon.png');
+          this.setDraggable(true);
+        },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					this.onClick();
@@ -235,6 +244,8 @@ function addEventsToMap(events){
 			//make polygon
 			evente = new google.maps.Polygon({
 				//map:map,
+				id: iId,
+				index: iOverlayIndex,
 				paths: aDecodGeom,
 				geodesic: true,
 				strokeColor: sColor,
@@ -257,7 +268,10 @@ function addEventsToMap(events){
 				highlightOff: function(){
 					this.setValues({fillOpacity:0.5});
 					this.timelineDiv.css({"opacity":"0.75"});
-				}
+				},
+			 makeEditable: function(){
+          this.setEditable(true);
+        },
 			});
 			google.maps.event.addListener(evente, 'click', function(){
 					this.onClick();
@@ -274,6 +288,8 @@ function addEventsToMap(events){
 			//make polyline
 			evente = new google.maps.Polyline({
 				//map:map,
+				id: iId,
+				index: iOverlayIndex,
 				path: aDecodGeom,
 				geodesic: true,
 				strokeColor: sColor,
@@ -291,10 +307,13 @@ function addEventsToMap(events){
 						this.setValues({strokeWeight:8.0});
 						this.timelineDiv.css({"opacity":"1"});
 					},
-					highlightOff: function(){
+				highlightOff: function(){
 						this.setValues({strokeWeight:5.0});
 						this.timelineDiv.css({"opacity":"0.75"});
 					},
+			  makeEditable: function(){
+			    this.setEditable(true);
+			  },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					this.onClick();
@@ -316,10 +335,19 @@ function addEventsToMap(events){
 //end addEventsToMap()
 
 google.maps.MVCObject.prototype.onClick = function(){
-	body_content = "<p>Event Collection: " + this.collection + "</p> <p>Dates: " + this.start + " - " + this.end + "</p> <p>Description: " + this.body + "</p>";
-	$('#view-modal-title').text(this.content);
-	$('#view-modal-body').html(body_content);
-	$('#view-modal').modal('show');
+	showEventPost(this);
+}
+
+function showEventPost(userEvent){
+  var color = userEvent.color;
+  $('#view-modal-title').text(userEvent.collection + ': ' + userEvent.content);
+  
+  body_content = "<p>Dates: " + userEvent.start + " - " + userEvent.end + "</p>"
+               + "<p>Description: " + userEvent.body + "</p>"
+               + '<input id="eventId" type="hidden" value="' + userEvent.index + '"/>';
+               
+  $('#view-modal-body').html(body_content);
+  $('#view-modal').modal('show');
 }
 
 function addEventToTimeline(data){    
@@ -447,12 +475,8 @@ function getEvents(){
     .done(function( json ) {
       userCollections = json.collections;
       createDatalist();
-      //TODO - make css classes for collections
-      userEvents = mockOverlayData; //json.events;
-      //console.log(userEvents);
-      //addEventsToTimeline(userEvents);
+      userEvents = json.events;
       addEventsToMap(userEvents);
-      //addEventsToTimeline(userOverlays);
     })
     .fail(function( textStatus ) {
       console.log( "Request failed: " + textStatus.toString() );
@@ -481,6 +505,7 @@ $(".new-close").click(function(){
 
 // Show or hide the color picker and collection label
 $("#collectionInput").change(function(){
+  var collectionInput = $('#collectionInput')[0];
 	if (collectionInput.value=="null"){
     	$("#new-collection").slideToggle();	
     }
@@ -495,12 +520,13 @@ $(".new-submit").click(function(){
 	$('#timeline-container').slideToggle();
 	$('#new-modal').modal('hide');
 	var collection;
+  var collectionInput = $('#collectionInput')[0];
 	var name = $('#eventName').val();
 	if (collectionInput.value=="null"){
 		collectionName = $('#newCollection').val();
 		collectionColor = $('#color').val();
 		collection = {name: collectionName, color: collectionColor};	
-		saveCollection(collection);
+		//saveCollection(collection);
 		userCollections.push(collection);
 	}
 	else{
@@ -510,15 +536,33 @@ $(".new-submit").click(function(){
 	var end = new Date($('#endDate').val()).toJSON();
 	var content = $('#eventDescription').val();
 	//var overlayIndex = userOverlays.length - 1;
+	console.log(collection);
 	var overlay = userOverlays.pop();//[overlayIndex];
 	overlay.setMap(null);
 	overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
-	var newEvent = {'name':name, 'content':content, 'collection':collection, 'user':"" ,'shape':overlay.shape, 'geometry':overlay.geometry, 'start':start, 'end':end}
+	
+	var newEvent = {'name':name, 
+	                'content':content, 
+	                'collection':collection, 
+	                'user':"" ,
+	                'shape':overlay.shape, 
+	                'geometry':overlay.geometry, 
+	                'start':start, 
+	                'end':end};
+	                
 	userEvents.push(newEvent);
 	addEventsToMap([newEvent]);
 	windowResize();
 	saveEvent(newEvent);
 	console.log (newEvent);
+});
+
+$('.edit-event').click(function(){
+  var eventId = $('#eventId').val();
+  var overlay = userOverlays[eventId];
+  $('#view-modal').modal('hide');
+  overlay.makeEditable();
+  //$('#edit-modal').modal('show');
 });
 
 
@@ -665,4 +709,5 @@ function dateTimeValidation(){
 		alert("You must choose a beginning date to have an end date.");
 	}
 }
-//end of jquery ui datepicker
+
+//
