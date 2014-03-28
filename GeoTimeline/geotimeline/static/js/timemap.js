@@ -181,6 +181,7 @@ function addEventsToMap(events){
 			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:10}
 			evente = new google.maps.Marker({
 				//map:map,
+				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
 				strokeColor: sColor,
@@ -226,17 +227,22 @@ function addEventsToMap(events){
 				},
 				makeEditable: function(){
 				  this.setIcon('http://icons.iconarchive.com/icons/everaldo/kids-icons/32/package-utilities-icon.png');
-          this.setDraggable(true);
-        },
+		          this.setDraggable(true);
+		          this.editOn = true;
+		        },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					this.onClick();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
-					this.highlightOn();
+					if(this.editOn == false){
+						this.highlightOn();
+					}
 				});
 				google.maps.event.addListener(evente, 'mouseout', function(){
-					this.highlightOff();
+					if(this.editOn == false){
+						this.highlightOff();
+					}
 				});
 			userOverlays.push(evente);
 			break;
@@ -244,6 +250,7 @@ function addEventsToMap(events){
 			//make polygon
 			evente = new google.maps.Polygon({
 				//map:map,
+				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
 				paths: aDecodGeom,
@@ -288,6 +295,7 @@ function addEventsToMap(events){
 			//make polyline
 			evente = new google.maps.Polyline({
 				//map:map,
+				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
 				path: aDecodGeom,
@@ -341,7 +349,7 @@ function addEventsToMap(events){
 
 google.maps.MVCObject.prototype.onClick = function(){
 	showEventPost(this);
-}
+};
 
 function showEventPost(userEvent){
   var color = userEvent.color;
@@ -396,8 +404,8 @@ function timelineManager () {
 		});
 		$(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
 			$.proxy(function(){this.highlightOff()}, overlay)
-        )
-		.click($.proxy(function(){this.onClick()}, overlay))
+       )
+		.click($.proxy(function(){this.onClick()}, overlay));
 		
 	});
 }
@@ -712,5 +720,3 @@ function dateTimeValidation(){
 		alert("You must choose a beginning date to have an end date.");
 	}
 }
-
-//
