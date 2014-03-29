@@ -121,6 +121,11 @@ div.timeline-content{
 	opacity:1 !important;
 }
 
+.mapFull{
+	z-index: 1000 !important;
+	position: relative;
+}
+
 .modal-body{
   
 }

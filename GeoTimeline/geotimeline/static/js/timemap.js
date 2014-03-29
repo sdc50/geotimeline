@@ -466,6 +466,7 @@ $("#new-event-click").click(function(){
     drawingManager.setDrawingMode(null);
     $('#timeline-container').slideToggle();
     $('#map').height($(window).height());
+    $('#map').addClass("mapFull");
 });
 
 // Remove event from map and array if new event is cancelled
@@ -475,6 +476,7 @@ $(".new-close").click(function(){
     $('#timeline-container').slideToggle();
     deletedOverlay = userOverlays.pop();
     deletedOverlay.setMap(null);
+    $('#map').removeClass("mapFull");
     resize;
     
 });
@@ -493,6 +495,7 @@ $(".new-submit").click(function(){
 	drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
 	$('#timeline-container').slideToggle();
+	$('#map').removeClass("mapFull");
 	$('#new-modal').modal('hide');
 	var collection;
 	var name = $('#eventName').val();
