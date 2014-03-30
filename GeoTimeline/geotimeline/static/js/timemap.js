@@ -720,3 +720,31 @@ function dateTimeValidation(){
 		alert("You must choose a beginning date to have an end date.");
 	}
 }
+//////////////////////////////////////////////
+//this is the validation stuff for the 
+//new events form
+//required
+// $('.requiredInput').on('blur',function(evt){
+	// if(!$(evt.target).val()){
+		// alert('This is a required field.');
+		// $(evt.target).focus();
+	// }
+// });
+//select item not required but check something?
+//$('#collectionInput')
+//only required if collectionInput is null
+$('.requiredInput').on('blur',function(evt){
+	if(!$(evt.target).val()){
+		alert('Please enter an event name');
+		$('#newCollection').focus();
+	}
+});
+//$('#color') //only required if collectionInput is null
+//$('#startDate')
+ //required with no time constraints
+//$('#endDate') //not required but if filled it must be at least 30 min after startDate
+//$('#eventDescription') //required
+//$('.btn btn-default new-submit')
+//$('#new-event') //this is the form id
+//end validation for new events form
+///////////////////////////////////////////
