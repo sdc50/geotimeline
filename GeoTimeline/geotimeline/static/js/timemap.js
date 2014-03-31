@@ -2,7 +2,7 @@
 //google.maps.event.addDomListener(window, 'load', initializeMap);
 //google.setOnLoadCallback(initializeTimeline);
 
-var map, timeline;
+var map, timeline, pageHeight, pageWidth;
 
 $(function(){
   $('header').addClass('map-header').find('a').first().fadeOut('slow');
@@ -34,13 +34,7 @@ function addListeners(){
     });
   });
   
-  // adding a new event
-  $("#new-event-click").click(function(){
-    drawingManager.setOptions({drawingControl:true});
-      drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideToggle();
-      $('#map').height($(window).height());
-  });
+
   
   // Remove event from map and array if new event is cancelled
   $(".new-close").click(function(){
@@ -49,7 +43,7 @@ function addListeners(){
       $('#timeline-container').slideToggle();
       deletedOverlay = userOverlays.pop();
       deletedOverlay.setMap(null);
-      resize;
+      windowResize();
       
   });
   
@@ -590,6 +584,14 @@ function getEvents(){
       console.log( "Request failed: " + textStatus.toString() );
     });
 }
+
+  // adding a new event
+  $("#new-event-click").click(function(){
+    drawingManager.setOptions({drawingControl:true});
+      drawingManager.setDrawingMode(null);
+      $('#timeline-container').slideToggle();
+      $('#map').height($(window).height());
+  });
 
 
 function showSubmission(){
