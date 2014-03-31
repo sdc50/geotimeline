@@ -10,13 +10,21 @@ $(function(){
 
   initializeMap();
   initializeTimeline();
-  resize();
+  $('#colorpicker').farbtastic('#color');
   
   getEvents();
 
   // validate();
 
+  addListeners();
+  
+
+});
+
+function addListeners(){
+  
   $(window).resize(windowResize);
+  
   $('.timeline-axis').mousedown(function(){
     $(document).mousemove(function(e){
       resizeTimeline(e.pageY);
@@ -25,11 +33,99 @@ $(function(){
             $(document).off('mousemove');
     });
   });
-});
-
-$(document).ready(function() {
-    $('#colorpicker').farbtastic('#color');
+  
+  // adding a new event
+  $("#new-event-click").click(function(){
+    drawingManager.setOptions({drawingControl:true});
+      drawingManager.setDrawingMode(null);
+      $('#timeline-container').slideToggle();
+      $('#map').height($(window).height());
   });
+  
+  // Remove event from map and array if new event is cancelled
+  $(".new-close").click(function(){
+    drawingManager.setOptions({drawingControl:false});
+      drawingManager.setDrawingMode(null);
+      $('#timeline-container').slideToggle();
+      deletedOverlay = userOverlays.pop();
+      deletedOverlay.setMap(null);
+      resize;
+      
+  });
+  
+  // Show or hide the color picker and collection label
+  $("#collectionInput").change(function(){
+  
+    var collectionInput = $('#collectionInput')[0];
+  
+    if (collectionInput.value=="null"){
+        $("#new-collection").slideToggle(); 
+  
+      }
+      else{
+        $("#new-collection").hide();
+      }
+  });
+  
+  $(".new-submit").click(function(){
+    //call validation function which returns an error message string.
+    //if it is blank then the form is submitted.
+    //If it is not blank then the string is shown in an alert and the form is not submitted.
+    var errorMsg = validateAllNewEvent();
+    if(errorMsg == ''){
+      drawingManager.setOptions({drawingControl:false});
+        drawingManager.setDrawingMode(null);
+      $('#timeline-container').slideToggle();
+      $('#new-modal').modal('hide');
+      var collection;
+      var collectionInput = $('#collectionInput')[0];
+      var name = $('#eventName').val();
+      if (collectionInput.value=="null"){
+        collectionName = $('#newCollection').val();
+        collectionColor = $('#color').val();
+        collection = {name: collectionName, color: collectionColor};  
+        //saveCollection(collection);
+        userCollections.push(collection);
+      }
+      else{
+        collection = userCollections[collectionInput.selectedIndex - 1];
+      }
+      var start = new Date($('#startDate').val()).toJSON();
+      var end = new Date($('#endDate').val()).toJSON();
+      var content = $('#eventDescription').val();
+      //var overlayIndex = userOverlays.length - 1;
+      console.log(collection);
+      var overlay = userOverlays.pop();//[overlayIndex];
+      overlay.setMap(null);
+      overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+      
+      var newEvent = {'name':name, 
+                      'content':content, 
+                      'collection':collection, 
+                      'user':"" ,
+                      'shape':overlay.shape, 
+                      'geometry':overlay.geometry, 
+                      'start':start, 
+                      'end':end};
+                      
+      userEvents.push(newEvent);
+      addEventsToMap([newEvent]);
+      windowResize();
+      saveEvent(newEvent);
+      console.log (newEvent);
+    }else{
+      alert(errorMsg);
+    }
+  });
+  
+  $('.edit-event').click(function(){
+    var eventId = $('#eventId').val();
+    var overlay = userOverlays[eventId];
+    $('#view-modal').modal('hide');
+    overlay.makeEditable();
+    //$('#edit-modal').modal('show');
+  });
+}
 
 var drawingManager
 function initializeMap() {
@@ -339,7 +435,6 @@ function addEventsToMap(events){
 		userOverlays[overlayIndex].setMap(map);
 		addEventToTimeline(userOverlays[overlayIndex]);
 	}
-	console.log('adding to map');
 	//now add all of the events in the evente array to the map
 	// for (var o=0; o<userOverlays.length; o++){
 		// userOverlays[o].setMap(map);
@@ -374,18 +469,6 @@ function addEventToTimeline(data){
     timelineManager();    
 }
 
-function addEventsToTimeline(events){    
-    // Draw our timeline with the created data
-    timeline.setData(events);
-    timeline.redraw();
-     
-    // Set visibility on load
-    timeline.setVisibleChartRangeAuto();
-    
-    timelineManager();
-      
-}
-
 function timelineManager () {
 	var overlay;
 	$('.timeline-event, .timeline-event-box').each(function(){
@@ -412,19 +495,28 @@ function timelineManager () {
 			var lon = coord.A;
 			console.log( lat );
 			console.log( lon );
+			var place = new google.maps.LatLng(lat , lon);
+			var bounds = new google.maps.LatLngBounds();
+			
 			});
 	
 		
 	});
 }
 
-function resize(e){
-  var height = $(window).height();
-  var width = $(window).width();
-  $('#map').height(height * .8);
-  $('#map').width(width);
-  $('#map-form').width(width + 500);
-  $('#content').width(width);
+function windowResize(){
+  pageHeight = $(window).height();
+  pageWidth = $(window).width();
+  resizeTimeline(pageHeight * .8);
+}
+
+function resizeTimeline(y){
+  var timelineHeight = pageHeight - y;
+  var BUFFER = 100;
+  timelineHeight = timelineHeight < BUFFER ? BUFFER : timelineHeight > pageHeight - BUFFER ? pageHeight - BUFFER : timelineHeight;
+  $('#timeline-container').height(timelineHeight);
+  $('#map').height(pageHeight - timelineHeight);
+  $('#map').width(pageWidth);
   timeline.checkResize();
 }
 
@@ -498,119 +590,6 @@ function getEvents(){
       console.log( "Request failed: " + textStatus.toString() );
     });
 }
-
-
-// adding a new event
-$("#new-event-click").click(function(){
-	drawingManager.setOptions({drawingControl:true});
-    drawingManager.setDrawingMode(null);
-    $('#timeline-container').slideToggle();
-    $('#map').height($(window).height());
-    $('#map').addClass("mapFull");
-});
-
-// Remove event from map and array if new event is cancelled
-$(".new-close").click(function(){
-	drawingManager.setOptions({drawingControl:false});
-    drawingManager.setDrawingMode(null);
-    $('#timeline-container').slideToggle();
-    deletedOverlay = userOverlays.pop();
-    deletedOverlay.setMap(null);
-    $('#map').removeClass("mapFull");
-    resize;
-    
-});
-
-// Show or hide the color picker and collection label
-$("#collectionInput").change(function(){
-
-  var collectionInput = $('#collectionInput')[0];
-
-	if (collectionInput.value=="null"){
-    	$("#new-collection").slideToggle();	
-
-    }
-    else{
-    	$("#new-collection").hide();
-    }
-});
-
-$(".new-submit").click(function(){
-	drawingManager.setOptions({drawingControl:false});
-    drawingManager.setDrawingMode(null);
-	$('#timeline-container').slideToggle();
-	$('#map').removeClass("mapFull");
-	$('#new-modal').modal('hide');
-	var collection;
-  var collectionInput = $('#collectionInput')[0];
-	var name = $('#eventName').val();
-	if (collectionInput.value=="null"){
-		collectionName = $('#newCollection').val();
-		collectionColor = $('#color').val();
-		collection = {name: collectionName, color: collectionColor};	
-		//saveCollection(collection);
-		userCollections.push(collection);
-	}
-	else{
-		collection = userCollections[collectionInput.selectedIndex - 1];
-
-	//call validation function which returns an error message string.
-	//if it is blank then the form is submitted.
-	//If it is not blank then the string is shown in an alert and the form is not submitted.
-	var errorMsg = validateAllNewEvent();
-	if(errorMsg == ''){
-		drawingManager.setOptions({drawingControl:false});
-	    drawingManager.setDrawingMode(null);
-		$('#timeline-container').slideToggle();
-		$('#new-modal').modal('hide');
-		var collection;
-	  var collectionInput = $('#collectionInput')[0];
-		var name = $('#eventName').val();
-		if (collectionInput.value=="null"){
-			collectionName = $('#newCollection').val();
-			collectionColor = $('#color').val();
-			collection = {name: collectionName, color: collectionColor};	
-			//saveCollection(collection);
-			userCollections.push(collection);
-		}
-		// else{
-			// collection = userCollections[collectionInput.selectedIndex - 1];
-		// }
-		// var start = new Date($('#startDate').val()).toJSON();
-		// var end = new Date($('#endDate').val()).toJSON();
-		// var content = $('#eventDescription').val();
-		// //var overlayIndex = userOverlays.length - 1;
-		// console.log(collection);
-		// var overlay = userOverlays.pop();//[overlayIndex];
-		// overlay.setMap(null);
-		// overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
-// 		
-		// var newEvent = {'name':name, 
-		                // 'content':content, 
-		                // 'collection':collection, 
-		                // 'user':"" ,
-		                // 'shape':overlay.shape, 
-		                // 'geometry':overlay.geometry, 
-		                // 'start':start, 
-		                // 'end':end};
-// 		                
-		// userEvents.push(newEvent);
-		// addEventsToMap([newEvent]);
-		// windowResize();
-		// saveEvent(newEvent);
-		// console.log (newEvent);
-	}else{
-		alert(errorMsg);
-	}
-}});
-
-$('.edit-event').click(function(){
-  var eventId = $('#eventId').val();
-  var overlay = userOverlays[eventId];
-  $('#view-modal').modal('hide');
-  overlay.makeEditable();
-  //$('#edit-modal').modal('show');
-});
 
 
 function showSubmission(){
@@ -775,8 +754,9 @@ function dateTimeValidation(target){
  */
 $('.requiredInput').on('blur',function(evt){
 	if(!$(evt.target).val()){
-		alert('This is a required field.');
-		$(evt.target).focus();
+	  $(evt.target).parent().addClass('has-error');
+		//alert('This is a required field.');
+		//$(evt.target).focus();
 	}
 });
 /*this function checks everything and returns a message string.
