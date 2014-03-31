@@ -92,10 +92,9 @@ def saveEvent(request):
         c.events.append(event)
         user.events.append(event) #TODO - sqlalchemy? (see initializedb)
         DBSession.add(c)
-        return {'msg':'success'}
+        return event
     except DBAPIError:
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'collections': collections}
     
 @view_config(route_name='saveCollection', renderer='json', permission='edit')
 def saveCollection(request):

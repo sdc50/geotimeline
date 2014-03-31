@@ -95,8 +95,9 @@ function addListeners(){
       var end = new Date($('#endDate').val()).toJSON();
       var content = $('#eventDescription').val();
       //var overlayIndex = userOverlays.length - 1;
-      console.log(collection);
+      //console.log(collection);
       var overlay = userOverlays.pop();//[overlayIndex];
+      console.log(overlay);
       overlay.setMap(null);
       overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
       
@@ -109,11 +110,11 @@ function addListeners(){
                       'start':start, 
                       'end':end};
                       
-      userEvents.push(newEvent);
       addEventsToMap([newEvent]);
       windowResize();
+      newEvent.index = userOverlays.length -1;
       saveEvent(newEvent);
-      console.log (newEvent);
+      //console.log (newEvent);
     }else{
       alert(errorMsg);
     }
@@ -234,13 +235,11 @@ function initializeTimeline(){
 //use global variable to represent event overlays just drawn
 var userCollections = [];
 var userOverlays = [];
-var userEvents = [];
 function addEventsToMap(events){
 	var startIndex = userOverlays.length
 	for (var e=0; e<events.length; e++){
-	  var iId = events[e].id;
-		var overlayIndex = startIndex + e;
 		var evente;
+		var iId = events[e].id;
 		var sColl = events[e].collection.name;
 		var sColor = events[e].collection.color;
 		var sUser = events[e].user;
@@ -248,20 +247,17 @@ function addEventsToMap(events){
 		var tStart = new Date(events[e].start);
 		var tEnd = new Date(events[e].end);
 		var tcontent = events[e].name;
-		var iOverlayIndex = overlayIndex;
-
-		var tclassName = "row" + overlayIndex;
-
+		var iOverlayIndex = startIndex + e;
+		var tclassName = "row" + iOverlayIndex;
 		var tbody = events[e].content;
 		var sTitle = events[e].name;
 		var aCodedGeom = events[e].geometry;
-		console.log(google.maps.geometry);
 		var aDecodGeom = google.maps.geometry.encoding.decodePath(aCodedGeom);
 		switch(sShape){
 			case 'marker':
 			//make variables for the pin color
 			var pinColor = sColor.substring(1);
-			console.log(pinColor);
+			//console.log(pinColor);
 			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
 				//new google.maps.Point(0,0),
 				//new google.maps.Point(10,34),
@@ -433,8 +429,8 @@ function addEventsToMap(events){
 			break;
 		}	
 		
-		userOverlays[overlayIndex].setMap(map);
-		addEventToTimeline(userOverlays[overlayIndex]);
+		userOverlays[iOverlayIndex].setMap(map);
+		addEventToTimeline(userOverlays[iOverlayIndex]);
 	}
 	//now add all of the events in the evente array to the map
 	// for (var o=0; o<userOverlays.length; o++){
@@ -453,7 +449,7 @@ function showEventPost(userEvent){
   
   body_content = "<p>Dates: " + userEvent.start + " - " + userEvent.end + "</p>"
                + "<p>Description: " + userEvent.body + "</p>"
-               + '<input id="eventId" type="hidden" value="' + userEvent.index + '"/>';
+               + '<input id="eventIndex" type="hidden" value="' + userEvent.index + '"/>';
                
   $('#view-modal-body').html(body_content);
   $('#view-modal').modal('show');
@@ -480,7 +476,7 @@ function timelineManager () {
 					var id = classes[i].split("row")[1];
 					overlay = userOverlays[id];
 					overlay.timelineDiv = $(this);
-					console.log(overlay);
+					//console.log(overlay);
 					var color = overlay.strokeColor;
 					$(this).css({"background-color": color, "opacity": "0.75"})
 				}
@@ -535,15 +531,23 @@ function validate(){
       //send invalid input message
 }
 
-function saveEvent(data){
+function saveEvent(newEvent){
   $.ajax({
     type: "POST",
     url: saveEventUrl,
-    data: data,
+    data: newEvent,
     //contentType: 'application/json; charset=utf-8'
   })
-    .done(function( msg ) {
-      console.log( "Data Saved: " + msg.msg );
+    .done(function( savedEvent ) {
+      var collection = newEvent.collection;
+      if(!collection.id){
+        collection.id = savedEvent.collection.id;
+        var optionString = '<option value="' + collection.id + '">'+ collection.name +'</option>';
+        $('#collectionInput').append(optionString);
+      }
+      
+      var overlay = userOverlays[newEvent.index];
+      overlay.id = savedEvent.id;
   });
 }
 
@@ -556,8 +560,7 @@ function saveCollection(collection){
   })
     .done(function( msg ) {
       collection.id =  msg.id
-      var optionString = '<option value="' + collection.id + '">'+ collection.name +'</option>';
-      $('#collectionInput').append(optionString);
+      
       
   });
 }
@@ -572,9 +575,7 @@ function getEvents(){
       userCollections = json.collections;
       createDatalist();
 
-      userEvents = json.events;
-
-      addEventsToMap(userEvents);
+      addEventsToMap(json.events);
     })
     .fail(function( textStatus ) {
       console.log( "Request failed: " + textStatus.toString() );
@@ -708,14 +709,14 @@ var st = $('#startDate');
 var dStart;
 st.on('blur',function(){
 	dStart = new Date(st.val());
-	console.log(dStart);
+	//console.log(dStart);
 	dateTimeValidation(st);
 });
 var en = $('#endDate');
 var dEnd;
 en.on('blur',function(){
 	dEnd = new Date(en.val());
-	console.log(dEnd);
+	//console.log(dEnd);
 	dateTimeValidation(en);
 });
 //function to check if the start is at least 30 min before the end
