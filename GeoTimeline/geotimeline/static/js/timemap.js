@@ -405,7 +405,15 @@ function timelineManager () {
 		$(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
 			$.proxy(function(){this.highlightOff()}, overlay)
        )
-		.click($.proxy(function(){this.onClick()}, overlay));
+		.click($.proxy(function(){this.onClick()}, overlay))
+		.click(function(){
+			var coord = overlay.position;
+			var lat = coord.k;
+			var lon = coord.A;
+			console.log( lat );
+			console.log( lon );
+			});
+	
 		
 	});
 }
@@ -565,36 +573,36 @@ $(".new-submit").click(function(){
 			//saveCollection(collection);
 			userCollections.push(collection);
 		}
-		else{
-			collection = userCollections[collectionInput.selectedIndex - 1];
-		}
-		var start = new Date($('#startDate').val()).toJSON();
-		var end = new Date($('#endDate').val()).toJSON();
-		var content = $('#eventDescription').val();
-		//var overlayIndex = userOverlays.length - 1;
-		console.log(collection);
-		var overlay = userOverlays.pop();//[overlayIndex];
-		overlay.setMap(null);
-		overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
-		
-		var newEvent = {'name':name, 
-		                'content':content, 
-		                'collection':collection, 
-		                'user':"" ,
-		                'shape':overlay.shape, 
-		                'geometry':overlay.geometry, 
-		                'start':start, 
-		                'end':end};
-		                
-		userEvents.push(newEvent);
-		addEventsToMap([newEvent]);
-		windowResize();
-		saveEvent(newEvent);
-		console.log (newEvent);
+		// else{
+			// collection = userCollections[collectionInput.selectedIndex - 1];
+		// }
+		// var start = new Date($('#startDate').val()).toJSON();
+		// var end = new Date($('#endDate').val()).toJSON();
+		// var content = $('#eventDescription').val();
+		// //var overlayIndex = userOverlays.length - 1;
+		// console.log(collection);
+		// var overlay = userOverlays.pop();//[overlayIndex];
+		// overlay.setMap(null);
+		// overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+// 		
+		// var newEvent = {'name':name, 
+		                // 'content':content, 
+		                // 'collection':collection, 
+		                // 'user':"" ,
+		                // 'shape':overlay.shape, 
+		                // 'geometry':overlay.geometry, 
+		                // 'start':start, 
+		                // 'end':end};
+// 		                
+		// userEvents.push(newEvent);
+		// addEventsToMap([newEvent]);
+		// windowResize();
+		// saveEvent(newEvent);
+		// console.log (newEvent);
 	}else{
 		alert(errorMsg);
 	}
-});
+}});
 
 $('.edit-event').click(function(){
   var eventId = $('#eventId').val();
