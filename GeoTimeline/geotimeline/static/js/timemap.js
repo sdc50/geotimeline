@@ -10,6 +10,7 @@ $(function(){
 
   initializeMap();
   initializeTimeline();
+  windowResize();
   $('#colorpicker').farbtastic('#color');
   
   getEvents();
@@ -18,7 +19,7 @@ $(function(){
 
   addListeners();
   
-
+  
 });
 
 function addListeners(){
@@ -34,7 +35,13 @@ function addListeners(){
     });
   });
   
-
+  // adding a new event
+  $("#new-event-click").click(function(){
+    drawingManager.setOptions({drawingControl:true});
+      drawingManager.setDrawingMode(null);
+      $('#timeline-container').slideToggle();
+      $('#map').height($(window).height());
+  });
   
   // Remove event from map and array if new event is cancelled
   $(".new-close").click(function(){
@@ -574,13 +581,7 @@ function getEvents(){
     });
 }
 
-  // adding a new event
-  $("#new-event-click").click(function(){
-    drawingManager.setOptions({drawingControl:true});
-      drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideToggle();
-      $('#map').height($(window).height());
-  });
+  
 
 
 function showSubmission(){
