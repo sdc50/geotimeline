@@ -485,13 +485,11 @@ function timelineManager () {
 		.click($.proxy(function(){this.onClick()}, overlay))
 		.click(function(){
 			var coord = overlay.position;
-			var lat = coord.k;
-			var lon = coord.A;
-			console.log( lat );
-			console.log( lon );
-			var place = new google.maps.LatLng(lat , lon);
+			// var place = new google.maps.LatLng(lat , lon);
+			var place = coord;
 			var bounds = new google.maps.LatLngBounds();
-			
+			bounds.extend(place);
+			map.fitBounds(bounds);
 			});
 	
 		
