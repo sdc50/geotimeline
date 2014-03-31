@@ -485,7 +485,16 @@ function timelineManager () {
 		$(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
 			$.proxy(function(){this.highlightOff()}, overlay)
        )
-		.click($.proxy(function(){this.onClick()}, overlay));
+		.click($.proxy(function(){this.onClick()}, overlay))
+		.click(function(){
+			var coord = overlay.position;
+			// var place = new google.maps.LatLng(lat , lon);
+			var place = coord;
+			var bounds = new google.maps.LatLngBounds();
+			bounds.extend(place);
+			map.fitBounds(bounds);
+			});
+	
 		
 	});
 }
