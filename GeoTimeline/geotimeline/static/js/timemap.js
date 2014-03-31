@@ -545,30 +545,55 @@ $(".new-submit").click(function(){
 	}
 	else{
 		collection = userCollections[collectionInput.selectedIndex - 1];
+
+	//call validation function which returns an error message string.
+	//if it is blank then the form is submitted.
+	//If it is not blank then the string is shown in an alert and the form is not submitted.
+	var errorMsg = validateAllNewEvent();
+	if(errorMsg == ''){
+		drawingManager.setOptions({drawingControl:false});
+	    drawingManager.setDrawingMode(null);
+		$('#timeline-container').slideToggle();
+		$('#new-modal').modal('hide');
+		var collection;
+	  var collectionInput = $('#collectionInput')[0];
+		var name = $('#eventName').val();
+		if (collectionInput.value=="null"){
+			collectionName = $('#newCollection').val();
+			collectionColor = $('#color').val();
+			collection = {name: collectionName, color: collectionColor};	
+			//saveCollection(collection);
+			userCollections.push(collection);
+		}
+		else{
+			collection = userCollections[collectionInput.selectedIndex - 1];
+		}
+		var start = new Date($('#startDate').val()).toJSON();
+		var end = new Date($('#endDate').val()).toJSON();
+		var content = $('#eventDescription').val();
+		//var overlayIndex = userOverlays.length - 1;
+		console.log(collection);
+		var overlay = userOverlays.pop();//[overlayIndex];
+		overlay.setMap(null);
+		overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+		
+		var newEvent = {'name':name, 
+		                'content':content, 
+		                'collection':collection, 
+		                'user':"" ,
+		                'shape':overlay.shape, 
+		                'geometry':overlay.geometry, 
+		                'start':start, 
+		                'end':end};
+		                
+		userEvents.push(newEvent);
+		addEventsToMap([newEvent]);
+		windowResize();
+		saveEvent(newEvent);
+		console.log (newEvent);
+	}else{
+		alert(errorMsg);
 	}
-	var start = new Date($('#startDate').val()).toJSON();
-	var end = new Date($('#endDate').val()).toJSON();
-	var content = $('#eventDescription').val();
-	//var overlayIndex = userOverlays.length - 1;
-	console.log(collection);
-	var overlay = userOverlays.pop();//[overlayIndex];
-	overlay.setMap(null);
-	overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
-	
-	var newEvent = {'name':name, 
-	                'content':content, 
-	                'collection':collection, 
-	                'user':"" ,
-	                'shape':overlay.shape, 
-	                'geometry':overlay.geometry, 
-	                'start':start, 
-	                'end':end};
-	                
-	userEvents.push(newEvent);
-	addEventsToMap([newEvent]);
-	windowResize();
-	saveEvent(newEvent);
-	console.log (newEvent);
 });
 
 $('.edit-event').click(function(){
@@ -705,21 +730,88 @@ var dStart;
 st.on('blur',function(){
 	dStart = new Date(st.val());
 	console.log(dStart);
-	dateTimeValidation();
+	dateTimeValidation(st);
 });
 var en = $('#endDate');
 var dEnd;
 en.on('blur',function(){
 	dEnd = new Date(en.val());
 	console.log(dEnd);
-	dateTimeValidation();
+	dateTimeValidation(en);
 });
-//function to check if the start is before the end
-function dateTimeValidation(){
-	if((dEnd-dStart<0) && dStart){
-		alert("The start date must be before the end date.");
+//function to check if the start is at least 30 min before the end
+function dateTimeValidation(target){
+	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
+		alert("The end date/time must be at least 30 minutes after the start date/time.");
+		target.focus();
 	}
 	else if(dEnd && !dStart){
 		alert("You must choose a beginning date to have an end date.");
+		st.focus();
 	}
 }
+//////////////////////////////////////////////
+//this is the validation stuff for the 
+//new events form
+//required
+// $('.requiredInput')
+//select item not required but check something?
+//$('#collectionInput')
+//only required if collectionInput is null
+/*this event listener is for the following ids:
+ * eventName
+ * newCollection
+ * color
+ * startDate
+ * eventDescription
+ */
+$('.requiredInput').on('blur',function(evt){
+	if(!$(evt.target).val()){
+		alert('This is a required field.');
+		$(evt.target).focus();
+	}
+});
+/*this function checks everything and returns a message string.
+ * If the message string is blank then it is all good.
+ * If it is not blank then the form is not submitted.
+ *
+ * This function is called within the submit button's click event on line 529.
+ */
+function validateAllNewEvent(){
+	var msg = '';
+	
+	if(!$('#eventName').val()){
+		msg = msg + 'The event name field is blank.\n';
+	}
+	if(!$('#newCollection').val() && ($('#collectionInput').val() == "null")){
+		msg = msg + 'The new collection name field is blank.\n';
+	}
+	if(!$('#color').val()){
+		msg = msg + 'The new collection color field is blank.\n';
+	}
+	if(!$('#startDate').val()){
+		msg = msg + 'The start date/time field is blank.\n';
+	}
+	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
+		msg = msg + 'The end date/time is less than 30 minutes after the start date/time.\n';
+	}
+	else if(dEnd && !dStart){
+		msg = msg + 'You have entered a beginning date without an end date.';
+	}
+	if(!$('#eventDescription').val()){
+		msg = msg + 'The event description field is blank.\n';
+	}
+	if(msg == ''){
+		return msg;
+	}
+	else{
+		msg = 'The following input errors have occured:\n' + msg;
+		msg = msg + 'Please make the necessary corrections and try submitting again.\n\nThank You.';
+		return msg;
+	}
+}
+//$('#endDate') //not required but if filled it must be at least 30 min after startDate
+//$('.btn btn-default new-submit')
+//$('#new-event') //this is the form id
+//end validation for new events form
+///////////////////////////////////////////
