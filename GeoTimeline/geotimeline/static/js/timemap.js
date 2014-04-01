@@ -123,6 +123,7 @@ function addListeners(){
   
   $('.edit-event').click(function(){
     var eventId = $('#eventId').val();
+    var eventId = parseInt(eventId);
     var overlay = userOverlays[eventId];
     $('#view-modal').modal('hide');
     overlay.makeEditable();
@@ -326,6 +327,9 @@ function addEventsToMap(events){
 		        },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
+					var index = this.index;
+					//console.log(index);
+					$('#eventId').val(index);
 					this.onClick();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
@@ -442,6 +446,11 @@ function addEventsToMap(events){
 
 google.maps.MVCObject.prototype.onClick = function(){
 	showEventPost(this);
+	console.log(this);
+	var coord = this.position;
+	var bounds = new google.maps.LatLngBounds();
+	bounds.extend(coord);
+	map.fitBounds(bounds);
 };
 
 function showEventPost(userEvent){
@@ -486,17 +495,7 @@ function timelineManager () {
 		$(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
 			$.proxy(function(){this.highlightOff()}, overlay)
        )
-		.click($.proxy(function(){this.onClick()}, overlay))
-		.click(function(){
-			var coord = overlay.position;
-			// var place = new google.maps.LatLng(lat , lon);
-			var place = coord;
-			var bounds = new google.maps.LatLngBounds();
-			bounds.extend(place);
-			map.fitBounds(bounds);
-			});
-	
-		
+		.click($.proxy(function(){this.onClick()}, overlay));
 	});
 }
 
