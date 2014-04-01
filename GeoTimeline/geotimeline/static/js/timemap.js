@@ -123,6 +123,7 @@ function addListeners(){
   
   $('.edit-event').click(function(){
     var eventId = $('#eventId').val();
+    var eventId = parseInt(eventId);
     var overlay = userOverlays[eventId];
     $('#view-modal').modal('hide');
     overlay.makeEditable();
@@ -326,6 +327,9 @@ function addEventsToMap(events){
 		        },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
+					var index = this.index;
+					//console.log(index);
+					$('#eventId').val(index);
 					this.onClick();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
