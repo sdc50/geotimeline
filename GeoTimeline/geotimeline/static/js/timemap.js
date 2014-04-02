@@ -40,7 +40,7 @@ function addListeners(){
     drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
       $('#timeline-container').slideToggle();
-      $('#map').height($(window).height());
+      $('#map').height(pageHeight);
   });
   
   // Remove event from map and array if new event is cancelled
@@ -122,13 +122,22 @@ function addListeners(){
   });
   
   $('.edit-event').click(function(){
-    var eventId = $('#eventId').val();
-    var eventId = parseInt(eventId);
-    var overlay = userOverlays[eventId];
+    var eventIndex = $('#eventIndex').val();
+    var overlay = userOverlays[eventIndex];
     $('#view-modal').modal('hide');
+    $('#usr-group').toggle();
+    $('#edit-post').toggle();
+    $('#timeline-container').slideToggle();
+    $('#map').height(pageHeight);
     overlay.makeEditable();
-    
-    //$('#edit-modal').modal('show');
+    populateEditModal(overlay);
+  });
+  
+  $('#edit-post').click(function(){
+    $('#usr-group').toggle();
+    $('#edit-post').toggle();
+    //overlay.makeUneditable(); TODO
+    $('#new-modal').modal('show');
   });
 }
 
@@ -245,6 +254,7 @@ function addEventsToMap(events){
 		var iId = events[e].id;
 		var sColl = events[e].collection.name;
 		var sColor = events[e].collection.color;
+		var iCollectionId = events[e].collection.id;
 		var sUser = events[e].user;
 		var sShape = events[e].shape;
 		var tStart = new Date(events[e].start);
@@ -280,6 +290,7 @@ function addEventsToMap(events){
 				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
+				collectionId:  iCollectionId,
 				strokeColor: sColor,
 				fillColor: sColor,
 				icon: pinImage, //this is new for the marker color
@@ -352,6 +363,7 @@ function addEventsToMap(events){
 				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
+				collectionId:  iCollectionId,
 				paths: aDecodGeom,
 				geodesic: true,
 				strokeColor: sColor,
@@ -400,6 +412,7 @@ function addEventsToMap(events){
 				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
+				collectionId:  iCollectionId,
 				path: aDecodGeom,
 				geodesic: true,
 				strokeColor: sColor,
@@ -472,6 +485,16 @@ function showEventPost(userEvent){
   $('#view-modal').modal('show');
 }
 
+function populateEditModal(userEvent){
+  console.log(userEvent);
+  $('#collectionInput').val(userEvent.collectionId);//TODO set selection
+  console.log(userEvent.collection);
+  $('#eventName').val(userEvent.content);
+  $('#startDate').val(userEvent.start);
+  $('#endDate').val(userEvent.end);
+  $('#eventDescription').val(userEvent.body);
+}
+
 function addEventToTimeline(data){    
     // Draw our timeline with the created data
     timeline.addItem(data);
@@ -522,31 +545,6 @@ function resizeTimeline(y){
   timeline.checkResize();
 }
 
-function validate(){
-  
-  //get name from name field
-  //get all fields
-  
-  //validate code 
-  var base = new Date()
-  var start = new Date(base.getTime() + Math.round(4 + Math.random() * 5) * 60 * 60 * 1000);
-  var end = new Date(start.getTime() + Math.round(4 + Math.random() * 5) * 60 * 60 * 1000);
-  
-  data = {name: 'test',
-          content: 'text', 
-          shape: 'point', 
-          geometry: 'encodedString', 
-          start: start.toJSON(),
-          end: end.toJSON(),
-          collectionId: 1,
-          collection: null,//'My Test Vacation3',
-          color: null//'#aabbcc' 
-          }; //get event data from form
-      saveEvent(data);
-  //else
-      //send invalid input message
-}
-
 function saveEvent(newEvent){
   $.ajax({
     type: "POST",
@@ -564,6 +562,7 @@ function saveEvent(newEvent){
       
       var overlay = userOverlays[newEvent.index];
       overlay.id = savedEvent.id;
+      overlay.collectionId = collection.id;
   });
 }
 
