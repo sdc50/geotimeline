@@ -468,17 +468,16 @@ function addEventsToMap(events){
 
 google.maps.MVCObject.prototype.onClick = function(){
 	showEventPost(this);
-	console.log(this);
 	var bounds = new google.maps.LatLngBounds();
 	// Get bounds of a point
-	if (this.icon == "Tl.MarkerImage"){
+	if (this.shapeType == "marker"){
 		var coord = this.position;
 		bounds.extend(coord);
 	}
 	// Get bounds of a line
-	else if (this.strokeWeight == "5"){
+	else if (this.shapeType=="polyline"){
 		path = this.getPath();
-		arrayOfPath = path.j[0].j;
+		arrayOfPath = path.j;
 		for(var i=0;i<arrayOfPath.length;i++){
 			coord=arrayOfPath[i];
 			bounds.extend(coord);
@@ -494,6 +493,9 @@ google.maps.MVCObject.prototype.onClick = function(){
 		}
 	}
 	map.fitBounds(bounds);
+	if (this.shapeType == "marker"){
+		map.setZoom(15);
+	}
 };
 
 function showEventPost(userEvent){
