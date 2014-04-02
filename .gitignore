@@ -36,3 +36,4 @@ nosetests.xml
 .pydevproject
 GeoTimeline/geotimeline/static/js/MapObjects.js
 GeoTimeline/geotimeline/static/js/MapObjects.js
+GeoTimeline/GeoTimeline.sqlite
