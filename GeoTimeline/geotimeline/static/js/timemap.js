@@ -447,9 +447,30 @@ function addEventsToMap(events){
 google.maps.MVCObject.prototype.onClick = function(){
 	showEventPost(this);
 	console.log(this);
-	var coord = this.position;
 	var bounds = new google.maps.LatLngBounds();
-	bounds.extend(coord);
+	// Get bounds of a point
+	if (this.icon == "Tl.MarkerImage"){
+		var coord = this.position;
+		bounds.extend(coord);
+	}
+	// Get bounds of a line
+	else if (this.strokeWeight == "5"){
+		path = this.getPath();
+		arrayOfPath = path.j[0].j;
+		for(var i=0;i<arrayOfPath.length;i++){
+			coord=arrayOfPath[i];
+			bounds.extend(coord);
+		}
+	}
+	// Get bounds of polygons
+	else{
+		path = this.getPaths();
+		arrayOfPaths = path.j[0].j;
+		for(var i=0;i<arrayOfPaths.length;i++){
+			coord=arrayOfPaths[i];
+			bounds.extend(coord);
+		}
+	}
 	map.fitBounds(bounds);
 };
 
