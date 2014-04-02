@@ -286,6 +286,7 @@ function addEventsToMap(events){
 			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:10}
 			evente = new google.maps.Marker({
 				//map:map,
+				shape: sShape,
 				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
@@ -357,6 +358,7 @@ function addEventsToMap(events){
 			break;
 			case 'polygon':
 			//make polygon
+			shape: sShape,
 			evente = new google.maps.Polygon({
 				//map:map,
 				editOn: false,
@@ -408,6 +410,7 @@ function addEventsToMap(events){
 			//make polyline
 			evente = new google.maps.Polyline({
 				//map:map,
+				shape: sShape,
 				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
@@ -751,31 +754,7 @@ function dateTimeValidation(target){
 		target.parent().find('.requiredInputMsg').text('');
 	}
 }
-//////////////////////////////////////////////
-//this is the validation stuff for the 
-//new events form
-//required
-// $('.requiredInput')
-//select item not required but check something?
-//$('#collectionInput')
-//only required if collectionInput is null
-/*this event listener is for the following ids:
- * eventName
- * newCollection
- * color
- * startDate
- * eventDescription
- */
-$('.requiredInput').on('blur',function(evt){
-	if(!$(evt.target).val()){
-	  $(evt.target).parent().addClass('has-error');
-	  $(evt.target).parent().find('.requiredInputMsg').text('This is a required input.');
-	}
-	else{
-		$(evt.target).parent().removeClass('has-error');
-		$(evt.target).parent().find('.requiredInputMsg').text('');
-	}
-});
+
 /*this function checks everything and returns a message string.
  * If the message string is blank then it is all good.
  * If it is not blank then the form is not submitted.
