@@ -127,6 +127,7 @@ function addListeners(){
     var overlay = userOverlays[eventId];
     $('#view-modal').modal('hide');
     overlay.makeEditable();
+    
     //$('#edit-modal').modal('show');
   });
 }
@@ -379,6 +380,9 @@ function addEventsToMap(events){
         },
 			});
 			google.maps.event.addListener(evente, 'click', function(){
+					var index = this.index;
+					//console.log(index);
+					$('#eventId').val(index);
 					this.onClick();
 				});
 			google.maps.event.addListener(evente, 'mouseover', function(){
@@ -422,6 +426,9 @@ function addEventsToMap(events){
 			  },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
+					var index = this.index;
+					//console.log(index);
+					$('#eventId').val(index);
 					this.onClick();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
