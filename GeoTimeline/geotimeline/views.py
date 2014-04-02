@@ -88,7 +88,16 @@ def saveEvent(request):
             c = Collection(collectionName, color)
             user.collections.append(c)
         
-        event = Event(name, content, shape, geometry, startDate, endDate)
+        if 'id' in params:
+          event = DBSession.query(Event).filter(Event.id==params['id'])
+          event.name = name
+          event.content = content
+          event.shape = shape
+          event.geometry = geometry
+          event.start = startDate
+          event.end = endDate
+        else:
+          event = Event(name, content, shape, geometry, startDate, endDate)
         c.events.append(event)
         user.events.append(event) #TODO - sqlalchemy? (see initializedb)
         DBSession.add(c)
