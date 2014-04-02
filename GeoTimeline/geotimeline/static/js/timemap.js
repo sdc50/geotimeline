@@ -59,12 +59,11 @@ function addListeners(){
   
     var collectionInput = $('#collectionInput')[0];
   
-    if (collectionInput.value=="null"){
-        $("#new-collection").slideToggle(); 
-  
+    if (collectionInput.value=="new"){
+        $("#new-collection").slideDown(); 
       }
       else{
-        $("#new-collection").hide();
+        $("#new-collection").slideUp();
       }
   });
   
@@ -81,7 +80,7 @@ function addListeners(){
       var collection;
       var collectionInput = $('#collectionInput')[0];
       var name = $('#eventName').val();
-      if (collectionInput.value=="null"){
+      if (collectionInput.value=="new"){
         collectionName = $('#newCollection').val();
         collectionColor = $('#color').val();
         collection = {name: collectionName, color: collectionColor};  
@@ -89,7 +88,7 @@ function addListeners(){
         userCollections.push(collection);
       }
       else{
-        collection = userCollections[collectionInput.selectedIndex - 1];
+        collection = userCollections[collectionInput.selectedIndex - 2];
       }
       var start = new Date($('#startDate').val()).toJSON();
       var end = new Date($('#endDate').val()).toJSON();
@@ -489,9 +488,8 @@ function showEventPost(userEvent){
 }
 
 function populateEditModal(userEvent){
-  console.log(userEvent);
-  $('#collectionInput').val(userEvent.collectionId);//TODO set selection
-  console.log(userEvent.collection);
+  
+  $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
   $('#startDate').val(userEvent.start);
   $('#endDate').val(userEvent.end);
@@ -769,7 +767,7 @@ function validateAllNewEvent(){
 	if(!$('#eventName').val()){
 		msg = msg + '<li>The event name field is blank.</li>';
 	}
-	if(!$('#newCollection').val() && ($('#collectionInput').val() == "null")){
+	if(!$('#newCollection').val() && ($('#collectionInput').val() == "new")){
 		msg = msg + '<li>The new collection name field is blank.</li>';
 	}
 	if(!$('#color').val()){
