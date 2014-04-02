@@ -116,7 +116,8 @@ function addListeners(){
       saveEvent(newEvent);
       //console.log (newEvent);
     }else{
-      alert(errorMsg);
+      //alert(errorMsg);
+      $('.inputErrorMessage').html(errorMsg);
     }
   });
   
@@ -338,6 +339,9 @@ function addEventsToMap(events){
 		        },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
+					var index = this.index;
+					//console.log(index);
+					$('#eventId').val(index);
 					this.onClick();
 				});
 				google.maps.event.addListener(evente, 'mouseover', function(){
@@ -456,6 +460,11 @@ function addEventsToMap(events){
 
 google.maps.MVCObject.prototype.onClick = function(){
 	showEventPost(this);
+	console.log(this);
+	var coord = this.position;
+	var bounds = new google.maps.LatLngBounds();
+	bounds.extend(coord);
+	map.fitBounds(bounds);
 };
 
 function showEventPost(userEvent){
@@ -510,17 +519,7 @@ function timelineManager () {
 		$(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
 			$.proxy(function(){this.highlightOff()}, overlay)
        )
-		.click($.proxy(function(){this.onClick()}, overlay))
-		.click(function(){
-			var coord = overlay.position;
-			// var place = new google.maps.LatLng(lat , lon);
-			var place = coord;
-			var bounds = new google.maps.LatLngBounds();
-			bounds.extend(place);
-			map.fitBounds(bounds);
-			});
-	
-		
+		.click($.proxy(function(){this.onClick()}, overlay));
 	});
 }
 
@@ -720,11 +719,11 @@ var dStart;
 st.on('blur',function(){
 	dStart = new Date(st.val());
 	//console.log(dStart);
-	dateTimeValidation(st);
+	dateTimeValidation(en);
 });
 var en = $('#endDate');
 var dEnd;
-en.on('blur',function(){
+en.on('blur',function(evt){
 	dEnd = new Date(en.val());
 	//console.log(dEnd);
 	dateTimeValidation(en);
@@ -732,12 +731,20 @@ en.on('blur',function(){
 //function to check if the start is at least 30 min before the end
 function dateTimeValidation(target){
 	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
-		alert("The end date/time must be at least 30 minutes after the start date/time.");
-		target.focus();
+		// alert("The end date/time must be at least 30 minutes after the start date/time.");
+		// target.focus();
+		target.parent().addClass('has-error');
+	  	target.parent().find('.requiredInputMsg').text('The end date/time must be at least 30 minutes after the start date/time.');
 	}
 	else if(dEnd && !dStart){
-		alert("You must choose a beginning date to have an end date.");
-		st.focus();
+		// alert("You must choose a beginning date to have an end date.");
+		// st.focus();
+		target.parent().addClass('has-error');
+	  	target.parent().find('.requiredInputMsg').text('You must choose a beginning date to have an end date.');
+	}
+	else{
+		target.parent().removeClass('has-error');
+		target.parent().find('.requiredInputMsg').text('');
 	}
 }
 //////////////////////////////////////////////
@@ -758,8 +765,11 @@ function dateTimeValidation(target){
 $('.requiredInput').on('blur',function(evt){
 	if(!$(evt.target).val()){
 	  $(evt.target).parent().addClass('has-error');
-		//alert('This is a required field.');
-		//$(evt.target).focus();
+	  $(evt.target).parent().find('.requiredInputMsg').text('This is a required input.');
+	}
+	else{
+		$(evt.target).parent().removeClass('has-error');
+		$(evt.target).parent().find('.requiredInputMsg').text('');
 	}
 });
 /*this function checks everything and returns a message string.
@@ -772,32 +782,32 @@ function validateAllNewEvent(){
 	var msg = '';
 	
 	if(!$('#eventName').val()){
-		msg = msg + 'The event name field is blank.\n';
+		msg = msg + '<li>The event name field is blank.</li>';
 	}
 	if(!$('#newCollection').val() && ($('#collectionInput').val() == "null")){
-		msg = msg + 'The new collection name field is blank.\n';
+		msg = msg + '<li>The new collection name field is blank.</li>';
 	}
 	if(!$('#color').val()){
-		msg = msg + 'The new collection color field is blank.\n';
+		msg = msg + '<li>The new collection color field is blank.</li>';
 	}
 	if(!$('#startDate').val()){
-		msg = msg + 'The start date/time field is blank.\n';
+		msg = msg + '<li>The start date/time field is blank.</li>';
 	}
 	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
-		msg = msg + 'The end date/time is less than 30 minutes after the start date/time.\n';
+		msg = msg + '<li>The end date/time is less than 30 minutes after the start date/time.</li>';
 	}
 	else if(dEnd && !dStart){
-		msg = msg + 'You have entered a beginning date without an end date.';
+		msg = msg + '<li>You have entered a beginning date without an end date.</li>';
 	}
 	if(!$('#eventDescription').val()){
-		msg = msg + 'The event description field is blank.\n';
+		msg = msg + '<li>The event description field is blank.</li>';
 	}
 	if(msg == ''){
 		return msg;
 	}
 	else{
-		msg = 'The following input errors have occured:\n' + msg;
-		msg = msg + 'Please make the necessary corrections and try submitting again.\n\nThank You.';
+		msg = 'The following input errors have occured:<ul>' + msg;
+		msg = msg + '</ul>Please make the necessary corrections and try submitting again. Thank You.';
 		return msg;
 	}
 }
