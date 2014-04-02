@@ -287,6 +287,7 @@ function addEventsToMap(events){
 			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:10}
 			evente = new google.maps.Marker({
 				//map:map,
+				shape: sShape,
 				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
@@ -358,6 +359,7 @@ function addEventsToMap(events){
 			break;
 			case 'polygon':
 			//make polygon
+			shape: sShape,
 			evente = new google.maps.Polygon({
 				//map:map,
 				editOn: false,
@@ -409,6 +411,7 @@ function addEventsToMap(events){
 			//make polyline
 			evente = new google.maps.Polyline({
 				//map:map,
+				shape: sShape,
 				editOn: false,
 				id: iId,
 				index: iOverlayIndex,
