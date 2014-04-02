@@ -50,6 +50,20 @@ header{
   width:200px;
 }
 
+#edit-post{
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  z-index:1;
+  width:200px;
+  height:50px;
+  background-color:#BE2939;
+  background: -webkit-linear-gradient(top,  #BE2939,  #96000B);
+  border-color:#96000B;
+  color:#FFFFFF;
+  display:none;
+}
+
 #content{
   overflow: hidden;
   /*position:relative;*/
