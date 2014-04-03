@@ -14,7 +14,7 @@ $(function(){
   $('#colorpicker').farbtastic('#color');
   
   getEvents();
-
+  
   // validate();
 
   addListeners();
@@ -226,6 +226,38 @@ function initializeMap() {
   
 }
 
+function centerMap(){
+	var bounds = new google.maps.LatLngBounds();
+	var coord;
+	for(var i=0;i<userOverlays.length;i++){
+		// Get bounds of a point
+		object = userOverlays[i]
+		if (object.shapeType == "marker"){
+			var coord = object.position;
+			bounds.extend(coord);
+		}
+		// Get bounds of a line
+		else if (object.shapeType=="polyline"){
+			path = object.getPath();
+			arrayOfPath = path.j;
+			for(var k=0;k<arrayOfPath.length;k++){
+				coord=arrayOfPath[k];
+				bounds.extend(coord);
+			}
+		}
+		// Get bounds of polygons
+		else{
+			path = object.getPaths();
+			arrayOfPaths = path.j[0].j;
+			for(var z=0;z<arrayOfPaths.length;z++){
+				coord=arrayOfPaths[z];
+				bounds.extend(coord);
+			}
+		}
+	}
+	map.fitBounds(bounds);
+}
+
 function initializeTimeline(){
     // Instantiate our timeline object.
     timeline = new links.Timeline($('#timeline-container')[0]);
@@ -249,6 +281,8 @@ function initializeTimeline(){
     // Draw our timeline with the created data and options
     timeline.draw('', options);
 }
+
+
 
 //use global variable to represent event overlays just drawn
 var userCollections = [];
@@ -475,6 +509,11 @@ function addEventsToMap(events){
 
 google.maps.MVCObject.prototype.onClick = function(){
 	showEventPost(this);
+	
+	// Set timeline to zoom to the event
+	timeline.setVisibleChartRange(this.start, this.end);
+	timeline.zoom(-0.5);
+	
 	var bounds = new google.maps.LatLngBounds();
 	// Get bounds of a point
 	if (this.shapeType == "marker"){
@@ -620,7 +659,9 @@ function getEvents(){
       createCollectionSelectList();
 
       addEventsToMap(json.events);
+      centerMap();
     })
+    
     .fail(function( textStatus ) {
       console.log( "Request failed: " + textStatus.toString() );
     });
