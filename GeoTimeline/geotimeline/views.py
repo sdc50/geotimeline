@@ -50,7 +50,13 @@ def geotimeline(request):
     saveCollectionUrl = request.route_url('saveCollection')
     saveEventUrl = request.route_url('saveEvent')
     getEventsUrl = request.route_url('events')
-    return {'saveCollectionUrl': saveCollectionUrl, 'saveEventUrl': saveEventUrl, 'getEventsUrl':getEventsUrl, 'logged_in': authenticated_userid(request), 'user': user}
+    deleteEventUrl = request.route_url('home')
+    return {'saveCollectionUrl': saveCollectionUrl, 
+            'saveEventUrl': saveEventUrl, 
+            'getEventsUrl':getEventsUrl, 
+            'deleteEventUrl':deleteEventUrl, 
+            'logged_in': authenticated_userid(request), 
+            'user': user}
 
 @view_config(route_name='events', renderer='json', permission='edit')
 def getUserEvents(request):
@@ -119,6 +125,18 @@ def saveCollection(request):
         DBSession.add(c)
         DBSession.flush()
         return {'id':c.id}
+    except DBAPIError:
+        return Response(conn_err_msg, content_type='text/plain', status_int=500)
+      
+@view_config(route_name='deleteEvent', renderer='json', permission='edit')
+def deleteEvent(request):
+    try:
+        userid = authenticated_userid(request)
+        user = DBSession.query(User).filter(User.userName==userid).first()
+        
+        print(request.params)
+        event = DBSession.query(Event).filter(Event.id==id)
+        print('*******************************',id, event)
     except DBAPIError:
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
  
