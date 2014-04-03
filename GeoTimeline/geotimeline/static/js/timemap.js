@@ -35,6 +35,10 @@ function addListeners(){
     });
   });
   
+  $('#zoom-extents').click(function(){
+    centerMap();
+  });
+    
   // adding a new event
   $("#new-event-click").click(function(){
     drawingManager.setOptions({drawingControl:true});

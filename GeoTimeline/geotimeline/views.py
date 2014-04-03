@@ -134,9 +134,9 @@ def deleteEvent(request):
         userid = authenticated_userid(request)
         user = DBSession.query(User).filter(User.userName==userid).first()
         
-        print(request.params)
-        event = DBSession.query(Event).filter(Event.id==id)
-        print('*******************************',id, event)
+        id = request.matchdict['id']
+        event = DBSession.query(Event).get(id)
+        DBSession.delete(event)
     except DBAPIError:
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
  
