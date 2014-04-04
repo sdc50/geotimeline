@@ -114,10 +114,8 @@ def saveEvent(request):
           event.geometry = geometry
           event.start = startDate
           event.end = endDate
-          print('***************',event.collection)
           event.collection = collection
           collection.events.append(event)
-          print(collection)
           
         else:
           event = Event(name, content, shape, geometry, startDate, endDate)

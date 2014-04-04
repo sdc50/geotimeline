@@ -6,7 +6,7 @@ var map, timeline, pageHeight, pageWidth;
 
 $(function(){
   $('header').addClass('map-header').find('a').first().fadeOut('slow');
-  $('footer').slideToggle();
+  $('footer').slideUp();
 
   initializeMap();
   initializeTimeline();
@@ -53,7 +53,7 @@ function addListeners(){
   $(".new-close").click(function(){
     drawingManager.setOptions({drawingControl:false});
       drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideToggle();
+      $('#timeline-container').slideDown();
       deletedOverlay = userOverlays.pop();
       deletedOverlay.setMap(null);
       windowResize();
