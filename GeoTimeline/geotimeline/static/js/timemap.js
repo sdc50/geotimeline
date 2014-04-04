@@ -302,7 +302,10 @@ function addEventsToMap(events){
 		var sUser = events[e].user;
 		var sShape = events[e].shape;
 		var tStart = new Date(events[e].start);
-		var tEnd = new Date(events[e].end);
+		var tEnd = null;
+		if(events[e].end){
+		  tEnd = new Date(events[e].end);
+		}
 		var tcontent = events[e].name;
 		var iOverlayIndex = startIndex + e;
 		var tclassName = "row" + iOverlayIndex;
@@ -772,7 +775,7 @@ function validateAllNewEvent(){
 	if(!$('#startDate').val()){
 		msg = msg + '<li>The start date/time field is blank.</li>';
 	}
-	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
+	if(dEnd != '' && (dEnd-dStart < (60*30*1000)) && dStart && dEnd){
 		msg = msg + '<li>The end date/time is less than 30 minutes after the start date/time.</li>';
 	}
 	else if(dEnd && !dStart){

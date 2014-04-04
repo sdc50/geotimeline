@@ -57,6 +57,13 @@ def geotimeline(request):
             'deleteEventUrl':deleteEventUrl, 
             'logged_in': authenticated_userid(request), 
             'user': user}
+    
+@view_config(route_name='settings', renderer='settings.html', permission='edit')
+def settings(request):
+    userid = authenticated_userid(request)
+    user = DBSession.query(User).filter(User.userName==userid).first()
+    return {'logged_in': authenticated_userid(request), 
+            'user': user}
 
 @view_config(route_name='events', renderer='json', permission='edit')
 def getUserEvents(request):
@@ -76,15 +83,18 @@ def saveEvent(request):
         user = DBSession.query(User).filter(User.userName==userid).first()
         
         params = request.POST
-        print(params)
+        print('*******************************',params)
         name = params['name']
         content = params['content'] 
         shape = params['shape']
         geometry = params['geometry']
-        start = params['start'] 
+        start = params['start']
         end = params['end']
         startDate = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S.%fZ')
-        endDate = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
+        if end != '':
+          endDate = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
+        else:
+          endDate = None
         if 'collection[id]' in params:
             collectionId = params['collection[id]']
             c = DBSession.query(Collection).filter(Collection.id==collectionId).first()
