@@ -159,18 +159,7 @@ function initializeMap() {
     $('#new-modal').modal('show');
 
     var overlay = event.overlay;
-    overlay.shape = event.type;
-    if(overlay.shape == "marker"){
-    	var newPos = overlay.getPosition();
-     	var posArr = [];
-     	var newLatLng = new google.maps.LatLng(newPos.k,newPos.A);
-     	posArr.push(newLatLng);
-     	overlay.geometry = google.maps.geometry.encoding.encodePath(posArr);
-    }
-    else{
-    	overlay.geometry = google.maps.geometry.encoding.encodePath(overlay.getPath());
-    }
-    
+    overlay.shapeType = event.type;
     userOverlays.push(overlay);
 	});
 
@@ -560,60 +549,7 @@ function populateEditModal(userEvent){
   $('#index').val(userEvent.index);
 }
 
-function newEventSubmit(){
-  //call validation function which returns an error message string.
-  //if it is blank then the form is submitted.
-  //If it is not blank then the string is shown in an alert and the form is not submitted.
-  var errorMsg = validateAllNewEvent();
-  if(errorMsg == ''){
-    drawingManager.setOptions({drawingControl:false});
-      drawingManager.setDrawingMode(null);
-    $('#timeline-container').slideToggle();
-    $('#new-modal').modal('hide');
-    var collection;
-    var collectionInput = $('#collectionInput')[0];
-    var name = $('#eventName').val();
-    if (collectionInput.value=="new"){
-      collectionName = $('#newCollection').val();
-      collectionColor = $('#color').val();
-      collection = {name: collectionName, color: collectionColor};  
-      //saveCollection(collection);
-      userCollections.push(collection);
-    }
-    else{
-      collection = userCollections[collectionInput.selectedIndex - 2];
-    }
-    var start = new Date($('#startDate').val()).toJSON();
-    var end = new Date($('#endDate').val()).toJSON();
-    var content = $('#eventDescription').val();
-    //var overlayIndex = userOverlays.length - 1;
-    //console.log(collection);
-    var overlay = userOverlays.pop();//[overlayIndex];
-    console.log(overlay);
-    overlay.setMap(null);
-    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
-    
-    var newEvent = {'name':name, 
-                    'content':content, 
-                    'collection':collection, 
-                    'user':"" ,
-                    'shape':overlay.shape, 
-                    'geometry':overlay.geometry, 
-                    'start':start, 
-                    'end':end};
-                    
-    addEventsToMap([newEvent]);
-    windowResize();
-    newEvent.index = userOverlays.length -1;
-    saveEvent(newEvent);
-    //console.log (newEvent);
-  }else{
-    //alert(errorMsg);
-    $('.inputErrorMessage').html(errorMsg);
-  }
-}
-
-function editEventSubmit(){
+function eventSubmit(overlay){
   //call validation function which returns an error message string.
   //if it is blank then the form is submitted.
   //If it is not blank then the string is shown in an alert and the form is not submitted.
@@ -626,6 +562,7 @@ function editEventSubmit(){
     var collection;
     var collectionInput = $('#collectionInput')[0];
     var name = $('#eventName').val();
+    overlay.content = name;
     if (collectionInput.value=="new"){
       collectionName = $('#newCollection').val();
       collectionColor = $('#color').val();
@@ -636,31 +573,73 @@ function editEventSubmit(){
     else{
       collection = userCollections[collectionInput.selectedIndex - 2];
     }
-    var start = new Date($('#startDate').val()).toJSON();
-    var end = new Date($('#endDate').val()).toJSON();
-    var content = $('#eventDescription').val();
-    var index = $('#index').val();
-    var overlay = userOverlays[index];
-    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+    var start = new Date($('#startDate').val());
+    overlay.start = start;
+    start = start.toJSON();
+    var end = $('#endDate').val();
+    if(end)
+    {
+      end = new Date(end);
+      overlay.end = end;
+      end = end.toJSON();
+    }
+    else{
+      overlay.end = null;
+    }
+      
     
-    var newEvent = {'name':name,
-                    'id':overlay.id,
-                    'index':index,
+    
+    var content = $('#eventDescription').val();
+    overlay.body = content;
+    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+    var shape = overlay.shapeType;
+    var geometry;
+    if(shape == "marker"){
+      var newPos = overlay.getPosition();
+      var posArr = [];
+      var newLatLng = new google.maps.LatLng(newPos.k,newPos.A);
+      posArr.push(newLatLng);
+      geometry = google.maps.geometry.encoding.encodePath(posArr);
+    }
+    else{
+      geometry = google.maps.geometry.encoding.encodePath(overlay.getPath());
+    }
+    
+    var newEvent = {'name':name, 
                     'content':content, 
                     'collection':collection, 
-                    'user':"" ,
-                    'shape':overlay.shapeType, 
-                    'geometry':google.maps.geometry.encoding.encodePath(overlay.getPath()),
+                    'shape':shape, 
+                    'geometry':geometry, 
                     'start':start, 
                     'end':end};
-                    
-    windowResize();
-    saveEvent(newEvent);
-    //console.log (newEvent);
-  }else{
-    //alert(errorMsg);
+  
+    return newEvent;
+    
+   }else{
     $('.inputErrorMessage').html(errorMsg);
   }
+}
+
+function newEventSubmit(){
+    var overlay = userOverlays.pop();
+    var newEvent = eventSubmit(overlay);
+    overlay.setMap(null);
+                    
+    addEventsToMap([newEvent]);
+    windowResize();
+    newEvent.index = userOverlays.length -1;
+    saveEvent(newEvent);
+}
+
+function editEventSubmit(){
+    var index = $('#index').val();
+    var overlay = userOverlays[index];
+    var newEvent = eventSubmit(overlay);
+
+    newEvent.index = index;
+    newEvent.id = overlay.id;            
+    windowResize();
+    saveEvent(newEvent);
 }
 
 function addEventToTimeline(data){    

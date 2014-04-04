@@ -103,11 +103,11 @@ div.timeline-frame {
 }
 div.timeline-axis {
     border-color: #96000B; 
-
     background-color: #BE2939;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#5D99C3', endColorstr='#3A6DA0'); /* for IE */
     background: -webkit-linear-gradient(top,  #BE2939,  #96000B); /* for webkit browsers */
     /*background: -moz-linear-gradient(top,  #C94D5A,  #96000B); /* for firefox 3.6+ */
+   cursor:move;
 }
 div.timeline-axis-grid {
 }
@@ -132,6 +132,7 @@ div.timeline-event-content {
 div.timeline-content{
     background-color:white;
     overflow-y:scroll;
+    cursor:ew-resize;
 }
 
 .timeline-event-box:hover{
