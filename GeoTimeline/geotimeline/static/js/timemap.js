@@ -37,6 +37,7 @@ function addListeners(){
   
   $('#zoom-extents').click(function(){
     centerMap();
+    timeline.setVisibleChartRangeAuto();
   });
     
   // adding a new event
@@ -45,6 +46,8 @@ function addListeners(){
       drawingManager.setDrawingMode(null);
       $('#timeline-container').slideToggle();
       $('#map').height(pageHeight);
+      clearNewEventForm();
+      $(".new-submit").click(newEventSubmit);
   });
   
   // Remove event from map and array if new event is cancelled
@@ -71,59 +74,6 @@ function addListeners(){
       }
   });
   
-  $(".new-submit").click(function(){
-    //call validation function which returns an error message string.
-    //if it is blank then the form is submitted.
-    //If it is not blank then the string is shown in an alert and the form is not submitted.
-    var errorMsg = validateAllNewEvent();
-    if(errorMsg == ''){
-      drawingManager.setOptions({drawingControl:false});
-        drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideToggle();
-      $('#new-modal').modal('hide');
-      var collection;
-      var collectionInput = $('#collectionInput')[0];
-      var name = $('#eventName').val();
-      if (collectionInput.value=="new"){
-        collectionName = $('#newCollection').val();
-        collectionColor = $('#color').val();
-        collection = {name: collectionName, color: collectionColor};  
-        //saveCollection(collection);
-        userCollections.push(collection);
-      }
-      else{
-        collection = userCollections[collectionInput.selectedIndex - 2];
-      }
-      var start = new Date($('#startDate').val()).toJSON();
-      var end = new Date($('#endDate').val()).toJSON();
-      var content = $('#eventDescription').val();
-      //var overlayIndex = userOverlays.length - 1;
-      //console.log(collection);
-      var overlay = userOverlays.pop();//[overlayIndex];
-      console.log(overlay);
-      overlay.setMap(null);
-      overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
-      
-      var newEvent = {'name':name, 
-                      'content':content, 
-                      'collection':collection, 
-                      'user':"" ,
-                      'shape':overlay.shape, 
-                      'geometry':overlay.geometry, 
-                      'start':start, 
-                      'end':end};
-                      
-      addEventsToMap([newEvent]);
-      windowResize();
-      newEvent.index = userOverlays.length -1;
-      saveEvent(newEvent);
-      //console.log (newEvent);
-    }else{
-      //alert(errorMsg);
-      $('.inputErrorMessage').html(errorMsg);
-    }
-  });
-  
   $('.edit-event').click(function(){
     var eventIndex = $('#eventIndex').val();
     var overlay = userOverlays[eventIndex];
@@ -134,6 +84,7 @@ function addListeners(){
     $('#map').height(pageHeight);
     overlay.makeEditable();
     populateEditModal(overlay);
+    $(".new-submit").click(editEventSubmit);
   });
   
   $('#edit-post').click(function(){
@@ -279,7 +230,7 @@ function initializeTimeline(){
       zoomMin: 54000000, // one hour
       // zoomMin: 2592000000, // 1 day
       zoomMax: 3153600000000, // 100 years
-      cluster: true
+      cluster: false
     };
  
     // Draw our timeline with the created data and options
@@ -302,7 +253,10 @@ function addEventsToMap(events){
 		var sUser = events[e].user;
 		var sShape = events[e].shape;
 		var tStart = new Date(events[e].start);
-		var tEnd = new Date(events[e].end);
+		var tEnd = null;
+		if(events[e].end){
+		  tEnd = new Date(events[e].end);
+		}
 		var tcontent = events[e].name;
 		var iOverlayIndex = startIndex + e;
 		var tclassName = "row" + iOverlayIndex;
@@ -548,16 +502,53 @@ google.maps.MVCObject.prototype.onClick = function(){
 	}
 };
 
+
 function showEventPost(userEvent){
   var color = userEvent.color;
   $('#view-modal-title').text(userEvent.collection + ': ' + userEvent.content);
+  var dateString = formatDate(userEvent.start);//.toDateString();
+  if(userEvent.end){
+    dateString += ' - ' + formatDate(userEvent.end);
+  }
+  else{
+    dateString += ' ' + formatTime(userEvent.start);//.toTimeString();
+  }
   
-  body_content = "<p>Dates: " + userEvent.start + " - " + userEvent.end + "</p>"
-               + "<p>Description: " + userEvent.body + "</p>"
+  body_content = "<p>" + dateString + "</p>"
+               + "<p>" + userEvent.body + "</p>"
                + '<input id="eventIndex" type="hidden" value="' + userEvent.index + '"/>';
                
   $('#view-modal-body').html(body_content);
   $('#view-modal').modal('show');
+}
+
+var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function formatDate(date){
+  var d = date.getDay();
+  var weekDay = DAYS[d];
+  var day = d + 1;
+  var month = MONTHS[date.getMonth()];
+  var year = date.getFullYear();
+
+  return weekDay + ', ' + month + ' ' + day + ', ' + year;
+}
+
+function formatTime(date){
+  var h = date.getHours();
+  var abr = h < 12 ? 'AM' : 'PM';
+  var hour = h < 12 ? h : h - 12;
+  var min = date.getMinutes();
+  
+  return hour + ':' + min + ' ' + abr;
+}
+
+function clearNewEventForm(){
+  $('#collectionInput').val('null');
+  $('#eventName').val('');
+  $('#startDate').val('');
+  $('#endDate').val('');
+  $('#eventDescription').val('');
 }
 
 function populateEditModal(userEvent){
@@ -567,6 +558,116 @@ function populateEditModal(userEvent){
   $('#startDate').val(userEvent.start);
   $('#endDate').val(userEvent.end);
   $('#eventDescription').val(userEvent.body);
+  $('#index').val(userEvent.index);
+}
+
+function newEventSubmit(){
+  //call validation function which returns an error message string.
+  //if it is blank then the form is submitted.
+  //If it is not blank then the string is shown in an alert and the form is not submitted.
+  var errorMsg = validateAllNewEvent();
+  if(errorMsg == ''){
+    drawingManager.setOptions({drawingControl:false});
+      drawingManager.setDrawingMode(null);
+    $('#timeline-container').slideToggle();
+    $('#new-modal').modal('hide');
+    var collection;
+    var collectionInput = $('#collectionInput')[0];
+    var name = $('#eventName').val();
+    if (collectionInput.value=="new"){
+      collectionName = $('#newCollection').val();
+      collectionColor = $('#color').val();
+      collection = {name: collectionName, color: collectionColor};  
+      //saveCollection(collection);
+      userCollections.push(collection);
+    }
+    else{
+      collection = userCollections[collectionInput.selectedIndex - 2];
+    }
+    var start = new Date($('#startDate').val()).toJSON();
+    var end = new Date($('#endDate').val()).toJSON();
+    var content = $('#eventDescription').val();
+    //var overlayIndex = userOverlays.length - 1;
+    //console.log(collection);
+    var overlay = userOverlays.pop();//[overlayIndex];
+    console.log(overlay);
+    overlay.setMap(null);
+    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+    
+    var newEvent = {'name':name, 
+                    'content':content, 
+                    'collection':collection, 
+                    'user':"" ,
+                    'shape':overlay.shape, 
+                    'geometry':overlay.geometry, 
+                    'start':start, 
+                    'end':end};
+                    
+    addEventsToMap([newEvent]);
+    windowResize();
+    newEvent.index = userOverlays.length -1;
+    saveEvent(newEvent);
+    //console.log (newEvent);
+  }else{
+    //alert(errorMsg);
+    $('.inputErrorMessage').html(errorMsg);
+  }
+}
+
+function editEventSubmit(){
+  //call validation function which returns an error message string.
+  //if it is blank then the form is submitted.
+  //If it is not blank then the string is shown in an alert and the form is not submitted.
+  var errorMsg = validateAllNewEvent();
+  if(errorMsg == ''){
+    drawingManager.setOptions({drawingControl:false});
+    drawingManager.setDrawingMode(null);
+    $('#timeline-container').slideToggle();
+    $('#new-modal').modal('hide');
+    var collection;
+    var collectionInput = $('#collectionInput')[0];
+    var name = $('#eventName').val();
+    if (collectionInput.value=="new"){
+      collectionName = $('#newCollection').val();
+      collectionColor = $('#color').val();
+      collection = {name: collectionName, color: collectionColor};  
+      //saveCollection(collection);
+      userCollections.push(collection);
+    }
+    else{
+      collection = userCollections[collectionInput.selectedIndex - 2];
+    }
+    var start = new Date($('#startDate').val()).toJSON();
+    var end = new Date($('#endDate').val()).toJSON();
+    var content = $('#eventDescription').val();
+    var index = $('#index').val();
+    var overlay = userOverlays[index];
+    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+    
+    var newEvent = {'name':name,
+                    'id':overlay.id,
+                    'index':index,
+                    'content':content, 
+                    'collection':collection, 
+                    'user':"" ,
+                    'shape':overlay.shapeType, 
+                    'geometry':google.maps.geometry.encoding.encodePath(overlay.getPath()),
+                    'start':start, 
+                    'end':end};
+    
+    className = "row" + index
+                    
+    console.log(newEvent);                
+	timeline.changeItem(index, {"content":name, "className":className, "start":start, "end":end});
+	timelineManager();            
+                    
+    windowResize();
+    saveEvent(newEvent);
+    //console.log (newEvent);
+  }else{
+    //alert(errorMsg);
+    $('.inputErrorMessage').html(errorMsg);
+  }
 }
 
 function addEventToTimeline(data){    
@@ -772,7 +873,7 @@ function validateAllNewEvent(){
 	if(!$('#startDate').val()){
 		msg = msg + '<li>The start date/time field is blank.</li>';
 	}
-	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
+	if(dEnd != '' && (dEnd-dStart < (60*30*1000)) && dStart && dEnd){
 		msg = msg + '<li>The end date/time is less than 30 minutes after the start date/time.</li>';
 	}
 	else if(dEnd && !dStart){
