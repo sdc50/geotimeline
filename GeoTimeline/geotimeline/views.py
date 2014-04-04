@@ -95,13 +95,15 @@ def saveEvent(request):
           endDate = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
         else:
           endDate = None
+          
+        collection = None
         if 'collection[id]' in params:
             collectionId = params['collection[id]']
-            c = DBSession.query(Collection).get(collectionId)
+            collection = DBSession.query(Collection).get(collectionId)
         else:
             collectionName = params['collection[name]']
             color = params['collection[color]']
-            c = Collection(collectionName, color)
+            collection = Collection(collectionName, color)
             user.collections.append(c)
         
         if 'id' in params:
@@ -112,11 +114,16 @@ def saveEvent(request):
           event.geometry = geometry
           event.start = startDate
           event.end = endDate
+          print('***************',event.collection)
+          event.collection = collection
+          collection.events.append(event)
+          print(collection)
+          
         else:
           event = Event(name, content, shape, geometry, startDate, endDate)
-          c.events.append(event)
+          collection.events.append(event)
           user.events.append(event) #TODO - sqlalchemy? (see initializedb)
-          DBSession.add(c)
+          DBSession.add(collection)
         return event
     except DBAPIError:
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
