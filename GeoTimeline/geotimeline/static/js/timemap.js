@@ -37,13 +37,14 @@ function addListeners(){
   
   $('#zoom-extents').click(function(){
     centerMap();
+    timeline.setVisibleChartRangeAuto();
   });
     
   // adding a new event
   $("#new-event-click").click(function(){
     drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideToggle();
+      $('#timeline-container').slideUp();
       $('#map').height(pageHeight);
       clearNewEventForm();
       $(".new-submit").click(newEventSubmit);
@@ -79,7 +80,7 @@ function addListeners(){
     $('#view-modal').modal('hide');
     $('#usr-group').toggle();
     $('#edit-post').toggle();
-    $('#timeline-container').slideToggle();
+    $('#timeline-container').slideUp();
     $('#map').height(pageHeight);
     overlay.makeEditable();
     populateEditModal(overlay);
@@ -87,9 +88,11 @@ function addListeners(){
   });
   
   $('#edit-post').click(function(){
+  	var eventIndex = $('#eventIndex').val();
+    var overlay = userOverlays[eventIndex];
     $('#usr-group').toggle();
     $('#edit-post').toggle();
-    //overlay.makeUneditable(); TODO
+    overlay.makeUneditable();
     $('#new-modal').modal('show');
   });
   
@@ -324,6 +327,11 @@ function addEventsToMap(events){
 		          this.setDraggable(true);
 		          this.editOn = true;
 		        },
+		        makeUneditable: function(){
+				  this.setIcon(pinImage);
+		          this.setDraggable(false);
+		          this.editOn = false;
+		        },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
@@ -376,8 +384,11 @@ function addEventsToMap(events){
 					this.timelineDiv.css({"opacity":"0.75"});
 				},
 			 makeEditable: function(){
-          this.setEditable(true);
-        },
+	          this.setEditable(true);
+	        },
+	        makeUneditable: function(){
+	          this.setEditable(false);
+	        },
 			});
 			google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
@@ -425,6 +436,9 @@ function addEventsToMap(events){
 					},
 			  makeEditable: function(){
 			    this.setEditable(true);
+			  },
+			  makeUneditable: function(){
+			    this.setEditable(false);
 			  },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
@@ -557,7 +571,7 @@ function eventSubmit(overlay){
   if(errorMsg == ''){
     drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
-    $('#timeline-container').slideToggle();
+    $('#timeline-container').slideDown();
     $('#new-modal').modal('hide');
     var collection;
     var collectionInput = $('#collectionInput')[0];
@@ -634,11 +648,19 @@ function newEventSubmit(){
 function editEventSubmit(){
     var index = $('#index').val();
     var overlay = userOverlays[index];
-    var newEvent = eventSubmit(overlay);
 
+    var newEvent = eventSubmit(overlay);
+    
+	className = "row" + index
+                    
+    console.log(newEvent);                
+	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
+	  
+	
     newEvent.index = index;
     newEvent.id = overlay.id;            
     windowResize();
+    timelineManager(); 
     saveEvent(newEvent);
 }
 
