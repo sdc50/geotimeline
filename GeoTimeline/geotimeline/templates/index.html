@@ -5,7 +5,9 @@
     <!-- Add to head here -->
 {% endblock %}
 
-
+{% block options%}
+  <li><a href="{{request.application_url}}/timemap">TimeMap</a></li>
+{% endblock %}
 
 {% block content %}
   <section class='map-img'>

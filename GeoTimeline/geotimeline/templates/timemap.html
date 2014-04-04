@@ -15,6 +15,11 @@
     
 {% endblock %}
 
+{% block options%}
+  <li id="new-event-click"><a><span>New Event</span></a></li>
+  <li id="zoom-extents"><a><span>Zoom to Extents</span></a></li>
+{% endblock %}
+
 {% block content %}
 
   <div id='map'></div>
@@ -39,7 +44,7 @@
         <div class="modal-footer">
         	<input type="hidden" id="eventId"/>
           <button type="button" class="btn btn-primary edit-event">Edit</button>
-          <button type="button" class="btn btn-primary">Delete</button>
+          <button type="button" class="btn btn-primary delete-event">Delete</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
@@ -167,6 +172,7 @@
     saveEventUrl = "{{saveEventUrl}}";
     getEventsUrl = "{{getEventsUrl}}";
     saveCollectionUrl = "{{saveCollectionUrl}}";
+    deleteEventUrl = "{{deleteEventUrl}}";
   </script>
   <!-- These are the links for the jquery ui datetime picker -->
   <!-- Do not use this one because we already have jquery loaded in the base.html page -->
