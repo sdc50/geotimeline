@@ -746,16 +746,25 @@ function getEvents(){
 
 function deleteEvent(overlay){
   url = deleteEventUrl + 'deleteEvent/' + overlay.id;
-  console.log(url);
   overlay.setMap(null);
-  timeline.deleteItem(overlay.index);//TODO remove from timeline
+  console.log(overlay.index);
+  console.log(userOverlays.length);
+  userOverlays.splice(overlay.index,1);
+  console.log(userOverlays.length);
+  for(var index = 0, len = userOverlays.length; index < len; index ++){
+    userOverlays[index].index = index;
+  }
+  
+  timeline.deleteItem(overlay.index);
   
   $.ajax({
     url: url,
     cache: false
   })
     .done(function( json ) {
-      console.log(json);
+      //console.log(json);
+      //location.reload();
+      centerMap();
     })
     .fail(function( textStatus ) {
       console.log( "Request failed: " + textStatus.toString() );
