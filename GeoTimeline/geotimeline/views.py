@@ -83,7 +83,7 @@ def saveEvent(request):
         user = DBSession.query(User).filter(User.userName==userid).first()
         
         params = request.POST
-        print('*******************************',params)
+        #print('*******************************',params)
         name = params['name']
         content = params['content'] 
         shape = params['shape']

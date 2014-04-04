@@ -45,6 +45,7 @@ function addListeners(){
       drawingManager.setDrawingMode(null);
       $('#timeline-container').slideToggle();
       $('#map').height(pageHeight);
+      clearNewEventForm();
   });
   
   // Remove event from map and array if new event is cancelled
@@ -279,7 +280,7 @@ function initializeTimeline(){
       zoomMin: 54000000, // one hour
       // zoomMin: 2592000000, // 1 day
       zoomMax: 3153600000000, // 100 years
-      cluster: true
+      cluster: false
     };
  
     // Draw our timeline with the created data and options
@@ -551,16 +552,53 @@ google.maps.MVCObject.prototype.onClick = function(){
 	}
 };
 
+
 function showEventPost(userEvent){
   var color = userEvent.color;
   $('#view-modal-title').text(userEvent.collection + ': ' + userEvent.content);
+  var dateString = formatDate(userEvent.start);//.toDateString();
+  if(userEvent.end){
+    dateString += ' - ' + formatDate(userEvent.end);
+  }
+  else{
+    dateString += ' ' + formatTime(userEvent.start);//.toTimeString();
+  }
   
-  body_content = "<p>Dates: " + userEvent.start + " - " + userEvent.end + "</p>"
-               + "<p>Description: " + userEvent.body + "</p>"
+  body_content = "<p>" + dateString + "</p>"
+               + "<p>" + userEvent.body + "</p>"
                + '<input id="eventIndex" type="hidden" value="' + userEvent.index + '"/>';
                
   $('#view-modal-body').html(body_content);
   $('#view-modal').modal('show');
+}
+
+var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function formatDate(date){
+  var d = date.getDay();
+  var weekDay = DAYS[d];
+  var day = d + 1;
+  var month = MONTHS[date.getMonth()];
+  var year = date.getFullYear();
+
+  return weekDay + ', ' + month + ' ' + day + ', ' + year;
+}
+
+function formatTime(date){
+  var h = date.getHours();
+  var abr = h < 12 ? 'AM' : 'PM';
+  var hour = h < 12 ? h : h - 12;
+  var min = date.getMinutes();
+  
+  return hour + ':' + min + ' ' + abr;
+}
+
+function clearNewEventForm(){
+  $('#collectionInput').val('null');
+  $('#eventName').val('');
+  $('#startDate').val('');
+  $('#endDate').val('');
+  $('#eventDescription').val('');
 }
 
 function populateEditModal(userEvent){
