@@ -6,7 +6,7 @@ var map, timeline, pageHeight, pageWidth;
 
 $(function(){
   $('header').addClass('map-header').find('a').first().fadeOut('slow');
-  $('footer').slideToggle();
+  $('footer').slideUp();
 
   initializeMap();
   initializeTimeline();
@@ -37,13 +37,14 @@ function addListeners(){
   
   $('#zoom-extents').click(function(){
     centerMap();
+    timeline.setVisibleChartRangeAuto();
   });
     
   // adding a new event
   $("#new-event-click").click(function(){
     drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideToggle();
+      $('#timeline-container').slideUp();
       $('#map').height(pageHeight);
       clearNewEventForm();
       $(".new-submit").click(newEventSubmit);
@@ -53,7 +54,7 @@ function addListeners(){
   $(".new-close").click(function(){
     drawingManager.setOptions({drawingControl:false});
       drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideToggle();
+      $('#timeline-container').slideDown();
       deletedOverlay = userOverlays.pop();
       deletedOverlay.setMap(null);
       windowResize();
@@ -79,7 +80,7 @@ function addListeners(){
     $('#view-modal').modal('hide');
     $('#usr-group').toggle();
     $('#edit-post').toggle();
-    $('#timeline-container').slideToggle();
+    $('#timeline-container').slideUp();
     $('#map').height(pageHeight);
     overlay.makeEditable();
     populateEditModal(overlay);
@@ -87,9 +88,11 @@ function addListeners(){
   });
   
   $('#edit-post').click(function(){
+  	var eventIndex = $('#eventIndex').val();
+    var overlay = userOverlays[eventIndex];
     $('#usr-group').toggle();
     $('#edit-post').toggle();
-    //overlay.makeUneditable(); TODO
+    overlay.makeUneditable();
     $('#new-modal').modal('show');
   });
   
@@ -159,18 +162,7 @@ function initializeMap() {
     $('#new-modal').modal('show');
 
     var overlay = event.overlay;
-    overlay.shape = event.type;
-    if(overlay.shape == "marker"){
-    	var newPos = overlay.getPosition();
-     	var posArr = [];
-     	var newLatLng = new google.maps.LatLng(newPos.k,newPos.A);
-     	posArr.push(newLatLng);
-     	overlay.geometry = google.maps.geometry.encoding.encodePath(posArr);
-    }
-    else{
-    	overlay.geometry = google.maps.geometry.encoding.encodePath(overlay.getPath());
-    }
-    
+    overlay.shapeType = event.type;
     userOverlays.push(overlay);
 	});
 
@@ -335,6 +327,11 @@ function addEventsToMap(events){
 		          this.setDraggable(true);
 		          this.editOn = true;
 		        },
+		        makeUneditable: function(){
+				  this.setIcon(pinImage);
+		          this.setDraggable(false);
+		          this.editOn = false;
+		        },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
@@ -387,8 +384,11 @@ function addEventsToMap(events){
 					this.timelineDiv.css({"opacity":"0.75"});
 				},
 			 makeEditable: function(){
-          this.setEditable(true);
-        },
+	          this.setEditable(true);
+	        },
+	        makeUneditable: function(){
+	          this.setEditable(false);
+	        },
 			});
 			google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
@@ -436,6 +436,9 @@ function addEventsToMap(events){
 					},
 			  makeEditable: function(){
 			    this.setEditable(true);
+			  },
+			  makeUneditable: function(){
+			    this.setEditable(false);
 			  },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
@@ -560,60 +563,7 @@ function populateEditModal(userEvent){
   $('#index').val(userEvent.index);
 }
 
-function newEventSubmit(){
-  //call validation function which returns an error message string.
-  //if it is blank then the form is submitted.
-  //If it is not blank then the string is shown in an alert and the form is not submitted.
-  var errorMsg = validateAllNewEvent();
-  if(errorMsg == ''){
-    drawingManager.setOptions({drawingControl:false});
-      drawingManager.setDrawingMode(null);
-    $('#timeline-container').slideToggle();
-    $('#new-modal').modal('hide');
-    var collection;
-    var collectionInput = $('#collectionInput')[0];
-    var name = $('#eventName').val();
-    if (collectionInput.value=="new"){
-      collectionName = $('#newCollection').val();
-      collectionColor = $('#color').val();
-      collection = {name: collectionName, color: collectionColor};  
-      //saveCollection(collection);
-      userCollections.push(collection);
-    }
-    else{
-      collection = userCollections[collectionInput.selectedIndex - 2];
-    }
-    var start = new Date($('#startDate').val()).toJSON();
-    var end = new Date($('#endDate').val()).toJSON();
-    var content = $('#eventDescription').val();
-    //var overlayIndex = userOverlays.length - 1;
-    //console.log(collection);
-    var overlay = userOverlays.pop();//[overlayIndex];
-    console.log(overlay);
-    overlay.setMap(null);
-    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
-    
-    var newEvent = {'name':name, 
-                    'content':content, 
-                    'collection':collection, 
-                    'user':"" ,
-                    'shape':overlay.shape, 
-                    'geometry':overlay.geometry, 
-                    'start':start, 
-                    'end':end};
-                    
-    addEventsToMap([newEvent]);
-    windowResize();
-    newEvent.index = userOverlays.length -1;
-    saveEvent(newEvent);
-    //console.log (newEvent);
-  }else{
-    //alert(errorMsg);
-    $('.inputErrorMessage').html(errorMsg);
-  }
-}
-
-function editEventSubmit(){
+function eventSubmit(overlay){
   //call validation function which returns an error message string.
   //if it is blank then the form is submitted.
   //If it is not blank then the string is shown in an alert and the form is not submitted.
@@ -621,11 +571,12 @@ function editEventSubmit(){
   if(errorMsg == ''){
     drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
-    $('#timeline-container').slideToggle();
+    $('#timeline-container').slideDown();
     $('#new-modal').modal('hide');
     var collection;
     var collectionInput = $('#collectionInput')[0];
     var name = $('#eventName').val();
+    overlay.content = name;
     if (collectionInput.value=="new"){
       collectionName = $('#newCollection').val();
       collectionColor = $('#color').val();
@@ -636,31 +587,81 @@ function editEventSubmit(){
     else{
       collection = userCollections[collectionInput.selectedIndex - 2];
     }
-    var start = new Date($('#startDate').val()).toJSON();
-    var end = new Date($('#endDate').val()).toJSON();
-    var content = $('#eventDescription').val();
-    var index = $('#index').val();
-    var overlay = userOverlays[index];
-    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+    var start = new Date($('#startDate').val());
+    overlay.start = start;
+    start = start.toJSON();
+    var end = $('#endDate').val();
+    if(end)
+    {
+      end = new Date(end);
+      overlay.end = end;
+      end = end.toJSON();
+    }
+    else{
+      overlay.end = null;
+    }
+      
     
-    var newEvent = {'name':name,
-                    'id':overlay.id,
-                    'index':index,
+    
+    var content = $('#eventDescription').val();
+    overlay.body = content;
+    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+    var shape = overlay.shapeType;
+    var geometry;
+    if(shape == "marker"){
+      var newPos = overlay.getPosition();
+      var posArr = [];
+      var newLatLng = new google.maps.LatLng(newPos.k,newPos.A);
+      posArr.push(newLatLng);
+      geometry = google.maps.geometry.encoding.encodePath(posArr);
+    }
+    else{
+      geometry = google.maps.geometry.encoding.encodePath(overlay.getPath());
+    }
+    
+    var newEvent = {'name':name, 
                     'content':content, 
                     'collection':collection, 
-                    'user':"" ,
-                    'shape':overlay.shapeType, 
-                    'geometry':google.maps.geometry.encoding.encodePath(overlay.getPath()),
+                    'shape':shape, 
+                    'geometry':geometry, 
                     'start':start, 
                     'end':end};
-                    
-    windowResize();
-    saveEvent(newEvent);
-    //console.log (newEvent);
-  }else{
-    //alert(errorMsg);
+  
+    return newEvent;
+    
+   }else{
     $('.inputErrorMessage').html(errorMsg);
   }
+}
+
+function newEventSubmit(){
+    var overlay = userOverlays.pop();
+    var newEvent = eventSubmit(overlay);
+    overlay.setMap(null);
+                    
+    addEventsToMap([newEvent]);
+    windowResize();
+    newEvent.index = userOverlays.length -1;
+    saveEvent(newEvent);
+}
+
+function editEventSubmit(){
+    var index = $('#index').val();
+    var overlay = userOverlays[index];
+
+    var newEvent = eventSubmit(overlay);
+    
+	className = "row" + index
+                    
+    console.log(newEvent);                
+	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
+	  
+	
+    newEvent.index = index;
+    newEvent.id = overlay.id;            
+    windowResize();
+    timelineManager(); 
+    saveEvent(newEvent);
 }
 
 function addEventToTimeline(data){    
@@ -767,16 +768,25 @@ function getEvents(){
 
 function deleteEvent(overlay){
   url = deleteEventUrl + 'deleteEvent/' + overlay.id;
-  console.log(url);
   overlay.setMap(null);
-  timeline.deleteItem(overlay.index);//TODO remove from timeline
+  console.log(overlay.index);
+  console.log(userOverlays.length);
+  userOverlays.splice(overlay.index,1);
+  console.log(userOverlays.length);
+  for(var index = 0, len = userOverlays.length; index < len; index ++){
+    userOverlays[index].index = index;
+  }
+  
+  timeline.deleteItem(overlay.index);
   
   $.ajax({
     url: url,
     cache: false
   })
     .done(function( json ) {
-      console.log(json);
+      //console.log(json);
+      //location.reload();
+      centerMap();
     })
     .fail(function( textStatus ) {
       console.log( "Request failed: " + textStatus.toString() );
