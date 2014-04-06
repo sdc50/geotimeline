@@ -14,7 +14,7 @@ $(function(){
   $('#colorpicker').farbtastic('#color');
   
   getEvents();
-
+  
   // validate();
 
   addListeners();
@@ -35,12 +35,18 @@ function addListeners(){
     });
   });
   
+  $('#zoom-extents').click(function(){
+    centerMap();
+  });
+    
   // adding a new event
   $("#new-event-click").click(function(){
     drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
       $('#timeline-container').slideToggle();
       $('#map').height(pageHeight);
+      clearNewEventForm();
+      $(".new-submit").click(newEventSubmit);
   });
   
   // Remove event from map and array if new event is cancelled
@@ -67,59 +73,6 @@ function addListeners(){
       }
   });
   
-  $(".new-submit").click(function(){
-    //call validation function which returns an error message string.
-    //if it is blank then the form is submitted.
-    //If it is not blank then the string is shown in an alert and the form is not submitted.
-    var errorMsg = validateAllNewEvent();
-    if(errorMsg == ''){
-      drawingManager.setOptions({drawingControl:false});
-        drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideToggle();
-      $('#new-modal').modal('hide');
-      var collection;
-      var collectionInput = $('#collectionInput')[0];
-      var name = $('#eventName').val();
-      if (collectionInput.value=="new"){
-        collectionName = $('#newCollection').val();
-        collectionColor = $('#color').val();
-        collection = {name: collectionName, color: collectionColor};  
-        //saveCollection(collection);
-        userCollections.push(collection);
-      }
-      else{
-        collection = userCollections[collectionInput.selectedIndex - 2];
-      }
-      var start = new Date($('#startDate').val()).toJSON();
-      var end = new Date($('#endDate').val()).toJSON();
-      var content = $('#eventDescription').val();
-      //var overlayIndex = userOverlays.length - 1;
-      //console.log(collection);
-      var overlay = userOverlays.pop();//[overlayIndex];
-      console.log(overlay);
-      overlay.setMap(null);
-      overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
-      
-      var newEvent = {'name':name, 
-                      'content':content, 
-                      'collection':collection, 
-                      'user':"" ,
-                      'shape':overlay.shape, 
-                      'geometry':overlay.geometry, 
-                      'start':start, 
-                      'end':end};
-                      
-      addEventsToMap([newEvent]);
-      windowResize();
-      newEvent.index = userOverlays.length -1;
-      saveEvent(newEvent);
-      //console.log (newEvent);
-    }else{
-      //alert(errorMsg);
-      $('.inputErrorMessage').html(errorMsg);
-    }
-  });
-  
   $('.edit-event').click(function(){
     var eventIndex = $('#eventIndex').val();
     var overlay = userOverlays[eventIndex];
@@ -130,6 +83,7 @@ function addListeners(){
     $('#map').height(pageHeight);
     overlay.makeEditable();
     populateEditModal(overlay);
+    $(".new-submit").click(editEventSubmit);
   });
   
   $('#edit-post').click(function(){
@@ -137,6 +91,13 @@ function addListeners(){
     $('#edit-post').toggle();
     //overlay.makeUneditable(); TODO
     $('#new-modal').modal('show');
+  });
+  
+  $('.delete-event').click(function(){
+    var eventIndex = $('#eventIndex').val();
+    var overlay = userOverlays[eventIndex];
+    $('#view-modal').modal('hide');
+    deleteEvent(overlay);
   });
 }
 
@@ -219,6 +180,38 @@ function initializeMap() {
   
 }
 
+function centerMap(){
+	var bounds = new google.maps.LatLngBounds();
+	var coord;
+	for(var i=0;i<userOverlays.length;i++){
+		// Get bounds of a point
+		object = userOverlays[i]
+		if (object.shapeType == "marker"){
+			var coord = object.position;
+			bounds.extend(coord);
+		}
+		// Get bounds of a line
+		else if (object.shapeType=="polyline"){
+			path = object.getPath();
+			arrayOfPath = path.j;
+			for(var k=0;k<arrayOfPath.length;k++){
+				coord=arrayOfPath[k];
+				bounds.extend(coord);
+			}
+		}
+		// Get bounds of polygons
+		else{
+			path = object.getPaths();
+			arrayOfPaths = path.j[0].j;
+			for(var z=0;z<arrayOfPaths.length;z++){
+				coord=arrayOfPaths[z];
+				bounds.extend(coord);
+			}
+		}
+	}
+	map.fitBounds(bounds);
+}
+
 function initializeTimeline(){
     // Instantiate our timeline object.
     timeline = new links.Timeline($('#timeline-container')[0]);
@@ -236,12 +229,14 @@ function initializeTimeline(){
       zoomMin: 54000000, // one hour
       // zoomMin: 2592000000, // 1 day
       zoomMax: 3153600000000, // 100 years
-      cluster: true
+      cluster: false
     };
  
     // Draw our timeline with the created data and options
     timeline.draw('', options);
 }
+
+
 
 //use global variable to represent event overlays just drawn
 var userCollections = [];
@@ -257,7 +252,10 @@ function addEventsToMap(events){
 		var sUser = events[e].user;
 		var sShape = events[e].shape;
 		var tStart = new Date(events[e].start);
-		var tEnd = new Date(events[e].end);
+		var tEnd = null;
+		if(events[e].end){
+		  tEnd = new Date(events[e].end);
+		}
 		var tcontent = events[e].name;
 		var iOverlayIndex = startIndex + e;
 		var tclassName = "row" + iOverlayIndex;
@@ -468,6 +466,11 @@ function addEventsToMap(events){
 
 google.maps.MVCObject.prototype.onClick = function(){
 	showEventPost(this);
+	
+	// Set timeline to zoom to the event
+	timeline.setVisibleChartRange(this.start, this.end);
+	timeline.zoom(-0.5);
+	
 	var bounds = new google.maps.LatLngBounds();
 	// Get bounds of a point
 	if (this.shapeType == "marker"){
@@ -498,16 +501,53 @@ google.maps.MVCObject.prototype.onClick = function(){
 	}
 };
 
+
 function showEventPost(userEvent){
   var color = userEvent.color;
   $('#view-modal-title').text(userEvent.collection + ': ' + userEvent.content);
+  var dateString = formatDate(userEvent.start);//.toDateString();
+  if(userEvent.end){
+    dateString += ' - ' + formatDate(userEvent.end);
+  }
+  else{
+    dateString += ' ' + formatTime(userEvent.start);//.toTimeString();
+  }
   
-  body_content = "<p>Dates: " + userEvent.start + " - " + userEvent.end + "</p>"
-               + "<p>Description: " + userEvent.body + "</p>"
+  body_content = "<p>" + dateString + "</p>"
+               + "<p>" + userEvent.body + "</p>"
                + '<input id="eventIndex" type="hidden" value="' + userEvent.index + '"/>';
                
   $('#view-modal-body').html(body_content);
   $('#view-modal').modal('show');
+}
+
+var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function formatDate(date){
+  var d = date.getDay();
+  var weekDay = DAYS[d];
+  var day = d + 1;
+  var month = MONTHS[date.getMonth()];
+  var year = date.getFullYear();
+
+  return weekDay + ', ' + month + ' ' + day + ', ' + year;
+}
+
+function formatTime(date){
+  var h = date.getHours();
+  var abr = h < 12 ? 'AM' : 'PM';
+  var hour = h < 12 ? h : h - 12;
+  var min = date.getMinutes();
+  
+  return hour + ':' + min + ' ' + abr;
+}
+
+function clearNewEventForm(){
+  $('#collectionInput').val('null');
+  $('#eventName').val('');
+  $('#startDate').val('');
+  $('#endDate').val('');
+  $('#eventDescription').val('');
 }
 
 function populateEditModal(userEvent){
@@ -517,6 +557,110 @@ function populateEditModal(userEvent){
   $('#startDate').val(userEvent.start);
   $('#endDate').val(userEvent.end);
   $('#eventDescription').val(userEvent.body);
+  $('#index').val(userEvent.index);
+}
+
+function newEventSubmit(){
+  //call validation function which returns an error message string.
+  //if it is blank then the form is submitted.
+  //If it is not blank then the string is shown in an alert and the form is not submitted.
+  var errorMsg = validateAllNewEvent();
+  if(errorMsg == ''){
+    drawingManager.setOptions({drawingControl:false});
+      drawingManager.setDrawingMode(null);
+    $('#timeline-container').slideToggle();
+    $('#new-modal').modal('hide');
+    var collection;
+    var collectionInput = $('#collectionInput')[0];
+    var name = $('#eventName').val();
+    if (collectionInput.value=="new"){
+      collectionName = $('#newCollection').val();
+      collectionColor = $('#color').val();
+      collection = {name: collectionName, color: collectionColor};  
+      //saveCollection(collection);
+      userCollections.push(collection);
+    }
+    else{
+      collection = userCollections[collectionInput.selectedIndex - 2];
+    }
+    var start = new Date($('#startDate').val()).toJSON();
+    var end = new Date($('#endDate').val()).toJSON();
+    var content = $('#eventDescription').val();
+    //var overlayIndex = userOverlays.length - 1;
+    //console.log(collection);
+    var overlay = userOverlays.pop();//[overlayIndex];
+    console.log(overlay);
+    overlay.setMap(null);
+    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+    
+    var newEvent = {'name':name, 
+                    'content':content, 
+                    'collection':collection, 
+                    'user':"" ,
+                    'shape':overlay.shape, 
+                    'geometry':overlay.geometry, 
+                    'start':start, 
+                    'end':end};
+                    
+    addEventsToMap([newEvent]);
+    windowResize();
+    newEvent.index = userOverlays.length -1;
+    saveEvent(newEvent);
+    //console.log (newEvent);
+  }else{
+    //alert(errorMsg);
+    $('.inputErrorMessage').html(errorMsg);
+  }
+}
+
+function editEventSubmit(){
+  //call validation function which returns an error message string.
+  //if it is blank then the form is submitted.
+  //If it is not blank then the string is shown in an alert and the form is not submitted.
+  var errorMsg = validateAllNewEvent();
+  if(errorMsg == ''){
+    drawingManager.setOptions({drawingControl:false});
+    drawingManager.setDrawingMode(null);
+    $('#timeline-container').slideToggle();
+    $('#new-modal').modal('hide');
+    var collection;
+    var collectionInput = $('#collectionInput')[0];
+    var name = $('#eventName').val();
+    if (collectionInput.value=="new"){
+      collectionName = $('#newCollection').val();
+      collectionColor = $('#color').val();
+      collection = {name: collectionName, color: collectionColor};  
+      //saveCollection(collection);
+      userCollections.push(collection);
+    }
+    else{
+      collection = userCollections[collectionInput.selectedIndex - 2];
+    }
+    var start = new Date($('#startDate').val()).toJSON();
+    var end = new Date($('#endDate').val()).toJSON();
+    var content = $('#eventDescription').val();
+    var index = $('#index').val();
+    var overlay = userOverlays[index];
+    overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
+    
+    var newEvent = {'name':name,
+                    'id':overlay.id,
+                    'index':index,
+                    'content':content, 
+                    'collection':collection, 
+                    'user':"" ,
+                    'shape':overlay.shapeType, 
+                    'geometry':google.maps.geometry.encoding.encodePath(overlay.getPath()),
+                    'start':start, 
+                    'end':end};
+                    
+    windowResize();
+    saveEvent(newEvent);
+    //console.log (newEvent);
+  }else{
+    //alert(errorMsg);
+    $('.inputErrorMessage').html(errorMsg);
+  }
 }
 
 function addEventToTimeline(data){    
@@ -599,8 +743,6 @@ function saveCollection(collection){
   })
     .done(function( msg ) {
       collection.id =  msg.id
-      
-      
   });
 }
 
@@ -612,15 +754,34 @@ function getEvents(){
   })
     .done(function( json ) {
       userCollections = json.collections;
-      createDatalist();
+      createCollectionSelectList();
 
       addEventsToMap(json.events);
+      centerMap();
     })
+    
     .fail(function( textStatus ) {
       console.log( "Request failed: " + textStatus.toString() );
     });
 }
 
+function deleteEvent(overlay){
+  url = deleteEventUrl + 'deleteEvent/' + overlay.id;
+  console.log(url);
+  overlay.setMap(null);
+  timeline.deleteItem(overlay.index);//TODO remove from timeline
+  
+  $.ajax({
+    url: url,
+    cache: false
+  })
+    .done(function( json ) {
+      console.log(json);
+    })
+    .fail(function( textStatus ) {
+      console.log( "Request failed: " + textStatus.toString() );
+    });
+}
   
 
 
@@ -636,7 +797,7 @@ function showSubmission(){
 
 
 
-function createDatalist(){
+function createCollectionSelectList(){
 	for(var l=0; l<userCollections.length; l++){
 		var listElement = userCollections[l];
 		var optionString = '<option value="' + listElement.id + '">'+ listElement.name +'</option>';
@@ -645,101 +806,7 @@ function createDatalist(){
 	
 }
 
-//this is a mock data set for the map overlays
-var mockOverlayData = [{
-	name: 'marker1',
-	content: 'content content',
-	collection: {name:'first collection', color: '#008000'},//green
-	user: 'user1',
-	shape: 'marker',
-	geometry: 'd_ehE}`}l[',
-	start: '2014-03-18 14:59:23',
-	end: '2014-05-18 15:00:00'
-},
-{
-	name: 'marker2',
-	content: 'content content',
-	collection: {name:'second collection', color: '#003D80'},
-	user: 'user1',
-	shape: 'marker',
-	geometry: '`i`jEac|~[',
-	start: '2014-01-18 15:47:12',
-	end: '2014-03-18 15:50:12'
-},
-{
-	name: 'marker3',
-	content: 'content content',
-	collection: {name:'third collection', color: '#DF1D03'},
-	user: 'user1',
-	shape: 'marker',
-	geometry: 'zf~lEgmqm[',
-	start: '2014-03-18 16:00:00',
-	end: '2014-03-20 16:00:00'
-},
-//polygons
-{
-	name: 'polygon1',
-	content: 'content content',
-	collection: {name:'first collection', color: '#008000'},//green
-	user: 'user1',
-	shape: 'polygon',
-	geometry: 'vvyfEmmsr[vjgBq{aCq_oAspd@',
-	start: '2014-02-18 14:59:23',
-	end: '2014-04-18 15:00:00'
-},
-{
-	name: 'polygon2',
-	content: 'content content',
-	collection: {name:'second collection', color: '#003D80'},
-	user: 'user1',
-	shape: 'polygon',
-	geometry: 'hxjoE_cck[qpR{`sCbt`AtfQh[zsoB',
-	start: '2014-03-18 15:47:12',
-	end: '2014-04-18 15:50:12'
-},
-{
-	name: 'polygon3',
-	content: 'content content',
-	collection: {name:'third collection', color: '#DF1D03'},
-	user: 'user1',
-	shape: 'polygon',
-	geometry: 'rewmEiwmv[{vY}~eBje^ikS|fe@tfQf{G||x@',
-	start: '2014-04-18 15:51:59',
-	end: '2014-05-18 16:00:00'
-},
-//polylines
-{
-	name: 'polyline1',
-	content: 'content content',
-	collection: {name:'first collection', color: '#008000'},//green
-	user: 'user1',
-	shape: 'polyline',
-	geometry: '|s{oEysgr[sieB}}[vqkAig`@of_BgimA_}Gi|i@',
-	start: '2014-05-18 14:59:23',
-	end: '2014-06-18 15:00:00'
-},
-{
-	name: 'polyline2',
-	content: 'content content',
-	collection: {name:'second collection', color: '#003D80'},
-	user: 'user1',
-	shape: 'polyline',
-	geometry: 'zelkEenk{[vioAsia@okwA}xeArwb@irV',
-	start: '2014-05-18 15:47:12',
-	end: '2014-06-18 15:50:12'
-},
-{
-	name: 'polyline3',
-	content: 'content content',
-	collection: {name:'third collection', color: '#DF1D03'},
-	user: 'user1',
-	shape: 'polyline',
-	geometry: '`choEaou}[dijAtcjGmlCzv_C',
-	start: '2014-05-18 15:51:59',
-	end: '2014-05-30 16:00:00'
-},
-];
-//end mock dataset for the overlays
+
 ///////////////////////////////////////////////////////////////////
 //this is for the jquery ui datepicker
 $('#startDate').datetimepicker();
@@ -799,7 +866,7 @@ function validateAllNewEvent(){
 	if(!$('#startDate').val()){
 		msg = msg + '<li>The start date/time field is blank.</li>';
 	}
-	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
+	if(dEnd != '' && (dEnd-dStart < (60*30*1000)) && dStart && dEnd){
 		msg = msg + '<li>The end date/time is less than 30 minutes after the start date/time.</li>';
 	}
 	else if(dEnd && !dStart){

@@ -35,11 +35,8 @@
               <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu" role="menu">
-              <li id="new-event-click"><a><span>New Event</span></a></li>
-              <li><a href="{{request.application_url}}/timemap">Go To TimeMap</a></li>
-              <li><a href="{{request.application_url}}/">Settings</a></li>
-              <li><a href="{{request.application_url}}/">Friends</a></li>
-              <li><a><span data-toggle="modal" data-target=".event-post-modal">Show Modal</span></a></li>
+              {% block options%}{% endblock %}
+              <li><a href="{{request.application_url}}/settings">Settings</a></li>
               <li class="divider"></li>
               <li><a href="{{request.application_url}}/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
             </ul>

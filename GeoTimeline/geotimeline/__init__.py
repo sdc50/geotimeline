@@ -41,6 +41,8 @@ def main(global_config, **settings):
     config.add_route('events', '/getCollections')
     config.add_route('saveEvent', '/saveEvent')
     config.add_route('saveCollection', '/saveCollection')
+    config.add_route('deleteEvent', '/deleteEvent/{id}')
+    config.add_route('settings', '/settings')
     #config.add_route('friends-events', '/getFriendsEvents')
     config.scan()
     return config.make_wsgi_app()

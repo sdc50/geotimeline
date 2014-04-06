@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Welcome{% endblock %}
+{% block head %}
+    {{ super() }}
+    <!-- Add to head here -->
+{% endblock %}
+
+{% block options%}
+  <li><a href="{{request.application_url}}/timemap">TimeMap</a></li>
+{% endblock %}
+
+{% block content %}
+ <h1>This is the settings page</h1>
+ your name is {{user.firstName}} {{user.lastName}}
+{% endblock %}
+
+{% block scripts %}{% endblock %}
