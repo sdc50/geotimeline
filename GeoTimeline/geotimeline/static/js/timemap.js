@@ -687,7 +687,7 @@ function timelineManager () {
 					overlay.timelineDiv = $(this);
 					//console.log(overlay);
 					var color = overlay.strokeColor;
-					$(this).css({"background-color": color, "opacity": "0.75"})
+					$(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"})
 				}
 			}
 		});
