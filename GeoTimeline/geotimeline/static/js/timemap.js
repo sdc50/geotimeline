@@ -61,7 +61,6 @@ function addListeners(){
       $('#new-modal-title:contains("New Event Details")').each(function(){
 	      deletedOverlay = userOverlays.pop();
 	      deletedOverlay.setMap(null);
-	      windowResize();
       });
       $('#new-modal-title:contains("Edit Event Details")').each(function(){location.reload()})
   });
