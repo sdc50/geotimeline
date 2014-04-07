@@ -9,8 +9,10 @@ $(function(){
   $('footer').slideUp();
 
   initializeMap();
+  pageHeight = $(window).height();
+  $('#map').height(pageHeight);
   initializeTimeline();
-  windowResize();
+  setTimeout(windowResize,1000);
   $('#colorpicker').farbtastic('#color');
   
   getEvents();
@@ -28,7 +30,10 @@ function addListeners(){
   
   $('.timeline-axis').mousedown(function(){
     $(document).mousemove(function(e){
-      resizeTimeline(e.pageY);
+      var BUFFER = 100;
+      var timelineHeight = pageHeight - e.pageY;
+      timelineHeight = timelineHeight < BUFFER ? BUFFER : timelineHeight > pageHeight - BUFFER ? pageHeight - BUFFER : timelineHeight;
+      resizeTimeline(timelineHeight);
     });
     $(document).mouseup(function(e){
             $(document).off('mousemove');
@@ -42,26 +47,25 @@ function addListeners(){
     
   // adding a new event
   $("#new-event-click").click(function(){
-    drawingManager.setOptions({drawingControl:true});
-      drawingManager.setDrawingMode(null);
-      timeline.checkResize();
-      $('#timeline-container').slideUp();
       $('#map').height(pageHeight);
+      $('#timeline-container').slideUp();
+      drawingManager.setOptions({drawingControl:true});
+      drawingManager.setDrawingMode(null);
       clearNewEventForm();
       $(".new-submit").click(newEventSubmit);
   });
   
   // Remove event from map and array if new event is cancelled
   $(".new-close").click(function(){
-    drawingManager.setOptions({drawingControl:false});
+      drawingManager.setOptions({drawingControl:false});
       drawingManager.setDrawingMode(null);
       $('#timeline-container').slideDown();
       $('#new-modal-title:contains("New Event Details")').each(function(){
 	      deletedOverlay = userOverlays.pop();
 	      deletedOverlay.setMap(null);
 	      windowResize();
-      })
-      
+      });
+      $('#new-modal-title:contains("Edit Event Details")').each(function(){locaion.reload()})
   });
   
   // Show or hide the color picker and collection label
@@ -123,20 +127,20 @@ function initializeMap() {
     },
     panControl: true,
     panControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_TOP
+        position: google.maps.ControlPosition.RIGHT_CENTER
     },
     zoomControl: true,
     zoomControlOptions: {
         style: google.maps.ZoomControlStyle.LARGE,
-        position: google.maps.ControlPosition.RIGHT_TOP
+        position: google.maps.ControlPosition.RIGHT_CENTER
     },
     scaleControl: true,
     scaleControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_TOP
+        position: google.maps.ControlPosition.RIGHT_CENTER
     },
     streetViewControl: true,
     streetViewControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_TOP
+        position: google.maps.ControlPosition.RIGHT_CENTER
     }
   });
   
@@ -177,7 +181,7 @@ function initializeMap() {
   // start: added for search bar
 	var searchMarkers = [];
 	var input = (document.getElementById('search-input'));
-	map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+	map.controls[google.maps.ControlPosition.RIGHT_TOP].setAt(0,input);
 	var searchBox = new google.maps.places.SearchBox(input);
 	google.maps.event.addListener(searchBox, 'places_changed', function(){
 		var places = searchBox.getPlaces();
@@ -725,7 +729,7 @@ function timelineManager () {
 					overlay.timelineDiv = $(this);
 					//console.log(overlay);
 					var color = overlay.strokeColor;
-					$(this).css({"background-color": color, "opacity": "0.75"});
+					$(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"});
 				}
 			}
 		});
@@ -739,17 +743,21 @@ function timelineManager () {
 function windowResize(){
   pageHeight = $(window).height();
   pageWidth = $(window).width();
-  resizeTimeline(pageHeight * .8);
+  if(!drawingManager.drawingControl){
+    resizeTimeline(pageHeight * .2);
+  }
+  else{
+    resizeTimeline(0);
+  }
+    
 }
 
-function resizeTimeline(y){
-  var timelineHeight = pageHeight - y;
-  var BUFFER = 100;
-  timelineHeight = timelineHeight < BUFFER ? BUFFER : timelineHeight > pageHeight - BUFFER ? pageHeight - BUFFER : timelineHeight;
+function resizeTimeline(timelineHeight){
+  var mapHeight = pageHeight - timelineHeight;
   $('#timeline-container').height(timelineHeight);
-  $('#map').height(pageHeight - timelineHeight);
-  $('#map').width(pageWidth);
   timeline.checkResize();
+  $('#map').height(mapHeight);
+  $('#map').width(pageWidth);
 }
 
 function saveEvent(newEvent){
