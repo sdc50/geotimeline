@@ -65,7 +65,7 @@ function addListeners(){
 	      deletedOverlay.setMap(null);
 	      windowResize();
       });
-      $('#new-modal-title:contains("Edit Event Details")').each(function(){locaion.reload()})
+      $('#new-modal-title:contains("Edit Event Details")').each(function(){location.reload()})
   });
   
   // Show or hide the color picker and collection label
