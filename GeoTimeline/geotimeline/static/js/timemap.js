@@ -44,8 +44,8 @@ function addListeners(){
   $("#new-event-click").click(function(){
     drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
-      //$('#timeline-container').slideUp();
       timeline.checkResize();
+      $('#timeline-container').slideUp();
       $('#map').height(pageHeight);
       clearNewEventForm();
       $(".new-submit").click(newEventSubmit);
@@ -55,7 +55,7 @@ function addListeners(){
   $(".new-close").click(function(){
     drawingManager.setOptions({drawingControl:false});
       drawingManager.setDrawingMode(null);
-      //$('#timeline-container').slideDown();
+      $('#timeline-container').slideDown();
       $('#new-modal-title:contains("New Event Details")').each(function(){
 	      deletedOverlay = userOverlays.pop();
 	      deletedOverlay.setMap(null);
@@ -83,7 +83,7 @@ function addListeners(){
     $('#view-modal').modal('hide');
     $('#usr-group').toggle();
     $('#edit-post').toggle();
-    //$('#timeline-container').slideUp();
+    $('#timeline-container').slideUp();
     $('#map').height(pageHeight);
     overlay.makeEditable();
     populateEditModal(overlay);
@@ -107,13 +107,14 @@ function addListeners(){
   });
 }
 
-var drawingManager
+var drawingManager;
 function initializeMap() {
+	
   var mapDiv = $('#map')[0];
   map = new google.maps.Map(mapDiv, {
     //center: new google.maps.LatLng(37.4419, -122.1419),
-    center: new google.maps.LatLng(39.8282, -98.5795),
-    zoom: 4,
+    center: new google.maps.LatLng(-34.397, 150.644),
+    zoom: 8,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControl: true,
     mapTypeControlOptions:{
@@ -173,43 +174,70 @@ function initializeMap() {
   drawingManager.setOptions({drawingControl:false});  //hides drawing controls
   drawingManager.setDrawingMode(null); //sets control to pan mode
   
+  // start: added for search bar
+	var searchMarkers = [];
+	var input = (document.getElementById('search-input'));
+	map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+	var searchBox = new google.maps.places.SearchBox(input);
+	google.maps.event.addListener(searchBox, 'places_changed', function(){
+		var places = searchBox.getPlaces();
+		for (var i = 0, searchMarker; searchMarker = searchMarkers[i]; i++){
+			searchMarker.setMap(null);
+		}
+		searchMarkers = [];
+		var searchBounds = new google.maps.LatLngBounds();
+		for (var i = 0, place; place = places[i]; i++){
+			var image = {
+				url: place.icon,
+				size: new google.maps.Size(71,71),
+				origin: new google.maps.Point(0,0),
+				anchor: new google.maps.Point(17,34),
+				scaledSize: new google.maps.Size(25,25)
+			};
+			var searchMarker = new google.maps.Marker({
+				map: map,
+				icon: image,
+				title: place.name,
+				position: place.geometry.location
+			});
+			searchMarkers.push(searchMarker);
+			searchBounds.extend(place.geometry.location);
+		}
+		map.fitBounds(searchBounds);
+	});
+	//end: added for search bar
 }
 
 function centerMap(){
 	var bounds = new google.maps.LatLngBounds();
 	var coord;
-	if (userOverlays.length == 0){
-		map.setZoom(4);
-	}
-	else{
-		for(var i=0;i<userOverlays.length;i++){
-			// Get bounds of a point
-			object = userOverlays[i];
-			if (object.shapeType == "marker"){
-				var coord = object.position;
+	for(var i=0;i<userOverlays.length;i++){
+		// Get bounds of a point
+		object = userOverlays[i];
+		if (object.shapeType == "marker"){
+			var coord = object.position;
+			bounds.extend(coord);
+		}
+		// Get bounds of a line
+		else if (object.shapeType=="polyline"){
+			path = object.getPath();
+			arrayOfPath = path.j;
+			for(var k=0;k<arrayOfPath.length;k++){
+				coord=arrayOfPath[k];
 				bounds.extend(coord);
 			}
-			// Get bounds of a line
-			else if (object.shapeType=="polyline"){
-				path = object.getPath();
-				arrayOfPath = path.j;
-				for(var k=0;k<arrayOfPath.length;k++){
-					coord=arrayOfPath[k];
-					bounds.extend(coord);
-				}
-			}
-			// Get bounds of polygons
-			else{
-				path = object.getPaths();
-				arrayOfPaths = path.j[0].j;
-				for(var z=0;z<arrayOfPaths.length;z++){
-					coord=arrayOfPaths[z];
-					bounds.extend(coord);
-				}
+		}
+		// Get bounds of polygons
+		else{
+			path = object.getPaths();
+			arrayOfPaths = path.j[0].j;
+			for(var z=0;z<arrayOfPaths.length;z++){
+				coord=arrayOfPaths[z];
+				bounds.extend(coord);
 			}
 		}
-		map.fitBounds(bounds);
-	}	
+	}
+	map.fitBounds(bounds);
 }
 
 function initializeTimeline(){
@@ -242,7 +270,7 @@ function initializeTimeline(){
 var userCollections = [];
 var userOverlays = [];
 function addEventsToMap(events){
-	var startIndex = userOverlays.length
+	var startIndex = userOverlays.length;
 	for (var e=0; e<events.length; e++){
 		var evente;
 		var iId = events[e].id;
@@ -267,25 +295,21 @@ function addEventsToMap(events){
 			case 'marker':
 			//make variables for the pin color
 			var pinColor = sColor.substring(1);
+			//console.log(pinColor);
 			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+				//new google.maps.Point(0,0),
+				//new google.maps.Point(10,34),
 				null,
 				null,
 				null,
 				new google.maps.Size(21,34));
-			var largePinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-          //new google.maps.Point(0,0),
-          //new google.maps.Point(10,34),
-          null,
-          null,
-          null,
-          new google.maps.Size(42,68));
-      var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
-        new google.maps.Size(40,37),
-        new google.maps.Point(0,0),
-        new google.maps.Point(12,35));
+			var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
+				new google.maps.Size(40,37),
+				new google.maps.Point(0,0),
+				new google.maps.Point(12,35));
 			//end pin color variables
 			//make marker
-			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:5, strokeColor: sColor, strokeWeight:2}
+			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:10}
 			evente = new google.maps.Marker({
 				//map:map,
 				shapeType: sShape,
@@ -295,8 +319,6 @@ function addEventsToMap(events){
 				collectionId:  iCollectionId,
 				strokeColor: sColor,
 				fillColor: sColor,
-				pinImage: pinImage,
-				largePinImage: largePinImage,
 				icon: pinImage, //this is new for the marker color
 				//shadow: pinShadow, //this is new for the marker shadow
 				position: aDecodGeom[0],
@@ -309,12 +331,30 @@ function addEventsToMap(events){
 				body: tbody,
 				className: tclassName,
 				highlightOn: function(){
-					this.setIcon(this.largePinImage);
+					var color = this.fillColor;
+					color = color.substring(1);
+					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
+					//new google.maps.Point(0,0),
+					//new google.maps.Point(10,34),
+					null,
+					null,
+					null,
+					new google.maps.Size(42,68));
+					this.setIcon(pinImage);
 					//this.setAnimation(google.maps.Animation.BOUNCE);
 					this.timelineDiv.css({"opacity":"1"});
 					},
 				highlightOff: function(){
-					this.setIcon(this.pinImage);
+					var color = this.fillColor;
+					color = color.substring(1);
+					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
+					//new google.maps.Point(0,0),
+					//new google.maps.Point(10,34),
+					null,
+					null,
+					null,
+					new google.maps.Size(21,34));
+					this.setIcon(pinImage);
 					//this.setAnimation(null);
 					this.timelineDiv.css({"opacity":"0.75"});
 				},
@@ -322,12 +362,12 @@ function addEventsToMap(events){
 				  this.setIcon('http://icons.iconarchive.com/icons/everaldo/kids-icons/32/package-utilities-icon.png');
 		          this.setDraggable(true);
 		          this.editOn = true;
-        },
-        makeUneditable: function(){
-				  this.setIcon(this.pinImage);
+		        },
+		        makeUneditable: function(){
+				  this.setIcon(pinImage);
 		          this.setDraggable(false);
 		          this.editOn = false;
-		    },
+		        },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
@@ -523,9 +563,9 @@ function showEventPost(userEvent){
 var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 function formatDate(date){
-  
-  var weekDay = DAYS[date.getDay()];
-  var day = date.getDate();
+  var d = date.getDay();
+  var weekDay = DAYS[d];
+  var day = d + 1;
   var month = MONTHS[date.getMonth()];
   var year = date.getFullYear();
 
@@ -537,25 +577,8 @@ function formatTime(date){
   var abr = h < 12 ? 'AM' : 'PM';
   var hour = h < 12 ? h : h - 12;
   var min = date.getMinutes();
-  min = min < 10 ? '0' + min : min;
   
   return hour + ':' + min + ' ' + abr;
-}
-
-function formatDateTime(date){
-  if(date)
-  {
-    var day = date.getDate();
-    var month = date.getMonth() + 1;
-    var year = date.getFullYear();
-    var hour = date.getHours();
-    var min = date.getMinutes();
-    min = min < 10 ? '0' + min : min;
-    
-    return year + '/' + month + '/' + day + ' ' + hour + ':' + min;
-  }
-  
-  return '';
 }
 
 function clearNewEventForm(){
@@ -572,12 +595,11 @@ function populateEditModal(userEvent){
   $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
-  $('#startDate').val(formatDateTime(userEvent.start));
-  $('#endDate').val(formatDateTime(userEvent.end));
+  $('#startDate').val(userEvent.start);
+  $('#endDate').val(userEvent.end);
   $('#eventDescription').val(userEvent.body);
   $('#index').val(userEvent.index);
 }
-
 
 function eventSubmit(overlay){
   //call validation function which returns an error message string.
@@ -587,7 +609,7 @@ function eventSubmit(overlay){
   if(errorMsg == ''){
     drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
-    //$('#timeline-container').slideDown();
+    $('#timeline-container').slideDown();
     $('#new-modal').modal('hide');
     var collection;
     var collectionInput = $('#collectionInput')[0];
@@ -667,7 +689,7 @@ function editEventSubmit(){
 
     var newEvent = eventSubmit(overlay);
     
-	className = "row" + index
+	className = "row" + index;
                     
     console.log(newEvent);                
 	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
@@ -703,7 +725,7 @@ function timelineManager () {
 					overlay.timelineDiv = $(this);
 					//console.log(overlay);
 					var color = overlay.strokeColor;
-					$(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"})
+					$(this).css({"background-color": color, "opacity": "0.75"});
 				}
 			}
 		});
