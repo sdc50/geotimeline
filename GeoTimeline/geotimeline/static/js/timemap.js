@@ -42,9 +42,10 @@ function addListeners(){
     
   // adding a new event
   $("#new-event-click").click(function(){
-    drawingManager.setOptions({drawingControl:true});
-      drawingManager.setDrawingMode(null);
       $('#timeline-container').slideUp();
+      timeline.checkResize();
+      drawingManager.setOptions({drawingControl:true});
+      drawingManager.setDrawingMode(null);
       $('#map').height(pageHeight);
       clearNewEventForm();
       $(".new-submit").click(newEventSubmit);
