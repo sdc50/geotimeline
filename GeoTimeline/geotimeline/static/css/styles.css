@@ -72,8 +72,8 @@ a{
 #timeline-img{
   height:50%;
   position:absolute;
-  top:15%;
-  right:-100px;
+  top:25%;
+  left:0px;
 }
 
 .blank{

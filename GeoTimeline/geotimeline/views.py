@@ -104,7 +104,7 @@ def saveEvent(request):
             collectionName = params['collection[name]']
             color = params['collection[color]']
             collection = Collection(collectionName, color)
-            user.collections.append(c)
+            user.collections.append(collection)
         
         if 'id' in params:
           event = DBSession.query(Event).get(params['id'])
