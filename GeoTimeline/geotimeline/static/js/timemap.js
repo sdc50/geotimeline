@@ -7,10 +7,13 @@ var map, timeline, pageHeight, pageWidth;
 $(function(){
   $('header').addClass('map-header').find('a').first().fadeOut('slow');
   $('footer').slideUp();
-
+  
+  
   initializeMap();
+  pageHeight = $(window).height();
+  $('#map').height(pageHeight);
   initializeTimeline();
-  setTimeout(windowResize,100);
+  setTimeout(windowResize,1000);
   $('#colorpicker').farbtastic('#color');
   
   getEvents();
@@ -24,7 +27,10 @@ function addListeners(){
   
   $('.timeline-axis').mousedown(function(){
     $(document).mousemove(function(e){
-      resizeTimeline(e.pageY);
+      var BUFFER = 100;
+      var timelineHeight = pageHeight - e.pageY;
+      timelineHeight = timelineHeight < BUFFER ? BUFFER : timelineHeight > pageHeight - BUFFER ? pageHeight - BUFFER : timelineHeight;
+      resizeTimeline(timelineHeight);
     });
     $(document).mouseup(function(e){
             $(document).off('mousemove');
@@ -39,17 +45,18 @@ function addListeners(){
   // adding a new event
   $("#new-event-click").click(function(){
       $('#timeline-container').slideUp();
-      timeline.checkResize();
+      //console.log($('#timeline-container').css('display'));
+      $('#map').height(pageHeight);
       drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
-      $('#map').height(pageHeight);
+      windowResize();
       clearNewEventForm();
       $(".new-submit").click(newEventSubmit);
   });
   
   // Remove event from map and array if new event is cancelled
   $(".new-close").click(function(){
-    drawingManager.setOptions({drawingControl:false});
+      drawingManager.setOptions({drawingControl:false});
       drawingManager.setDrawingMode(null);
       $('#timeline-container').slideDown();
       deletedOverlay = userOverlays.pop();
@@ -709,16 +716,20 @@ function timelineManager () {
 function windowResize(){
   pageHeight = $(window).height();
   pageWidth = $(window).width();
-  resizeTimeline(pageHeight * .8);
+  if(!drawingManager.drawingControl){
+    resizeTimeline(pageHeight * .2);
+  }
+  else{
+    resizeTimeline(0);
+  }
+    
 }
 
-function resizeTimeline(y){
-  var timelineHeight = pageHeight - y;
-  var BUFFER = 100;
-  timelineHeight = timelineHeight < BUFFER ? BUFFER : timelineHeight > pageHeight - BUFFER ? pageHeight - BUFFER : timelineHeight;
+function resizeTimeline(timelineHeight){
+  var mapHeight = pageHeight - timelineHeight;
   $('#timeline-container').height(timelineHeight);
   timeline.checkResize();
-  $('#map').height(pageHeight - timelineHeight);
+  $('#map').height(mapHeight);
   $('#map').width(pageWidth);
 }
 
