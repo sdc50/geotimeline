@@ -17,11 +17,9 @@ $(function(){
   
   getEvents();
   
-  // validate();
 
   addListeners();
-  
-  
+
 });
 
 function addListeners(){
@@ -59,10 +57,9 @@ function addListeners(){
   $(".new-close").click(function(){
       drawingManager.setOptions({drawingControl:false});
       drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideDown();
       deletedOverlay = userOverlays.pop();
       deletedOverlay.setMap(null);
-      windowResize();
+      $('#timeline-container').slideDown(windowResize);
   });
   
   // Show or hide the color picker and collection label
