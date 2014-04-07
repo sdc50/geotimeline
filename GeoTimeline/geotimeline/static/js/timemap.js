@@ -177,7 +177,7 @@ function centerMap(){
 	var coord;
 	for(var i=0;i<userOverlays.length;i++){
 		// Get bounds of a point
-		object = userOverlays[i]
+		object = userOverlays[i];
 		if (object.shapeType == "marker"){
 			var coord = object.position;
 			bounds.extend(coord);
@@ -693,7 +693,7 @@ function timelineManager () {
 					overlay.timelineDiv = $(this);
 					//console.log(overlay);
 					var color = overlay.strokeColor;
-					$(this).css({"background-color": color, "opacity": "0.75"})
+					$(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"})
 				}
 			}
 		});
@@ -860,6 +860,20 @@ function dateTimeValidation(target){
 		target.parent().find('.requiredInputMsg').text('');
 	}
 }
+/*This is for validation while filling out the form.
+ * It captures on a blur event for the requiredInput class and changes
+ * the text in the associated span tag with the requiredInputMsg class.
+ */
+$('.requiredInput').on('blur',function(evt){
+	var target = $(evt.target);
+	if (target.val() == ''){
+		target.parent().find('.requiredInputMsg').text('This is a required field!');
+		target.parent().addClass('has-error');
+	}else{
+		target.parent().find('.requiredInputMsg').text('');
+		target.parent().removeClass('has-error');
+	}
+});
 
 /*this function checks everything and returns a message string.
  * If the message string is blank then it is all good.
