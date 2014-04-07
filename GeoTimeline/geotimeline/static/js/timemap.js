@@ -17,11 +17,9 @@ $(function(){
   
   getEvents();
   
-  // validate();
 
   addListeners();
-  
-  
+
 });
 
 function addListeners(){
@@ -59,7 +57,9 @@ function addListeners(){
   $(".new-close").click(function(){
       drawingManager.setOptions({drawingControl:false});
       drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideDown();
+      deletedOverlay = userOverlays.pop();
+      deletedOverlay.setMap(null);
+      $('#timeline-container').slideDown(windowResize);
       $('#new-modal-title:contains("New Event Details")').each(function(){
 	      deletedOverlay = userOverlays.pop();
 	      deletedOverlay.setMap(null);
