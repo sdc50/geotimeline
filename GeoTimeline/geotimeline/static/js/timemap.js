@@ -44,7 +44,7 @@ function addListeners(){
   $("#new-event-click").click(function(){
     drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideUp();
+      //$('#timeline-container').slideUp();
       timeline.checkResize();
       $('#map').height(pageHeight);
       clearNewEventForm();
@@ -55,10 +55,12 @@ function addListeners(){
   $(".new-close").click(function(){
     drawingManager.setOptions({drawingControl:false});
       drawingManager.setDrawingMode(null);
-      $('#timeline-container').slideDown();
-      deletedOverlay = userOverlays.pop();
-      deletedOverlay.setMap(null);
-      windowResize();
+      //$('#timeline-container').slideDown();
+      $('#new-modal-title:contains("New Event Details")').each(function(){
+	      deletedOverlay = userOverlays.pop();
+	      deletedOverlay.setMap(null);
+	      windowResize();
+      })
       
   });
   
@@ -81,7 +83,7 @@ function addListeners(){
     $('#view-modal').modal('hide');
     $('#usr-group').toggle();
     $('#edit-post').toggle();
-    $('#timeline-container').slideUp();
+    //$('#timeline-container').slideUp();
     $('#map').height(pageHeight);
     overlay.makeEditable();
     populateEditModal(overlay);
@@ -557,6 +559,7 @@ function formatDateTime(date){
 }
 
 function clearNewEventForm(){
+  $('#new-modal-title span').text("New Event Details")	
   $('#collectionInput').val('null');
   $('#eventName').val('');
   $('#startDate').val('');
@@ -566,6 +569,7 @@ function clearNewEventForm(){
 
 function populateEditModal(userEvent){
   
+  $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
   $('#startDate').val(formatDateTime(userEvent.start));
@@ -583,7 +587,7 @@ function eventSubmit(overlay){
   if(errorMsg == ''){
     drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
-    $('#timeline-container').slideDown();
+    //$('#timeline-container').slideDown();
     $('#new-modal').modal('hide');
     var collection;
     var collectionInput = $('#collectionInput')[0];
@@ -781,10 +785,10 @@ function getEvents(){
 function deleteEvent(overlay){
   url = deleteEventUrl + 'deleteEvent/' + overlay.id;
   overlay.setMap(null);
-  console.log(overlay.index);
-  console.log(userOverlays.length);
+  //console.log(overlay.index);
+  //console.log(userOverlays.length);
   userOverlays.splice(overlay.index,1);
-  console.log(userOverlays.length);
+  //console.log(userOverlays.length);
   for(var index = 0, len = userOverlays.length; index < len; index ++){
     userOverlays[index].index = index;
   }
