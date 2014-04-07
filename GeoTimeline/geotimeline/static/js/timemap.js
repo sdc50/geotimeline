@@ -60,6 +60,12 @@ function addListeners(){
       deletedOverlay = userOverlays.pop();
       deletedOverlay.setMap(null);
       $('#timeline-container').slideDown(windowResize);
+      $('#new-modal-title:contains("New Event Details")').each(function(){
+	      deletedOverlay = userOverlays.pop();
+	      deletedOverlay.setMap(null);
+	      windowResize();
+      });
+      $('#new-modal-title:contains("Edit Event Details")').each(function(){locaion.reload()})
   });
   
   // Show or hide the color picker and collection label
@@ -580,6 +586,7 @@ function formatTime(date){
 }
 
 function clearNewEventForm(){
+  $('#new-modal-title span').text("New Event Details")	
   $('#collectionInput').val('null');
   $('#eventName').val('');
   $('#startDate').val('');
@@ -589,6 +596,7 @@ function clearNewEventForm(){
 
 function populateEditModal(userEvent){
   
+  $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
   $('#startDate').val(userEvent.start);
@@ -721,7 +729,7 @@ function timelineManager () {
 					overlay.timelineDiv = $(this);
 					//console.log(overlay);
 					var color = overlay.strokeColor;
-					$(this).css({"background-color": color, "opacity": "0.75"});
+					$(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"});
 				}
 			}
 		});
@@ -807,10 +815,10 @@ function getEvents(){
 function deleteEvent(overlay){
   url = deleteEventUrl + 'deleteEvent/' + overlay.id;
   overlay.setMap(null);
-  console.log(overlay.index);
-  console.log(userOverlays.length);
+  //console.log(overlay.index);
+  //console.log(userOverlays.length);
   userOverlays.splice(overlay.index,1);
-  console.log(userOverlays.length);
+  //console.log(userOverlays.length);
   for(var index = 0, len = userOverlays.length; index < len; index ++){
     userOverlays[index].index = index;
   }
