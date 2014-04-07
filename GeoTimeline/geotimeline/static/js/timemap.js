@@ -10,16 +10,12 @@ $(function(){
 
   initializeMap();
   initializeTimeline();
-  windowResize();
+  setTimeout(windowResize,100);
   $('#colorpicker').farbtastic('#color');
   
   getEvents();
   
-  // validate();
-
-  addListeners();
-  
-  
+  addListeners(); 
 });
 
 function addListeners(){
@@ -721,9 +717,9 @@ function resizeTimeline(y){
   var BUFFER = 100;
   timelineHeight = timelineHeight < BUFFER ? BUFFER : timelineHeight > pageHeight - BUFFER ? pageHeight - BUFFER : timelineHeight;
   $('#timeline-container').height(timelineHeight);
+  timeline.checkResize();
   $('#map').height(pageHeight - timelineHeight);
   $('#map').width(pageWidth);
-  timeline.checkResize();
 }
 
 function saveEvent(newEvent){
@@ -835,13 +831,18 @@ $('#startDate').datetimepicker();
 $('#endDate').datetimepicker();
 var st = $('#startDate');
 var dStart;
-st.on('blur',function(){
-	dStart = new Date(st.val());
-	//console.log(dStart);
-	dateTimeValidation(en);
-});
 var en = $('#endDate');
 var dEnd;
+
+st.on('blur',function(){
+	dStart = new Date(st.val());
+	console.log(dStart);
+	dEnd = new Date(dStart.getTime() + (60*30*1000));
+	console.log(dEnd);
+	$('#endDate').val(formatDateTime(dEnd));
+	dateTimeValidation(en);
+});
+
 en.on('blur',function(evt){
 	dEnd = new Date(en.val());
 	//console.log(dEnd);
