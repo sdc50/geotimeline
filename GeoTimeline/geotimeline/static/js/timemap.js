@@ -259,21 +259,25 @@ function addEventsToMap(events){
 			case 'marker':
 			//make variables for the pin color
 			var pinColor = sColor.substring(1);
-			//console.log(pinColor);
 			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-				//new google.maps.Point(0,0),
-				//new google.maps.Point(10,34),
 				null,
 				null,
 				null,
 				new google.maps.Size(21,34));
-			var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
-				new google.maps.Size(40,37),
-				new google.maps.Point(0,0),
-				new google.maps.Point(12,35));
+			var largePinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+          //new google.maps.Point(0,0),
+          //new google.maps.Point(10,34),
+          null,
+          null,
+          null,
+          new google.maps.Size(42,68));
+      var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
+        new google.maps.Size(40,37),
+        new google.maps.Point(0,0),
+        new google.maps.Point(12,35));
 			//end pin color variables
 			//make marker
-			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:10}
+			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:5, strokeColor: sColor, strokeWeight:2}
 			evente = new google.maps.Marker({
 				//map:map,
 				shapeType: sShape,
@@ -283,6 +287,8 @@ function addEventsToMap(events){
 				collectionId:  iCollectionId,
 				strokeColor: sColor,
 				fillColor: sColor,
+				pinImage: pinImage,
+				largePinImage: largePinImage,
 				icon: pinImage, //this is new for the marker color
 				//shadow: pinShadow, //this is new for the marker shadow
 				position: aDecodGeom[0],
@@ -295,30 +301,12 @@ function addEventsToMap(events){
 				body: tbody,
 				className: tclassName,
 				highlightOn: function(){
-					var color = this.fillColor;
-					color = color.substring(1);
-					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-					//new google.maps.Point(0,0),
-					//new google.maps.Point(10,34),
-					null,
-					null,
-					null,
-					new google.maps.Size(42,68));
-					this.setIcon(pinImage);
+					this.setIcon(this.largePinImage);
 					//this.setAnimation(google.maps.Animation.BOUNCE);
 					this.timelineDiv.css({"opacity":"1"});
 					},
 				highlightOff: function(){
-					var color = this.fillColor;
-					color = color.substring(1);
-					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-					//new google.maps.Point(0,0),
-					//new google.maps.Point(10,34),
-					null,
-					null,
-					null,
-					new google.maps.Size(21,34));
-					this.setIcon(pinImage);
+					this.setIcon(this.pinImage);
 					//this.setAnimation(null);
 					this.timelineDiv.css({"opacity":"0.75"});
 				},
@@ -326,12 +314,12 @@ function addEventsToMap(events){
 				  this.setIcon('http://icons.iconarchive.com/icons/everaldo/kids-icons/32/package-utilities-icon.png');
 		          this.setDraggable(true);
 		          this.editOn = true;
-		        },
-		        makeUneditable: function(){
-				  this.setIcon(pinImage);
+        },
+        makeUneditable: function(){
+				  this.setIcon(this.pinImage);
 		          this.setDraggable(false);
 		          this.editOn = false;
-		        },
+		    },
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
@@ -527,9 +515,9 @@ function showEventPost(userEvent){
 var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 function formatDate(date){
-  var d = date.getDay();
-  var weekDay = DAYS[d];
-  var day = d + 1;
+  
+  var weekDay = DAYS[date.getDay()];
+  var day = date.getDate();
   var month = MONTHS[date.getMonth()];
   var year = date.getFullYear();
 
@@ -541,8 +529,25 @@ function formatTime(date){
   var abr = h < 12 ? 'AM' : 'PM';
   var hour = h < 12 ? h : h - 12;
   var min = date.getMinutes();
+  min = min < 10 ? '0' + min : min;
   
   return hour + ':' + min + ' ' + abr;
+}
+
+function formatDateTime(date){
+  if(date)
+  {
+    var day = date.getDate();
+    var month = date.getMonth() + 1;
+    var year = date.getFullYear();
+    var hour = date.getHours();
+    var min = date.getMinutes();
+    min = min < 10 ? '0' + min : min;
+    
+    return year + '/' + month + '/' + day + ' ' + hour + ':' + min;
+  }
+  
+  return '';
 }
 
 function clearNewEventForm(){
@@ -557,11 +562,12 @@ function populateEditModal(userEvent){
   
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
-  $('#startDate').val(userEvent.start);
-  $('#endDate').val(userEvent.end);
+  $('#startDate').val(formatDateTime(userEvent.start));
+  $('#endDate').val(formatDateTime(userEvent.end));
   $('#eventDescription').val(userEvent.body);
   $('#index').val(userEvent.index);
 }
+
 
 function eventSubmit(overlay){
   //call validation function which returns an error message string.

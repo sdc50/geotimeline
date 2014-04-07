@@ -48,7 +48,7 @@
   <script>
     $(window).scroll(function(e){
       var top = $(this).scrollTop();
-      $('#timeline-img').css('right',top*2 - 100);
+      $('#timeline-img').css('left',-top*2 );
     });
   </script>
 {% endblock %}
