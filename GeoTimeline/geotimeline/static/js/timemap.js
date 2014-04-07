@@ -267,7 +267,7 @@ function initializeTimeline(){
 var userCollections = [];
 var userOverlays = [];
 function addEventsToMap(events){
-	var startIndex = userOverlays.length
+	var startIndex = userOverlays.length;
 	for (var e=0; e<events.length; e++){
 		var evente;
 		var iId = events[e].id;
@@ -684,7 +684,7 @@ function editEventSubmit(){
 
     var newEvent = eventSubmit(overlay);
     
-	className = "row" + index
+	className = "row" + index;
                     
     console.log(newEvent);                
 	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
@@ -720,7 +720,7 @@ function timelineManager () {
 					overlay.timelineDiv = $(this);
 					//console.log(overlay);
 					var color = overlay.strokeColor;
-					$(this).css({"background-color": color, "opacity": "0.75"})
+					$(this).css({"background-color": color, "opacity": "0.75"});
 				}
 			}
 		});
