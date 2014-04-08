@@ -22,18 +22,18 @@
   <section class="features">
     <div class="bucket">
       <div class="feature one">
-        <img src="http://placehold.it/250x250" alt="">
-        <a><h4 id="intro">Getting Started</h4></a>
+        <a id="intro"><img src="static/img/intro/GetStarted.jpg" alt="">
+        <h4>Getting Started</h4></a>
         <span>Learn how to start mapping your life events</span>
       </div>
       <div class="feature two">
-        <img src="http://placehold.it/250x250" alt="">
-        <a><h4 id="view">Navigate your timeline</h4></a>
+        <a id="view"><img src="static/img/intro/Navigate.jpg" alt="">
+        <h4>Navigate your timeline</h4></a>
         <span>Explore your life events</span>
       </div>
       <div class="feature three">
-        <img src="http://placehold.it/250x250" alt="">
-        <a><h4 id="how">Edit your timeline</h4></a>
+        <a id="how"><img src="static/img/intro/Edit.png" alt="">
+        <h4>Edit your timeline</h4></a>
         <span>How to fix your life events</span>
       </div>
     </div>
@@ -66,11 +66,11 @@
 	                </div>
 	                <div class="modal-body next"></div>
 	                <div class="modal-footer">
-	                    <button type="button" class="btn btn-default pull-left prev">
+	                    <button type="button" class="btn btn-default pull-left prev" id="prv">
 	                        <i class="glyphicon glyphicon-chevron-left"></i>
 	                        Previous
 	                    </button>
-	                    <button type="button" class="btn btn-primary next">
+	                    <button type="button" class="btn btn-primary next" id="nxt">
 	                        Next
 	                        <i class="glyphicon glyphicon-chevron-right"></i>
 	                    </button>
@@ -86,7 +86,7 @@
     <a href="static/img/intro/2.png" title="Draw An Event" data-gallery></a>
     <a href="static/img/intro/4.png" title="Add Event Details" data-gallery></a>
     <a href="static/img/intro/5.png" title="Save the Event and Admire It!" data-gallery></a>
-    <a href="static/img/intro/getStarted.png" title="Start Building Your GeoTimeline Today" data-gallery></a>
+    <a href="static/img/intro/11.png" title="Start Adding Your Life Events Today!" data-gallery></a>
     </div>
     
     <div id="links_view">
@@ -104,50 +104,7 @@
 {% endblock %}
 
 {% block scripts %}
-  <script>
-    $(window).scroll(function(e){
-      var top = $(this).scrollTop();
-      $('#timeline-img').css('left',-top*2 );
-    });
-    
-    $('#intro').click(function(event){
-    	event.preventDefault();
-    	blueimp.Gallery(
-		    document.getElementById('links_intro').getElementsByTagName('a'),
-		    {
-		        container: '#blueimp-gallery',
-		        continuous: false,
-		        carousel: false
-		    }
-		);
-    });
-    
-    $('#how').click(function(event){
-    	event.preventDefault();
-    	blueimp.Gallery(
-		    document.getElementById('links_how').getElementsByTagName('a'),
-		    {
-		        container: '#blueimp-gallery',
-		        continuous: false,
-		        carousel: false
-		    }
-		);
-    });
-    
-    $('#view').click(function(event){
-    	event.preventDefault();
-    	blueimp.Gallery(
-		    document.getElementById('links_view').getElementsByTagName('a'),
-		    {
-		        container: '#blueimp-gallery',
-		        continuous: false,
-		        carousel: false
-		    }
-		);
-    });
-    
-    
-  </script>
+  <script src="{{request.static_url('geotimeline:static/js/index.js')}}"></script>
   
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script src="http://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
