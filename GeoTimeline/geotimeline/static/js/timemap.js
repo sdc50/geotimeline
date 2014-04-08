@@ -588,12 +588,15 @@ function formatTime(date){
 function formatDateTime(date){
   if(date)
   {
-    var day = date.getDate();
-    var month = date.getMonth() + 1;
+    function twoDigits(num){
+      return num < 10 ? '0' + num : num;
+    }
+    var day = twoDigits(date.getDate());
+    var month = twoDigits(date.getMonth() + 1);
     var year = date.getFullYear();
-    var hour = date.getHours();
-    var min = date.getMinutes();
-    min = min < 10 ? '0' + min : min;
+    var hour = twoDigits(date.getHours());
+    var min = twoDigits(date.getMinutes());
+    
     
     return year + '/' + month + '/' + day + ' ' + hour + ':' + min;
   }
@@ -615,8 +618,8 @@ function populateEditModal(userEvent){
   $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
-  $('#startDate').val(userEvent.start);
-  $('#endDate').val(userEvent.end);
+  $('#startDate').val(formatDateTime(userEvent.start));
+  $('#endDate').val(formatDateTime(userEvent.end));
   $('#eventDescription').val(userEvent.body);
   $('#index').val(userEvent.index);
 }
@@ -772,11 +775,7 @@ function resizeTimeline(timelineHeight){
   var mapHeight = pageHeight - timelineHeight;
   $('#timeline-container').height(timelineHeight);
   timeline.checkResize();
-<<<<<<< HEAD
   $('#map').height(mapHeight);
-=======
-  $('#map').height(pageHeight - timelineHeight);
->>>>>>> 13c97fb... automatic end date population
   $('#map').width(pageWidth);
 }
 
@@ -893,20 +892,15 @@ var en = $('#endDate');
 var dEnd;
 
 st.on('blur',function(){
-<<<<<<< HEAD
-  dStart = new Date(st.val());
-  console.log(dStart);
-  dEnd = new Date(dStart.getTime() + (60*30*1000));
-  $('#endDate').val(formatDateTime(dEnd));
-  dateTimeValidation(en);
-=======
 	dStart = new Date(st.val());
-	console.log(dStart);
-	dEnd = new Date(dStart.getTime() + (60*30*1000));
-	console.log(dEnd);
-	$('#endDate').val(formatDateTime(dEnd));
+	if(!en.val()){
+	  dEnd = new Date(dStart.getTime() + (60*30*1000));
+    $('#endDate').val(formatDateTime(dEnd));
+	}
+	else{
+	  console.log(en.val());
+	}
 	dateTimeValidation(en);
->>>>>>> 13c97fb... automatic end date population
 });
 
 en.on('blur',function(evt){
