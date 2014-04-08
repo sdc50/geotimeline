@@ -51,6 +51,8 @@ function addListeners(){
       drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
       clearNewEventForm();
+      $(".new-submit").off('click', editEventSubmit);
+      $(".new-submit").off('click', newEventSubmit);
       $(".new-submit").click(newEventSubmit);
   });
   
@@ -89,6 +91,8 @@ function addListeners(){
     $('#map').height(pageHeight);
     overlay.makeEditable();
     populateEditModal(overlay);
+    $(".new-submit").off('click', editEventSubmit);
+    $(".new-submit").off('click', newEventSubmit);
     $(".new-submit").click(editEventSubmit);
   });
   
