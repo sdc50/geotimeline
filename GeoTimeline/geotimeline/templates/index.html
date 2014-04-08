@@ -3,6 +3,8 @@
 {% block head %}
     {{ super() }}
     <!-- Add to head here -->
+	<link rel="stylesheet" href="http://blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
+	<link rel="stylesheet" href="static/js/Bootstrap-Image-Gallery-3.1.0/css/bootstrap-image-gallery.min.css">
 {% endblock %}
 
 {% block options%}
@@ -21,18 +23,18 @@
     <div class="bucket">
       <div class="feature one">
         <img src="http://placehold.it/250x250" alt="">
-        <h4>Mapping</h4>
-        <span>Map your life events</span>
+        <a><h4 id="intro">Getting Started</h4></a>
+        <span>Learn how to start mapping your life events</span>
       </div>
       <div class="feature two">
         <img src="http://placehold.it/250x250" alt="">
-        <h4>Timeline</h4>
-        <span>See your life's conology</span>
+        <a><h4 id="view">Navigate your timeline</h4></a>
+        <span>Explore your life events</span>
       </div>
       <div class="feature three">
         <img src="http://placehold.it/250x250" alt="">
-        <h4>Blog</h4>
-        <span>Keep a travel log of your adventures</span>
+        <a><h4 id="how">Edit your timeline</h4></a>
+        <span>How to fix your life events</span>
       </div>
     </div>
   </section>
@@ -42,6 +44,63 @@
   <section class='get-started'>
     <a href="{{request.application_url}}/timemap" class="btn btn-default btn-lg" role="button">Get Started</a>
   </section>
+  
+  <!-- The Bootstrap Image Gallery lightbox, should be a child element of the document body -->
+	<div id="blueimp-gallery" class="blueimp-gallery">
+	    <!-- The container for the modal slides -->
+	    <div class="slides"></div>
+	    <!-- Controls for the borderless lightbox -->
+	    <h3 class="title"></h3>
+	    <a class="prev">‹</a>
+	    <a class="next">›</a>
+	    <a class="close">×</a>
+	    <a class="play-pause"></a>
+	    <ol class="indicator"></ol>
+	    <!-- The modal dialog, which will be used to wrap the lightbox content -->
+	    <div class="modal fade">
+	        <div class="modal-dialog">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" aria-hidden="true">&times;</button>
+	                    <h4 class="modal-title"></h4>
+	                </div>
+	                <div class="modal-body next"></div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-default pull-left prev">
+	                        <i class="glyphicon glyphicon-chevron-left"></i>
+	                        Previous
+	                    </button>
+	                    <button type="button" class="btn btn-primary next">
+	                        Next
+	                        <i class="glyphicon glyphicon-chevron-right"></i>
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	<div id="links_intro">
+    <a href="static/img/intro/1.png" title="Start By Creating An Account" data-gallery></a>
+    <a href="static/img/intro/3.png" title="Go To The Map And Open the Menu to Create a New Event" data-gallery></a>
+    <a href="static/img/intro/2.png" title="Draw An Event" data-gallery></a>
+    <a href="static/img/intro/4.png" title="Add Event Details" data-gallery></a>
+    <a href="static/img/intro/5.png" title="Save the Event and Admire It!" data-gallery></a>
+    <a href="static/img/intro/getStarted.png" title="Start Building Your GeoTimeline Today" data-gallery></a>
+    </div>
+    
+    <div id="links_view">
+    <a href="static/img/intro/6.png" title="Hover Over Events on the Map or Timeline..." data-gallery></a>
+    <a href="static/img/intro/7_1.png" title="Or Click on Events to View Details" data-gallery></a>
+    <a href="static/img/intro/10.png" title="Keep Adding Events and Record Where You've Been and What You've Done" data-gallery></a>
+    </div>
+    
+    <div id="links_how">
+    <a href="static/img/intro/7.png" title="Click on Events to Edit or Delete Them" data-gallery></a>
+    <a href="static/img/intro/8.png" title="When You Edit an Event You Can Change Its Location..." data-gallery></a>
+	<a href="static/img/intro/9.png" title="And Then the Event Details" data-gallery></a>
+	</div>
+	  
 {% endblock %}
 
 {% block scripts %}
@@ -50,5 +109,47 @@
       var top = $(this).scrollTop();
       $('#timeline-img').css('left',-top*2 );
     });
+    
+    $('#intro').click(function(event){
+    	event.preventDefault();
+    	blueimp.Gallery(
+		    document.getElementById('links_intro').getElementsByTagName('a'),
+		    {
+		        container: '#blueimp-gallery',
+		        continuous: false,
+		        carousel: false
+		    }
+		);
+    });
+    
+    $('#how').click(function(event){
+    	event.preventDefault();
+    	blueimp.Gallery(
+		    document.getElementById('links_how').getElementsByTagName('a'),
+		    {
+		        container: '#blueimp-gallery',
+		        continuous: false,
+		        carousel: false
+		    }
+		);
+    });
+    
+    $('#view').click(function(event){
+    	event.preventDefault();
+    	blueimp.Gallery(
+		    document.getElementById('links_view').getElementsByTagName('a'),
+		    {
+		        container: '#blueimp-gallery',
+		        continuous: false,
+		        carousel: false
+		    }
+		);
+    });
+    
+    
   </script>
+  
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="http://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
+  <script src="static/js/Bootstrap-Image-Gallery-3.1.0/js/bootstrap-image-gallery.min.js"></script>
 {% endblock %}

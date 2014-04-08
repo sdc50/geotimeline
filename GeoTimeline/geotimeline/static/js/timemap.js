@@ -7,6 +7,7 @@ var map, timeline, pageHeight, pageWidth;
 $(function(){
   $('header').addClass('map-header').find('a').first().fadeOut('slow');
   $('footer').slideUp();
+  
 
   initializeMap();
   pageHeight = $(window).height();
@@ -17,7 +18,6 @@ $(function(){
   
   getEvents();
   
-
   addListeners();
 
 });
@@ -106,6 +106,7 @@ function addListeners(){
     $('#view-modal').modal('hide');
     deleteEvent(overlay);
   });
+
 }
 
 var drawingManager;
