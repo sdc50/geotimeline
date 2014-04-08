@@ -272,6 +272,7 @@ function initializeTimeline(){
 var userCollections = [];
 var userOverlays = [];
 function addEventsToMap(events){
+  console.log(events);
 	var startIndex = userOverlays.length;
 	for (var e=0; e<events.length; e++){
 		var evente;
@@ -583,6 +584,22 @@ function formatTime(date){
   return hour + ':' + min + ' ' + abr;
 }
 
+function formatDateTime(date){
+  if(date)
+  {
+    var day = date.getDate();
+    var month = date.getMonth() + 1;
+    var year = date.getFullYear();
+    var hour = date.getHours();
+    var min = date.getMinutes();
+    min = min < 10 ? '0' + min : min;
+    
+    return year + '/' + month + '/' + day + ' ' + hour + ':' + min;
+  }
+  
+  return '';
+}
+
 function clearNewEventForm(){
   $('#new-modal-title span').text("New Event Details")	
   $('#collectionInput').val('null');
@@ -867,17 +884,21 @@ $('#startDate').datetimepicker();
 $('#endDate').datetimepicker();
 var st = $('#startDate');
 var dStart;
-st.on('blur',function(){
-	dStart = new Date(st.val());
-	//console.log(dStart);
-	dateTimeValidation(en);
-});
 var en = $('#endDate');
 var dEnd;
+
+st.on('blur',function(){
+  dStart = new Date(st.val());
+  console.log(dStart);
+  dEnd = new Date(dStart.getTime() + (60*30*1000));
+  $('#endDate').val(formatDateTime(dEnd));
+  dateTimeValidation(en);
+});
+
 en.on('blur',function(evt){
-	dEnd = new Date(en.val());
-	//console.log(dEnd);
-	dateTimeValidation(en);
+  dEnd = new Date(en.val());
+  //console.log(dEnd);
+  dateTimeValidation(en);
 });
 //function to check if the start is at least 30 min before the end
 function dateTimeValidation(target){
