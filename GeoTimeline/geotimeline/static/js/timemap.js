@@ -608,6 +608,7 @@ function formatDateTime(date){
 }
 
 function clearNewEventForm(){
+  clearErrorMessages();
   $('#new-modal-title span').text("New Event Details")	
   $('#collectionInput').val('null');
   $('#eventName').val('');
@@ -617,7 +618,7 @@ function clearNewEventForm(){
 }
 
 function populateEditModal(userEvent){
-  
+  clearErrorMessages();
   $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
@@ -625,6 +626,11 @@ function populateEditModal(userEvent){
   $('#endDate').val(formatDateTime(userEvent.end));
   $('#eventDescription').val(userEvent.body);
   $('#index').val(userEvent.index);
+}
+
+function clearErrorMessages(){
+  $('.inputErrorMessage').text('');
+  $('.requiredInputMsg').text('');
 }
 
 function eventSubmit(overlay){
