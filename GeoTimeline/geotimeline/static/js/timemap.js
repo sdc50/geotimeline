@@ -39,6 +39,7 @@ function addListeners(){
     });
   });
   
+  // setting for zoom to extents button
   $('#zoom-extents').click(function(){
     centerMap();
     timeline.setVisibleChartRangeAuto();
@@ -81,6 +82,7 @@ function addListeners(){
       }
   });
   
+  // turn on drawing editor when the edit event button is pressed
   $('.edit-event').click(function(){
     var eventIndex = $('#eventIndex').val();
     var overlay = userOverlays[eventIndex];
@@ -96,6 +98,7 @@ function addListeners(){
     $(".new-submit").click(editEventSubmit);
   });
   
+  // bring up the edit modal when the shape is finished being edited
   $('#edit-post').click(function(){
   	var eventIndex = $('#eventIndex').val();
     var overlay = userOverlays[eventIndex];
@@ -105,6 +108,7 @@ function addListeners(){
     $('#new-modal').modal('show');
   });
   
+  // Delete events when the button is pressed
   $('.delete-event').click(function(){
     var eventIndex = $('#eventIndex').val();
     var overlay = userOverlays[eventIndex];
@@ -153,10 +157,8 @@ function initializeMap() {
       position: google.maps.ControlPosition.TOP_CENTER,
       drawingModes: [
         google.maps.drawing.OverlayType.MARKER,
-        //google.maps.drawing.OverlayType.CIRCLE,
         google.maps.drawing.OverlayType.POLYGON,
-        google.maps.drawing.OverlayType.POLYLINE,
-        //google.maps.drawing.OverlayType.RECTANGLE
+        google.maps.drawing.OverlayType.POLYLINE
       ]
     },
   });
@@ -166,6 +168,7 @@ function initializeMap() {
   drawingManager.setOptions({drawingControl:false});
   drawingManager.setDrawingMode(null);
   
+  // bring up modal after a new event is drawn
   google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
 	drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
@@ -217,6 +220,7 @@ function initializeMap() {
 function centerMap(){
 	var bounds = new google.maps.LatLngBounds();
 	var coord;
+	// if there aren't any overlays
 	if (userOverlays.length == 0){
 		map.setZoom(4);
 	}
@@ -247,6 +251,7 @@ function centerMap(){
 				}
 			}
 		}
+		// fit the map to all of the bounds of the shapes
 		map.fitBounds(bounds);
 	}
 }
@@ -308,8 +313,6 @@ function addEventsToMap(events){
 			var pinColor = sColor.substring(1);
 			//console.log(pinColor);
 			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-				//new google.maps.Point(0,0),
-				//new google.maps.Point(10,34),
 				null,
 				null,
 				null,
@@ -320,9 +323,7 @@ function addEventsToMap(events){
 				new google.maps.Point(12,35));
 			//end pin color variables
 			//make marker
-			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:10}
 			evente = new google.maps.Marker({
-				//map:map,
 				shapeType: sShape,
 				editOn: false,
 				id: iId,
@@ -331,7 +332,6 @@ function addEventsToMap(events){
 				strokeColor: sColor,
 				fillColor: sColor,
 				icon: pinImage, //this is new for the marker color
-				//shadow: pinShadow, //this is new for the marker shadow
 				position: aDecodGeom[0],
 				title: sTitle,
 				collection: sColl,
@@ -345,8 +345,6 @@ function addEventsToMap(events){
 					var color = this.fillColor;
 					color = color.substring(1);
 					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-					//new google.maps.Point(0,0),
-					//new google.maps.Point(10,34),
 					null,
 					null,
 					null,
@@ -359,8 +357,6 @@ function addEventsToMap(events){
 					var color = this.fillColor;
 					color = color.substring(1);
 					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-					//new google.maps.Point(0,0),
-					//new google.maps.Point(10,34),
 					null,
 					null,
 					null,
@@ -401,7 +397,6 @@ function addEventsToMap(events){
 			case 'polygon':
 			//make polygon
 			evente = new google.maps.Polygon({
-				//map:map,
 				shapeType: sShape,
 				editOn: false,
 				id: iId,
@@ -439,7 +434,6 @@ function addEventsToMap(events){
 			});
 			google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
-					//console.log(index);
 					$('#eventId').val(index);
 					this.onClick();
 				});
@@ -454,7 +448,6 @@ function addEventsToMap(events){
 			case 'polyline':
 			//make polyline
 			evente = new google.maps.Polyline({
-				//map:map,
 				shapeType: sShape,
 				editOn: false,
 				id: iId,
@@ -490,7 +483,6 @@ function addEventsToMap(events){
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
-					//console.log(index);
 					$('#eventId').val(index);
 					this.onClick();
 				});
@@ -503,14 +495,11 @@ function addEventsToMap(events){
 			userOverlays.push(evente);
 			break;
 		}	
-		
+		// Add event to the map and timeline
 		userOverlays[iOverlayIndex].setMap(map);
 		addEventToTimeline(userOverlays[iOverlayIndex]);
 	}
-	//now add all of the events in the evente array to the map
-	// for (var o=0; o<userOverlays.length; o++){
-		// userOverlays[o].setMap(map);
-	// }
+
 }
 //end addEventsToMap()
 
@@ -545,13 +534,14 @@ google.maps.MVCObject.prototype.onClick = function(){
 			bounds.extend(coord);
 		}
 	}
+	// zoom to the bounds of the event
 	map.fitBounds(bounds);
 	if (this.shapeType == "marker"){
 		map.setZoom(15);
 	}
 };
 
-
+// function for showing the event information modal
 function showEventPost(userEvent){
   var color = userEvent.color;
   $('#view-modal-title').text(userEvent.collection + ': ' + userEvent.content);
@@ -611,6 +601,7 @@ function formatDateTime(date){
   return '';
 }
 
+// clear the form for new events
 function clearNewEventForm(){
   $('#new-modal-title span').text("New Event Details")	
   $('#collectionInput').val('null');
@@ -620,8 +611,8 @@ function clearNewEventForm(){
   $('#eventDescription').val('');
 }
 
+// populate the edit modal with the existing information
 function populateEditModal(userEvent){
-  
   $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
@@ -649,7 +640,6 @@ function eventSubmit(overlay){
       collectionName = $('#newCollection').val();
       collectionColor = $('#color').val();
       collection = {name: collectionName, color: collectionColor};  
-      //saveCollection(collection);
       userCollections.push(collection);
     }
     else{
@@ -669,8 +659,6 @@ function eventSubmit(overlay){
       overlay.end = null;
     }
       
-    
-    
     var content = $('#eventDescription').val();
     overlay.body = content;
     overlay.setOptions({fillColor:collection.color, strokeColor:collection.color});
@@ -702,6 +690,7 @@ function eventSubmit(overlay){
   }
 }
 
+// function to save new event when it is submitted
 function newEventSubmit(){
     var overlay = userOverlays.pop();
     var newEvent = eventSubmit(overlay);
@@ -713,6 +702,7 @@ function newEventSubmit(){
     saveEvent(newEvent);
 }
 
+//function for saving edits to an event
 function editEventSubmit(){
     var index = $('#index').val();
     var overlay = userOverlays[index];
@@ -720,11 +710,9 @@ function editEventSubmit(){
     var newEvent = eventSubmit(overlay);
     
 	className = "row" + index;
-                    
-  //console.log(newEvent);                
+                                   
 	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
 	  
-	
     newEvent.index = index;
     newEvent.id = overlay.id;            
     windowResize();
@@ -743,6 +731,7 @@ function addEventToTimeline(data){
     timelineManager();    
 }
 
+// change event opacity when timeline event is hovered over and open event info when clicked
 function timelineManager () {
 	var overlay;
 	$('.timeline-event, .timeline-event-box').each(function(){
@@ -753,7 +742,6 @@ function timelineManager () {
 					var id = classes[i].split("row")[1];
 					overlay = userOverlays[id];
 					overlay.timelineDiv = $(this);
-					//console.log(overlay);
 					var color = overlay.strokeColor;
 					$(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"});
 				}
@@ -774,8 +762,7 @@ function windowResize(){
   }
   else{
     resizeTimeline(0);
-  }
-    
+  }  
 }
 
 function resizeTimeline(timelineHeight){
@@ -820,7 +807,6 @@ function saveCollection(collection){
 }
 
 function getEvents(){
-  
   $.ajax({
     url: getEventsUrl,
     cache: false
@@ -838,13 +824,11 @@ function getEvents(){
     });
 }
 
+// delete events from the map and timeline
 function deleteEvent(overlay){
   url = deleteEventUrl + 'deleteEvent/' + overlay.id;
   overlay.setMap(null);
-  //console.log(overlay.index);
-  //console.log(userOverlays.length);
   userOverlays.splice(overlay.index,1);
-  //console.log(userOverlays.length);
   for(var index = 0, len = userOverlays.length; index < len; index ++){
     userOverlays[index].index = index;
   }
@@ -856,8 +840,6 @@ function deleteEvent(overlay){
     cache: false
   })
     .done(function( json ) {
-      //console.log(json);
-      //location.reload();
       centerMap();
     })
     .fail(function( textStatus ) {
@@ -865,8 +847,6 @@ function deleteEvent(overlay){
     });
 }
   
-
-
 function showSubmission(){
 	var x = $('#collectionInput').val();
 	var z = $('#collections');
@@ -877,17 +857,14 @@ function showSubmission(){
 	alert("x: " + x + " z: " + z + " val: " + val + " endval: " + endval);
 }
 
-
-
+// populate the collection list for the dropdown menu
 function createCollectionSelectList(){
 	for(var l=0; l<userCollections.length; l++){
 		var listElement = userCollections[l];
 		var optionString = '<option value="' + listElement.id + '">'+ listElement.name +'</option>';
 		$('#collectionInput').append(optionString);
 	}
-	
 }
-
 
 ///////////////////////////////////////////////////////////////////
 //this is for the jquery ui datepicker
@@ -915,14 +892,10 @@ en.on('blur',function(evt){
 //function to check if the start is at least 30 min before the end
 function dateTimeValidation(target){
 	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
-		// alert("The end date/time must be at least 30 minutes after the start date/time.");
-		// target.focus();
 		target.parent().addClass('has-error');
 	  	target.parent().find('.requiredInputMsg').text('The end date/time must be at least 30 minutes after the start date/time.');
 	}
 	else if(dEnd && !dStart){
-		// alert("You must choose a beginning date to have an end date.");
-		// st.focus();
 		target.parent().addClass('has-error');
 	  	target.parent().find('.requiredInputMsg').text('You must choose a beginning date to have an end date.');
 	}
@@ -985,8 +958,5 @@ function validateAllNewEvent(){
 		return msg;
 	}
 }
-//$('#endDate') //not required but if filled it must be at least 30 min after startDate
-//$('.btn btn-default new-submit')
-//$('#new-event') //this is the form id
 //end validation for new events form
 ///////////////////////////////////////////
