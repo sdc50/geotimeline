@@ -603,6 +603,7 @@ function formatDateTime(date){
 
 // clear the form for new events
 function clearNewEventForm(){
+  clearErrorMessages();
   $('#new-modal-title span').text("New Event Details")	
   $('#collectionInput').val('null');
   $('#eventName').val('');
@@ -613,6 +614,10 @@ function clearNewEventForm(){
 
 // populate the edit modal with the existing information
 function populateEditModal(userEvent){
+<<<<<<< HEAD
+=======
+  clearErrorMessages();
+>>>>>>> c9ddde42fd6a3fa4303a454aa47afc209b738b51
   $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
@@ -620,6 +625,11 @@ function populateEditModal(userEvent){
   $('#endDate').val(formatDateTime(userEvent.end));
   $('#eventDescription').val(userEvent.body);
   $('#index').val(userEvent.index);
+}
+
+function clearErrorMessages(){
+  $('.inputErrorMessage').text('');
+  $('.requiredInputMsg').text('');
 }
 
 function eventSubmit(overlay){
