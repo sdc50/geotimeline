@@ -277,7 +277,6 @@ function initializeTimeline(){
 var userCollections = [];
 var userOverlays = [];
 function addEventsToMap(events){
-  console.log(events);
 	var startIndex = userOverlays.length;
 	for (var e=0; e<events.length; e++){
 		var evente;
@@ -718,7 +717,7 @@ function editEventSubmit(){
     
 	className = "row" + index;
                     
-    console.log(newEvent);                
+  //console.log(newEvent);                
 	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
 	  
 	
@@ -900,9 +899,6 @@ st.on('blur',function(){
 	if(!en.val()){
 	  dEnd = new Date(dStart.getTime() + (60*30*1000));
     $('#endDate').val(formatDateTime(dEnd));
-	}
-	else{
-	  console.log(en.val());
 	}
 	dateTimeValidation(en);
 });
