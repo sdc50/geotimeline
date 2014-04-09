@@ -114,9 +114,8 @@ function initializeMap() {
 	
   var mapDiv = $('#map')[0];
   map = new google.maps.Map(mapDiv, {
-    //center: new google.maps.LatLng(37.4419, -122.1419),
-    center: new google.maps.LatLng(-34.397, 150.644),
-    zoom: 8,
+    center: new google.maps.LatLng(39.8282, -98.5795),
+    zoom: 4,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControl: true,
     mapTypeControlOptions:{
@@ -213,33 +212,38 @@ function initializeMap() {
 function centerMap(){
 	var bounds = new google.maps.LatLngBounds();
 	var coord;
-	for(var i=0;i<userOverlays.length;i++){
-		// Get bounds of a point
-		object = userOverlays[i];
-		if (object.shapeType == "marker"){
-			var coord = object.position;
-			bounds.extend(coord);
-		}
-		// Get bounds of a line
-		else if (object.shapeType=="polyline"){
-			path = object.getPath();
-			arrayOfPath = path.j;
-			for(var k=0;k<arrayOfPath.length;k++){
-				coord=arrayOfPath[k];
-				bounds.extend(coord);
-			}
-		}
-		// Get bounds of polygons
-		else{
-			path = object.getPaths();
-			arrayOfPaths = path.j[0].j;
-			for(var z=0;z<arrayOfPaths.length;z++){
-				coord=arrayOfPaths[z];
-				bounds.extend(coord);
-			}
-		}
+	if (userOverlays.length == 0){
+		map.setZoom(4);
 	}
-	map.fitBounds(bounds);
+	else{
+		for(var i=0;i<userOverlays.length;i++){
+			// Get bounds of a point
+			object = userOverlays[i];
+			if (object.shapeType == "marker"){
+				var coord = object.position;
+				bounds.extend(coord);
+			}
+			// Get bounds of a line
+			else if (object.shapeType=="polyline"){
+				path = object.getPath();
+				arrayOfPath = path.j;
+				for(var k=0;k<arrayOfPath.length;k++){
+					coord=arrayOfPath[k];
+					bounds.extend(coord);
+				}
+			}
+			// Get bounds of polygons
+			else{
+				path = object.getPaths();
+				arrayOfPaths = path.j[0].j;
+				for(var z=0;z<arrayOfPaths.length;z++){
+					coord=arrayOfPaths[z];
+					bounds.extend(coord);
+				}
+			}
+		}
+		map.fitBounds(bounds);
+	}
 }
 
 function initializeTimeline(){
