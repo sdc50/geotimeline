@@ -14,6 +14,7 @@ $(function(){
   $('#map').height(pageHeight);
   initializeTimeline();
   setTimeout(windowResize,1000);
+
   $('#colorpicker').farbtastic('#color');
   
   getEvents();
@@ -50,6 +51,8 @@ function addListeners(){
       drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
       clearNewEventForm();
+      $(".new-submit").off('click', editEventSubmit);
+      $(".new-submit").off('click', newEventSubmit);
       $(".new-submit").click(newEventSubmit);
   });
   
@@ -88,6 +91,8 @@ function addListeners(){
     $('#map').height(pageHeight);
     overlay.makeEditable();
     populateEditModal(overlay);
+    $(".new-submit").off('click', editEventSubmit);
+    $(".new-submit").off('click', newEventSubmit);
     $(".new-submit").click(editEventSubmit);
   });
   
@@ -587,6 +592,25 @@ function formatTime(date){
   return hour + ':' + min + ' ' + abr;
 }
 
+function formatDateTime(date){
+  if(date)
+  {
+    function twoDigits(num){
+      return num < 10 ? '0' + num : num;
+    }
+    var day = twoDigits(date.getDate());
+    var month = twoDigits(date.getMonth() + 1);
+    var year = date.getFullYear();
+    var hour = twoDigits(date.getHours());
+    var min = twoDigits(date.getMinutes());
+    
+    
+    return year + '/' + month + '/' + day + ' ' + hour + ':' + min;
+  }
+  
+  return '';
+}
+
 function clearNewEventForm(){
   $('#new-modal-title span').text("New Event Details")	
   $('#collectionInput').val('null');
@@ -601,8 +625,8 @@ function populateEditModal(userEvent){
   $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
-  $('#startDate').val(userEvent.start);
-  $('#endDate').val(userEvent.end);
+  $('#startDate').val(formatDateTime(userEvent.start));
+  $('#endDate').val(formatDateTime(userEvent.end));
   $('#eventDescription').val(userEvent.body);
   $('#index').val(userEvent.index);
 }
@@ -697,7 +721,7 @@ function editEventSubmit(){
     
 	className = "row" + index;
                     
-    console.log(newEvent);                
+  //console.log(newEvent);                
 	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
 	  
 	
@@ -871,17 +895,22 @@ $('#startDate').datetimepicker();
 $('#endDate').datetimepicker();
 var st = $('#startDate');
 var dStart;
-st.on('blur',function(){
-	dStart = new Date(st.val());
-	//console.log(dStart);
-	dateTimeValidation(en);
-});
 var en = $('#endDate');
 var dEnd;
-en.on('blur',function(evt){
-	dEnd = new Date(en.val());
-	//console.log(dEnd);
+
+st.on('blur',function(){
+	dStart = new Date(st.val());
+	if(!en.val()){
+	  dEnd = new Date(dStart.getTime() + (60*30*1000));
+    $('#endDate').val(formatDateTime(dEnd));
+	}
 	dateTimeValidation(en);
+});
+
+en.on('blur',function(evt){
+  dEnd = new Date(en.val());
+  //console.log(dEnd);
+  dateTimeValidation(en);
 });
 //function to check if the start is at least 30 min before the end
 function dateTimeValidation(target){
