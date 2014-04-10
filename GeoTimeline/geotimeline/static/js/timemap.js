@@ -306,10 +306,7 @@ function addEventsToMap(events){
 			case 'marker':
 			//make variables for the pin color
 			var pinColor = sColor.substring(1);
-			//console.log(pinColor);
 			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-				//new google.maps.Point(0,0),
-				//new google.maps.Point(10,34),
 				null,
 				null,
 				null,
@@ -320,7 +317,6 @@ function addEventsToMap(events){
 				new google.maps.Point(12,35));
 			//end pin color variables
 			//make marker
-			//pinImage = { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale:10}
 			evente = new google.maps.Marker({
 				//map:map,
 				shapeType: sShape,
@@ -331,7 +327,6 @@ function addEventsToMap(events){
 				strokeColor: sColor,
 				fillColor: sColor,
 				icon: pinImage, //this is new for the marker color
-				//shadow: pinShadow, //this is new for the marker shadow
 				position: aDecodGeom[0],
 				title: sTitle,
 				collection: sColl,
@@ -345,8 +340,6 @@ function addEventsToMap(events){
 					var color = this.fillColor;
 					color = color.substring(1);
 					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-					//new google.maps.Point(0,0),
-					//new google.maps.Point(10,34),
 					null,
 					null,
 					null,
@@ -359,8 +352,6 @@ function addEventsToMap(events){
 					var color = this.fillColor;
 					color = color.substring(1);
 					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-					//new google.maps.Point(0,0),
-					//new google.maps.Point(10,34),
 					null,
 					null,
 					null,
@@ -382,7 +373,6 @@ function addEventsToMap(events){
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
-					//console.log(index);
 					$('#eventId').val(index);
 					this.onClick();
 				});
@@ -439,7 +429,6 @@ function addEventsToMap(events){
 			});
 			google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
-					//console.log(index);
 					$('#eventId').val(index);
 					this.onClick();
 				});
@@ -490,7 +479,6 @@ function addEventsToMap(events){
 				});
 				google.maps.event.addListener(evente, 'click', function(){
 					var index = this.index;
-					//console.log(index);
 					$('#eventId').val(index);
 					this.onClick();
 				});
@@ -726,8 +714,7 @@ function editEventSubmit(){
     var newEvent = eventSubmit(overlay);
     
 	className = "row" + index;
-                    
-  //console.log(newEvent);                
+                                
 	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
 	  
 	
@@ -759,7 +746,6 @@ function timelineManager () {
 					var id = classes[i].split("row")[1];
 					overlay = userOverlays[id];
 					overlay.timelineDiv = $(this);
-					//console.log(overlay);
 					var color = overlay.strokeColor;
 					$(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"});
 				}
@@ -847,10 +833,9 @@ function getEvents(){
 function deleteEvent(overlay){
   url = deleteEventUrl + 'deleteEvent/' + overlay.id;
   overlay.setMap(null);
-  //console.log(overlay.index);
-  //console.log(userOverlays.length);
+
   userOverlays.splice(overlay.index,1);
-  //console.log(userOverlays.length);
+
   for(var index = 0, len = userOverlays.length; index < len; index ++){
     userOverlays[index].index = index;
   }
@@ -862,8 +847,6 @@ function deleteEvent(overlay){
     cache: false
   })
     .done(function( json ) {
-      //console.log(json);
-      //location.reload();
       centerMap();
     })
     .fail(function( textStatus ) {
@@ -915,20 +898,15 @@ st.on('blur',function(){
 
 en.on('blur',function(evt){
   dEnd = new Date(en.val());
-  //console.log(dEnd);
   dateTimeValidation(en);
 });
 //function to check if the start is at least 30 min before the end
 function dateTimeValidation(target){
 	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
-		// alert("The end date/time must be at least 30 minutes after the start date/time.");
-		// target.focus();
 		target.parent().addClass('has-error');
 	  	target.parent().find('.requiredInputMsg').text('The end date/time must be at least 30 minutes after the start date/time.');
 	}
 	else if(dEnd && !dStart){
-		// alert("You must choose a beginning date to have an end date.");
-		// st.focus();
 		target.parent().addClass('has-error');
 	  	target.parent().find('.requiredInputMsg').text('You must choose a beginning date to have an end date.');
 	}
