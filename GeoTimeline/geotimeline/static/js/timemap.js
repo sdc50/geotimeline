@@ -715,11 +715,7 @@ function editEventSubmit(){
     var newEvent = eventSubmit(overlay);
     
 	className = "row" + index;
-<<<<<<< HEAD
-                                
-=======
-                                   
->>>>>>> 16ae72d8926f2905ae7b672528e9ad281d67600a
+
 	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
 	  
     newEvent.index = index;
@@ -837,13 +833,9 @@ function getEvents(){
 function deleteEvent(overlay){
   url = deleteEventUrl + 'deleteEvent/' + overlay.id;
   overlay.setMap(null);
-<<<<<<< HEAD
 
   userOverlays.splice(overlay.index,1);
 
-=======
-  userOverlays.splice(overlay.index,1);
->>>>>>> 16ae72d8926f2905ae7b672528e9ad281d67600a
   for(var index = 0, len = userOverlays.length; index < len; index ++){
     userOverlays[index].index = index;
   }
