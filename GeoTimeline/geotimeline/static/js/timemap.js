@@ -63,8 +63,8 @@ function addListeners(){
       drawingManager.setDrawingMode(null);
       $('#timeline-container').slideDown(windowResize);
       $('#new-modal-title:contains("New Event Details")').each(function(){
-	      deletedOverlay = userOverlays.pop();
-	      deletedOverlay.setMap(null);
+        deletedOverlay = userOverlays.pop();
+        deletedOverlay.setMap(null);
       });
       $('#new-modal-title:contains("Edit Event Details")').each(function(){location.reload()})
   });
@@ -100,7 +100,7 @@ function addListeners(){
   
   // bring up the edit modal when the shape is finished being edited
   $('#edit-post').click(function(){
-  	var eventIndex = $('#eventIndex').val();
+    var eventIndex = $('#eventIndex').val();
     var overlay = userOverlays[eventIndex];
     $('#usr-group').toggle();
     $('#edit-post').toggle();
@@ -120,7 +120,7 @@ function addListeners(){
 
 var drawingManager;
 function initializeMap() {
-	
+  
   var mapDiv = $('#map')[0];
   map = new google.maps.Map(mapDiv, {
     center: new google.maps.LatLng(39.8282, -98.5795),
@@ -170,90 +170,90 @@ function initializeMap() {
   
   // bring up modal after a new event is drawn
   google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
-	drawingManager.setOptions({drawingControl:false});
+  drawingManager.setOptions({drawingControl:false});
     drawingManager.setDrawingMode(null);
     $('#new-modal').modal('show');
 
     var overlay = event.overlay;
     overlay.shapeType = event.type;
     userOverlays.push(overlay);
-	});
+  });
 
   drawingManager.setMap(map);
   drawingManager.setOptions({drawingControl:false});  //hides drawing controls
   drawingManager.setDrawingMode(null); //sets control to pan mode
   
   // start: added for search bar
-	var searchMarkers = [];
-	var input = (document.getElementById('search-input'));
-	map.controls[google.maps.ControlPosition.RIGHT_TOP].setAt(0,input);
-	var searchBox = new google.maps.places.SearchBox(input);
-	google.maps.event.addListener(searchBox, 'places_changed', function(){
-		var places = searchBox.getPlaces();
-		for (var i = 0, searchMarker; searchMarker = searchMarkers[i]; i++){
-			searchMarker.setMap(null);
-		}
-		searchMarkers = [];
-		var searchBounds = new google.maps.LatLngBounds();
-		for (var i = 0, place; place = places[i]; i++){
-			var image = {
-				url: place.icon,
-				size: new google.maps.Size(71,71),
-				origin: new google.maps.Point(0,0),
-				anchor: new google.maps.Point(17,34),
-				scaledSize: new google.maps.Size(25,25)
-			};
-			var searchMarker = new google.maps.Marker({
-				map: map,
-				icon: image,
-				title: place.name,
-				position: place.geometry.location
-			});
-			searchMarkers.push(searchMarker);
-			searchBounds.extend(place.geometry.location);
-		}
-		map.fitBounds(searchBounds);
-	});
-	//end: added for search bar
+  var searchMarkers = [];
+  var input = (document.getElementById('search-input'));
+  map.controls[google.maps.ControlPosition.RIGHT_TOP].setAt(0,input);
+  var searchBox = new google.maps.places.SearchBox(input);
+  google.maps.event.addListener(searchBox, 'places_changed', function(){
+    var places = searchBox.getPlaces();
+    for (var i = 0, searchMarker; searchMarker = searchMarkers[i]; i++){
+      searchMarker.setMap(null);
+    }
+    searchMarkers = [];
+    var searchBounds = new google.maps.LatLngBounds();
+    for (var i = 0, place; place = places[i]; i++){
+      var image = {
+        url: place.icon,
+        size: new google.maps.Size(71,71),
+        origin: new google.maps.Point(0,0),
+        anchor: new google.maps.Point(17,34),
+        scaledSize: new google.maps.Size(25,25)
+      };
+      var searchMarker = new google.maps.Marker({
+        map: map,
+        icon: image,
+        title: place.name,
+        position: place.geometry.location
+      });
+      searchMarkers.push(searchMarker);
+      searchBounds.extend(place.geometry.location);
+    }
+    map.fitBounds(searchBounds);
+  });
+  //end: added for search bar
 }
 
 function centerMap(){
-	var bounds = new google.maps.LatLngBounds();
-	var coord;
-	// if there aren't any overlays
-	if (userOverlays.length == 0){
-		map.setZoom(4);
-	}
-	else{
-		for(var i=0;i<userOverlays.length;i++){
-			// Get bounds of a point
-			object = userOverlays[i];
-			if (object.shapeType == "marker"){
-				var coord = object.position;
-				bounds.extend(coord);
-			}
-			// Get bounds of a line
-			else if (object.shapeType=="polyline"){
-				path = object.getPath();
-				arrayOfPath = path.j;
-				for(var k=0;k<arrayOfPath.length;k++){
-					coord=arrayOfPath[k];
-					bounds.extend(coord);
-				}
-			}
-			// Get bounds of polygons
-			else{
-				path = object.getPaths();
-				arrayOfPaths = path.j[0].j;
-				for(var z=0;z<arrayOfPaths.length;z++){
-					coord=arrayOfPaths[z];
-					bounds.extend(coord);
-				}
-			}
-		}
-		// fit the map to all of the bounds of the shapes
-		map.fitBounds(bounds);
-	}
+  var bounds = new google.maps.LatLngBounds();
+  var coord;
+  // if there aren't any overlays
+  if (userOverlays.length == 0){
+    map.setZoom(4);
+  }
+  else{
+    for(var i=0;i<userOverlays.length;i++){
+      // Get bounds of a point
+      object = userOverlays[i];
+      if (object.shapeType == "marker"){
+        var coord = object.position;
+        bounds.extend(coord);
+      }
+      // Get bounds of a line
+      else if (object.shapeType=="polyline"){
+        path = object.getPath();
+        arrayOfPath = path.j;
+        for(var k=0;k<arrayOfPath.length;k++){
+          coord=arrayOfPath[k];
+          bounds.extend(coord);
+        }
+      }
+      // Get bounds of polygons
+      else{
+        path = object.getPaths();
+        arrayOfPaths = path.j[0].j;
+        for(var z=0;z<arrayOfPaths.length;z++){
+          coord=arrayOfPaths[z];
+          bounds.extend(coord);
+        }
+      }
+    }
+    // fit the map to all of the bounds of the shapes
+    map.fitBounds(bounds);
+  }
 }
 
 function initializeTimeline(){
@@ -286,257 +286,257 @@ function initializeTimeline(){
 var userCollections = [];
 var userOverlays = [];
 function addEventsToMap(events){
-	var startIndex = userOverlays.length;
-	for (var e=0; e<events.length; e++){
-		var evente;
-		var iId = events[e].id;
-		var sColl = events[e].collection.name;
-		var sColor = events[e].collection.color;
-		var iCollectionId = events[e].collection.id;
-		var sUser = events[e].user;
-		var sShape = events[e].shape;
-		var tStart = new Date(events[e].start);
-		var tEnd = null;
-		if(events[e].end){
-		  tEnd = new Date(events[e].end);
-		}
-		var tcontent = events[e].name;
-		var iOverlayIndex = startIndex + e;
-		var tclassName = "row" + iOverlayIndex;
-		var tbody = events[e].content;
-		var sTitle = events[e].name;
-		var aCodedGeom = events[e].geometry;
-		var aDecodGeom = google.maps.geometry.encoding.decodePath(aCodedGeom);
-		switch(sShape){
-			case 'marker':
-			//make variables for the pin color
-			var pinColor = sColor.substring(1);
-			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-				null,
-				null,
-				null,
-				new google.maps.Size(21,34));
-			var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
-				new google.maps.Size(40,37),
-				new google.maps.Point(0,0),
-				new google.maps.Point(12,35));
-			//end pin color variables
-			//make marker
-			evente = new google.maps.Marker({
-				shapeType: sShape,
-				editOn: false,
-				id: iId,
-				index: iOverlayIndex,
-				collectionId:  iCollectionId,
-				strokeColor: sColor,
-				fillColor: sColor,
-				icon: pinImage, //this is new for the marker color
-				position: aDecodGeom[0],
-				title: sTitle,
-				collection: sColl,
-				user: sUser,
-				start: tStart,
-				end: tEnd,
-				content: tcontent,
-				body: tbody,
-				className: tclassName,
-				highlightOn: function(){
-					var color = this.fillColor;
-					color = color.substring(1);
-					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-					null,
-					null,
-					null,
-					new google.maps.Size(42,68));
-					this.setIcon(pinImage);
-					//this.setAnimation(google.maps.Animation.BOUNCE);
-					this.timelineDiv.css({"opacity":"1"});
-					},
-				highlightOff: function(){
-					var color = this.fillColor;
-					color = color.substring(1);
-					var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-					null,
-					null,
-					null,
-					new google.maps.Size(21,34));
-					this.setIcon(pinImage);
-					//this.setAnimation(null);
-					this.timelineDiv.css({"opacity":"0.75"});
-				},
-				makeEditable: function(){
-				  this.setIcon('http://icons.iconarchive.com/icons/everaldo/kids-icons/32/package-utilities-icon.png');
-		          this.setDraggable(true);
-		          this.editOn = true;
-		        },
-		        makeUneditable: function(){
-				  this.setIcon(pinImage);
-		          this.setDraggable(false);
-		          this.editOn = false;
-		        },
-				});
-				google.maps.event.addListener(evente, 'click', function(){
-					var index = this.index;
-					$('#eventId').val(index);
-					this.onClick();
-				});
-				google.maps.event.addListener(evente, 'mouseover', function(){
-					if(this.editOn == false){
-						this.highlightOn();
-					}
-				});
-				google.maps.event.addListener(evente, 'mouseout', function(){
-					if(this.editOn == false){
-						this.highlightOff();
-					}
-				});
-			userOverlays.push(evente);
-			break;
-			case 'polygon':
-			//make polygon
-			evente = new google.maps.Polygon({
-				shapeType: sShape,
-				editOn: false,
-				id: iId,
-				index: iOverlayIndex,
-				collectionId:  iCollectionId,
-				paths: aDecodGeom,
-				geodesic: true,
-				strokeColor: sColor,
-				fillColor: sColor,
-				strokeOpacity: 1.0,
-				fillOpacity: 0.5,
-				strokeWeight: 2.0,
-				title: sTitle,
-				collection: sColl,
-				user: sUser,
-				start: tStart,
-				end: tEnd,
-				content: tcontent,
-				body: tbody,
-				className: tclassName,
-				highlightOn: function(){
-					this.setValues({fillOpacity:1.0});
-					this.timelineDiv.css({"opacity":"1"});
-				},
-				highlightOff: function(){
-					this.setValues({fillOpacity:0.5});
-					this.timelineDiv.css({"opacity":"0.75"});
-				},
-			 makeEditable: function(){
-	          this.setEditable(true);
-	        },
-	        makeUneditable: function(){
-	          this.setEditable(false);
-	        },
-			});
-			google.maps.event.addListener(evente, 'click', function(){
-					var index = this.index;
-					$('#eventId').val(index);
-					this.onClick();
-				});
-			google.maps.event.addListener(evente, 'mouseover', function(){
-				this.highlightOn();
-			});
-			google.maps.event.addListener(evente, 'mouseout', function(){
-				this.highlightOff();
-			});
-			userOverlays.push(evente);
-			break;
-			case 'polyline':
-			//make polyline
-			evente = new google.maps.Polyline({
-				shapeType: sShape,
-				editOn: false,
-				id: iId,
-				index: iOverlayIndex,
-				collectionId:  iCollectionId,
-				path: aDecodGeom,
-				geodesic: true,
-				strokeColor: sColor,
-				strokeOpacity: 1.0,
-				strokeWeight: 5.0,
-				title: sTitle,
-				collection: sColl,
-				user: sUser,
-				start: tStart,
-				end: tEnd,
-				content: tcontent,
-				body: tbody,
-				className: tclassName,
-				highlightOn: function(){
-						this.setValues({strokeWeight:8.0});
-						this.timelineDiv.css({"opacity":"1"});
-					},
-				highlightOff: function(){
-						this.setValues({strokeWeight:5.0});
-						this.timelineDiv.css({"opacity":"0.75"});
-					},
-			  makeEditable: function(){
-			    this.setEditable(true);
-			  },
-			  makeUneditable: function(){
-			    this.setEditable(false);
-			  },
-				});
-				google.maps.event.addListener(evente, 'click', function(){
-					var index = this.index;
-					$('#eventId').val(index);
-					this.onClick();
-				});
-				google.maps.event.addListener(evente, 'mouseover', function(){
-					this.highlightOn();
-				});
-				google.maps.event.addListener(evente, 'mouseout', function(){
-					this.highlightOff();
-			});
-			userOverlays.push(evente);
-			break;
-		}	
-		// Add event to the map and timeline
-		userOverlays[iOverlayIndex].setMap(map);
-		addEventToTimeline(userOverlays[iOverlayIndex]);
-	}
+  var startIndex = userOverlays.length;
+  for (var e=0; e<events.length; e++){
+    var evente;
+    var iId = events[e].id;
+    var sColl = events[e].collection.name;
+    var sColor = events[e].collection.color;
+    var iCollectionId = events[e].collection.id;
+    var sUser = events[e].user;
+    var sShape = events[e].shape;
+    var tStart = new Date(events[e].start);
+    var tEnd = null;
+    if(events[e].end){
+      tEnd = new Date(events[e].end);
+    }
+    var tcontent = events[e].name;
+    var iOverlayIndex = startIndex + e;
+    var tclassName = "row" + iOverlayIndex;
+    var tbody = events[e].content;
+    var sTitle = events[e].name;
+    var aCodedGeom = events[e].geometry;
+    var aDecodGeom = google.maps.geometry.encoding.decodePath(aCodedGeom);
+    switch(sShape){
+      case 'marker':
+      //make variables for the pin color
+      var pinColor = sColor.substring(1);
+      var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+        null,
+        null,
+        null,
+        new google.maps.Size(21,34));
+      var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
+        new google.maps.Size(40,37),
+        new google.maps.Point(0,0),
+        new google.maps.Point(12,35));
+      //end pin color variables
+      //make marker
+      evente = new google.maps.Marker({
+        shapeType: sShape,
+        editOn: false,
+        id: iId,
+        index: iOverlayIndex,
+        collectionId:  iCollectionId,
+        strokeColor: sColor,
+        fillColor: sColor,
+        icon: pinImage, //this is new for the marker color
+        position: aDecodGeom[0],
+        title: sTitle,
+        collection: sColl,
+        user: sUser,
+        start: tStart,
+        end: tEnd,
+        content: tcontent,
+        body: tbody,
+        className: tclassName,
+        highlightOn: function(){
+          var color = this.fillColor;
+          color = color.substring(1);
+          var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
+          null,
+          null,
+          null,
+          new google.maps.Size(42,68));
+          this.setIcon(pinImage);
+          //this.setAnimation(google.maps.Animation.BOUNCE);
+          this.timelineDiv.css({"opacity":"1"});
+          },
+        highlightOff: function(){
+          var color = this.fillColor;
+          color = color.substring(1);
+          var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
+          null,
+          null,
+          null,
+          new google.maps.Size(21,34));
+          this.setIcon(pinImage);
+          //this.setAnimation(null);
+          this.timelineDiv.css({"opacity":"0.75"});
+        },
+        makeEditable: function(){
+          this.setIcon('http://icons.iconarchive.com/icons/everaldo/kids-icons/32/package-utilities-icon.png');
+              this.setDraggable(true);
+              this.editOn = true;
+            },
+            makeUneditable: function(){
+          this.setIcon(pinImage);
+              this.setDraggable(false);
+              this.editOn = false;
+            },
+        });
+        google.maps.event.addListener(evente, 'click', function(){
+          var index = this.index;
+          $('#eventId').val(index);
+          this.onClick();
+        });
+        google.maps.event.addListener(evente, 'mouseover', function(){
+          if(this.editOn == false){
+            this.highlightOn();
+          }
+        });
+        google.maps.event.addListener(evente, 'mouseout', function(){
+          if(this.editOn == false){
+            this.highlightOff();
+          }
+        });
+      userOverlays.push(evente);
+      break;
+      case 'polygon':
+      //make polygon
+      evente = new google.maps.Polygon({
+        shapeType: sShape,
+        editOn: false,
+        id: iId,
+        index: iOverlayIndex,
+        collectionId:  iCollectionId,
+        paths: aDecodGeom,
+        geodesic: true,
+        strokeColor: sColor,
+        fillColor: sColor,
+        strokeOpacity: 1.0,
+        fillOpacity: 0.5,
+        strokeWeight: 2.0,
+        title: sTitle,
+        collection: sColl,
+        user: sUser,
+        start: tStart,
+        end: tEnd,
+        content: tcontent,
+        body: tbody,
+        className: tclassName,
+        highlightOn: function(){
+          this.setValues({fillOpacity:1.0});
+          this.timelineDiv.css({"opacity":"1"});
+        },
+        highlightOff: function(){
+          this.setValues({fillOpacity:0.5});
+          this.timelineDiv.css({"opacity":"0.75"});
+        },
+       makeEditable: function(){
+            this.setEditable(true);
+          },
+          makeUneditable: function(){
+            this.setEditable(false);
+          },
+      });
+      google.maps.event.addListener(evente, 'click', function(){
+          var index = this.index;
+          $('#eventId').val(index);
+          this.onClick();
+        });
+      google.maps.event.addListener(evente, 'mouseover', function(){
+        this.highlightOn();
+      });
+      google.maps.event.addListener(evente, 'mouseout', function(){
+        this.highlightOff();
+      });
+      userOverlays.push(evente);
+      break;
+      case 'polyline':
+      //make polyline
+      evente = new google.maps.Polyline({
+        shapeType: sShape,
+        editOn: false,
+        id: iId,
+        index: iOverlayIndex,
+        collectionId:  iCollectionId,
+        path: aDecodGeom,
+        geodesic: true,
+        strokeColor: sColor,
+        strokeOpacity: 1.0,
+        strokeWeight: 5.0,
+        title: sTitle,
+        collection: sColl,
+        user: sUser,
+        start: tStart,
+        end: tEnd,
+        content: tcontent,
+        body: tbody,
+        className: tclassName,
+        highlightOn: function(){
+            this.setValues({strokeWeight:8.0});
+            this.timelineDiv.css({"opacity":"1"});
+          },
+        highlightOff: function(){
+            this.setValues({strokeWeight:5.0});
+            this.timelineDiv.css({"opacity":"0.75"});
+          },
+        makeEditable: function(){
+          this.setEditable(true);
+        },
+        makeUneditable: function(){
+          this.setEditable(false);
+        },
+        });
+        google.maps.event.addListener(evente, 'click', function(){
+          var index = this.index;
+          $('#eventId').val(index);
+          this.onClick();
+        });
+        google.maps.event.addListener(evente, 'mouseover', function(){
+          this.highlightOn();
+        });
+        google.maps.event.addListener(evente, 'mouseout', function(){
+          this.highlightOff();
+      });
+      userOverlays.push(evente);
+      break;
+    }  
+    // Add event to the map and timeline
+    userOverlays[iOverlayIndex].setMap(map);
+    addEventToTimeline(userOverlays[iOverlayIndex]);
+  }
 
 }
 //end addEventsToMap()
 
 google.maps.MVCObject.prototype.onClick = function(){
-	showEventPost(this);
-	
-	// Set timeline to zoom to the event
-	timeline.setVisibleChartRange(this.start, this.end);
-	timeline.zoom(-0.5);
-	
-	var bounds = new google.maps.LatLngBounds();
-	// Get bounds of a point
-	if (this.shapeType == "marker"){
-		var coord = this.position;
-		bounds.extend(coord);
-	}
-	// Get bounds of a line
-	else if (this.shapeType=="polyline"){
-		path = this.getPath();
-		arrayOfPath = path.j;
-		for(var i=0;i<arrayOfPath.length;i++){
-			coord=arrayOfPath[i];
-			bounds.extend(coord);
-		}
-	}
-	// Get bounds of polygons
-	else{
-		path = this.getPaths();
-		arrayOfPaths = path.j[0].j;
-		for(var i=0;i<arrayOfPaths.length;i++){
-			coord=arrayOfPaths[i];
-			bounds.extend(coord);
-		}
-	}
-	// zoom to the bounds of the event
-	map.fitBounds(bounds);
-	if (this.shapeType == "marker"){
-		map.setZoom(15);
-	}
+  showEventPost(this);
+  
+  // Set timeline to zoom to the event
+  timeline.setVisibleChartRange(this.start, this.end);
+  timeline.zoom(-0.5);
+  
+  var bounds = new google.maps.LatLngBounds();
+  // Get bounds of a point
+  if (this.shapeType == "marker"){
+    var coord = this.position;
+    bounds.extend(coord);
+  }
+  // Get bounds of a line
+  else if (this.shapeType=="polyline"){
+    path = this.getPath();
+    arrayOfPath = path.j;
+    for(var i=0;i<arrayOfPath.length;i++){
+      coord=arrayOfPath[i];
+      bounds.extend(coord);
+    }
+  }
+  // Get bounds of polygons
+  else{
+    path = this.getPaths();
+    arrayOfPaths = path.j[0].j;
+    for(var i=0;i<arrayOfPaths.length;i++){
+      coord=arrayOfPaths[i];
+      bounds.extend(coord);
+    }
+  }
+  // zoom to the bounds of the event
+  map.fitBounds(bounds);
+  if (this.shapeType == "marker"){
+    map.setZoom(15);
+  }
 };
 
 // function for showing the event information modal
@@ -602,7 +602,7 @@ function formatDateTime(date){
 // clear the form for new events
 function clearNewEventForm(){
   clearErrorMessages();
-  $('#new-modal-title span').text("New Event Details")	
+  $('#new-modal-title span').text("New Event Details")  
   $('#collectionInput').val('null');
   $('#newCollection').val('');
   $('#eventName').val('');
@@ -739,25 +739,25 @@ function addEventToTimeline(data){
 
 // change event opacity when timeline event is hovered over and open event info when clicked
 function timelineManager () {
-	var overlay;
-	$('.timeline-event, .timeline-event-box').each(function(){
-		$(this).filter(function(){
-			var classes = this.className.split(" ");
-			for (var i=0, len = classes.length; i<len; i++){
-				if (/row\d+/.test(classes[i])){
-					var id = classes[i].split("row")[1];
-					overlay = userOverlays[id];
-					overlay.timelineDiv = $(this);
-					var color = overlay.strokeColor;
-					$(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"});
-				}
-			}
-		});
-		$(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
-			$.proxy(function(){this.highlightOff()}, overlay)
+  var overlay;
+  $('.timeline-event, .timeline-event-box').each(function(){
+    $(this).filter(function(){
+      var classes = this.className.split(" ");
+      for (var i=0, len = classes.length; i<len; i++){
+        if (/row\d+/.test(classes[i])){
+          var id = classes[i].split("row")[1];
+          overlay = userOverlays[id];
+          overlay.timelineDiv = $(this);
+          var color = overlay.strokeColor;
+          $(this).css({"background-color": color, "opacity": "0.75", "cursor":"pointer"});
+        }
+      }
+    });
+    $(this).hover($.proxy(function(){this.highlightOn()}, overlay), 
+      $.proxy(function(){this.highlightOff()}, overlay)
        )
-		.click($.proxy(function(){this.onClick()}, overlay));
-	});
+    .click($.proxy(function(){this.onClick()}, overlay));
+  });
 }
 
 function windowResize(){
@@ -856,22 +856,22 @@ function deleteEvent(overlay){
 }
   
 function showSubmission(){
-	var x = $('#collectionInput').val();
-	var z = $('#collections');
-	var val = $(z).find('option[value="' + x + '"]');
-	var endval = val.attr('id');
-	//x is the name
-	//endval is the id
-	alert("x: " + x + " z: " + z + " val: " + val + " endval: " + endval);
+  var x = $('#collectionInput').val();
+  var z = $('#collections');
+  var val = $(z).find('option[value="' + x + '"]');
+  var endval = val.attr('id');
+  //x is the name
+  //endval is the id
+  alert("x: " + x + " z: " + z + " val: " + val + " endval: " + endval);
 }
 
 // populate the collection list for the dropdown menu
 function createCollectionSelectList(){
-	for(var l=0; l<userCollections.length; l++){
-		var listElement = userCollections[l];
-		var optionString = '<option value="' + listElement.id + '">'+ listElement.name +'</option>';
-		$('#collectionInput').append(optionString);
-	}
+  for(var l=0; l<userCollections.length; l++){
+    var listElement = userCollections[l];
+    var optionString = '<option value="' + listElement.id + '">'+ listElement.name +'</option>';
+    $('#collectionInput').append(optionString);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -884,13 +884,13 @@ var en = $('#endDate');
 var dEnd;
 
 st.on('blur',function(){
-	dStart = new Date(st.val());
-	dEnd = new Date(en.val());
-	if(!en.val()){
-	  dEnd = new Date(dStart.getTime() + (60*30*1000));
+  dStart = new Date(st.val());
+  dEnd = new Date(en.val());
+  if(!en.val()){
+    dEnd = new Date(dStart.getTime() + (60*30*1000));
     $('#endDate').val(formatDateTime(dEnd));
-	}
-	dateTimeValidation(en);
+  }
+  dateTimeValidation(en);
 });
 
 en.on('blur',function(evt){
@@ -900,32 +900,32 @@ en.on('blur',function(evt){
 });
 //function to check if the start is at least 30 min before the end
 function dateTimeValidation(target){
-	if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
-		target.parent().addClass('has-error');
-	  	target.parent().find('.requiredInputMsg').text('The end date/time must be at least 30 minutes after the start date/time.');
-	}
-	else if(dEnd && !dStart){
-		target.parent().addClass('has-error');
-	  	target.parent().find('.requiredInputMsg').text('You must choose a beginning date to have an end date.');
-	}
-	else{
-		target.parent().removeClass('has-error');
-		target.parent().find('.requiredInputMsg').text('');
-	}
+  if((dEnd-dStart < (60*30*1000)) && dStart && dEnd){
+    target.parent().addClass('has-error');
+      target.parent().find('.requiredInputMsg').text('The end date/time must be at least 30 minutes after the start date/time.');
+  }
+  else if(dEnd && !dStart){
+    target.parent().addClass('has-error');
+      target.parent().find('.requiredInputMsg').text('You must choose a beginning date to have an end date.');
+  }
+  else{
+    target.parent().removeClass('has-error');
+    target.parent().find('.requiredInputMsg').text('');
+  }
 }
 /*This is for validation while filling out the form.
  * It captures on a blur event for the requiredInput class and changes
  * the text in the associated span tag with the requiredInputMsg class.
  */
 $('.requiredInput').on('blur',function(evt){
-	var target = $(evt.target);
-	if (target.val() == ''){
-		target.parent().find('.requiredInputMsg').text('This is a required field!');
-		target.parent().addClass('has-error');
-	}else{
-		target.parent().find('.requiredInputMsg').text('');
-		target.parent().removeClass('has-error');
-	}
+  var target = $(evt.target);
+  if (target.val() == ''){
+    target.parent().find('.requiredInputMsg').text('This is a required field!');
+    target.parent().addClass('has-error');
+  }else{
+    target.parent().find('.requiredInputMsg').text('');
+    target.parent().removeClass('has-error');
+  }
 });
 
 /*this function checks everything and returns a message string.
@@ -935,37 +935,37 @@ $('.requiredInput').on('blur',function(evt){
  * This function is called within the submit button's click event on line 529.
  */
 function validateAllNewEvent(){
-	var msg = '';
-	
-	if(!$('#eventName').val()){
-		msg = msg + '<li>The event name field is blank.</li>';
-	}
-	if(!$('#newCollection').val() && ($('#collectionInput').val() == "new")){
-		msg = msg + '<li>The new collection name field is blank.</li>';
-	}
-	if(!$('#color').val()){
-		msg = msg + '<li>The new collection color field is blank.</li>';
-	}
-	if(!$('#startDate').val()){
-		msg = msg + '<li>The start date/time field is blank.</li>';
-	}
-	if(dEnd != '' && (dEnd-dStart < (60*30*1000)) && dStart && dEnd){
-		msg = msg + '<li>The end date/time is less than 30 minutes after the start date/time.</li>';
-	}
-	else if(dEnd && !dStart){
-		msg = msg + '<li>You have entered a beginning date without an end date.</li>';
-	}
-	if(!$('#eventDescription').val()){
-		msg = msg + '<li>The event description field is blank.</li>';
-	}
-	if(msg == ''){
-		return msg;
-	}
-	else{
-		msg = 'The following input errors have occured:<ul>' + msg;
-		msg = msg + '</ul>Please make the necessary corrections and try submitting again. Thank You.';
-		return msg;
-	}
+  var msg = '';
+  
+  if(!$('#eventName').val()){
+    msg = msg + '<li>The event name field is blank.</li>';
+  }
+  if(!$('#newCollection').val() && ($('#collectionInput').val() == "new")){
+    msg = msg + '<li>The new collection name field is blank.</li>';
+  }
+  if(!$('#color').val()){
+    msg = msg + '<li>The new collection color field is blank.</li>';
+  }
+  if(!$('#startDate').val()){
+    msg = msg + '<li>The start date/time field is blank.</li>';
+  }
+  if(dEnd != '' && (dEnd-dStart < (60*30*1000)) && dStart && dEnd){
+    msg = msg + '<li>The end date/time is less than 30 minutes after the start date/time.</li>';
+  }
+  else if(dEnd && !dStart){
+    msg = msg + '<li>You have entered a beginning date without an end date.</li>';
+  }
+  if(!$('#eventDescription').val()){
+    msg = msg + '<li>The event description field is blank.</li>';
+  }
+  if(msg == ''){
+    return msg;
+  }
+  else{
+    msg = 'The following input errors have occured:<ul>' + msg;
+    msg = msg + '</ul>Please make the necessary corrections and try submitting again. Thank You.';
+    return msg;
+  }
 }
 //end validation for new events form
 ///////////////////////////////////////////
