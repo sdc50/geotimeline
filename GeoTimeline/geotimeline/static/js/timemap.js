@@ -604,10 +604,12 @@ function clearNewEventForm(){
   clearErrorMessages();
   $('#new-modal-title span').text("New Event Details")	
   $('#collectionInput').val('null');
+  $('#newCollection').val('');
   $('#eventName').val('');
   $('#startDate').val('');
   $('#endDate').val('');
   $('#eventDescription').val('');
+  $('#new-collection').hide();
 }
 
 // populate the edit modal with the existing information
@@ -699,30 +701,29 @@ function eventSubmit(overlay){
 function newEventSubmit(){
     var overlay = userOverlays.pop();
     var newEvent = eventSubmit(overlay);
-    overlay.setMap(null);
-                    
-    addEventsToMap([newEvent]);
-    windowResize();
-    newEvent.index = userOverlays.length -1;
-    saveEvent(newEvent);
+    if(newEvent){
+      overlay.setMap(null);              
+      addEventsToMap([newEvent]);
+      windowResize();
+      newEvent.index = userOverlays.length -1;
+      saveEvent(newEvent);
+    }
 }
 
 //function for saving edits to an event
 function editEventSubmit(){
-    var index = $('#index').val();
-    var overlay = userOverlays[index];
-
-    var newEvent = eventSubmit(overlay);
-    
-	className = "row" + index;
-
-	timeline.changeItem(index, {"content":newEvent.name, "className":className, "start":overlay.start, "end":overlay.end});
-	  
+  var index = $('#index').val();
+  var overlay = userOverlays[index];
+  var newEvent = eventSubmit(overlay);
+  if(newEvent){
+    timeline.changeItem(index, {"content":newEvent.name, "className":"row" + index, "start":overlay.start, "end":overlay.end});
     newEvent.index = index;
     newEvent.id = overlay.id;            
     windowResize();
     timelineManager(); 
     saveEvent(newEvent);
+  }
+
 }
 
 function addEventToTimeline(data){    
@@ -884,6 +885,7 @@ var dEnd;
 
 st.on('blur',function(){
 	dStart = new Date(st.val());
+	dEnd = new Date(en.val());
 	if(!en.val()){
 	  dEnd = new Date(dStart.getTime() + (60*30*1000));
     $('#endDate').val(formatDateTime(dEnd));
@@ -892,6 +894,7 @@ st.on('blur',function(){
 });
 
 en.on('blur',function(evt){
+  dStart = new Date(st.val());
   dEnd = new Date(en.val());
   dateTimeValidation(en);
 });
