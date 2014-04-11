@@ -51,7 +51,7 @@ function addListeners(){
       $('#timeline-container').slideUp();
       drawingManager.setOptions({drawingControl:true});
       drawingManager.setDrawingMode(null);
-      clearNewEventForm();
+      clearEventForm();
       $(".new-submit").off('click', editEventSubmit);
       $(".new-submit").off('click', newEventSubmit);
       $(".new-submit").click(newEventSubmit);
@@ -309,20 +309,21 @@ function addEventsToMap(events){
     var aDecodGeom = google.maps.geometry.encoding.decodePath(aCodedGeom);
     switch(sShape){
       case 'marker':
-      //make variables for the pin color
-      var pinColor = sColor.substring(1);
-      var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-        null,
-        null,
-        null,
-        new google.maps.Size(21,34));
-      var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
-        new google.maps.Size(40,37),
-        new google.maps.Point(0,0),
-        new google.maps.Point(12,35));
-      //end pin color variables
       //make marker
+      var pinColor = sColor.substring(1);
+      var pinImage =  new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+          null,
+          null,
+          null,
+          new google.maps.Size(21,34));
+      var largePinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+          null,
+          null,
+          null,
+          new google.maps.Size(42,68));
       evente = new google.maps.Marker({
+        pinImage: pinImage,
+        largePinImage: largePinImage,
         shapeType: sShape,
         editOn: false,
         id: iId,
@@ -341,26 +342,12 @@ function addEventsToMap(events){
         body: tbody,
         className: tclassName,
         highlightOn: function(){
-          var color = this.fillColor;
-          color = color.substring(1);
-          var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-          null,
-          null,
-          null,
-          new google.maps.Size(42,68));
-          this.setIcon(pinImage);
+          this.setIcon(this.largePinImage);
           //this.setAnimation(google.maps.Animation.BOUNCE);
           this.timelineDiv.css({"opacity":"1"});
           },
         highlightOff: function(){
-          var color = this.fillColor;
-          color = color.substring(1);
-          var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
-          null,
-          null,
-          null,
-          new google.maps.Size(21,34));
-          this.setIcon(pinImage);
+          this.setIcon(this.pinImage);
           //this.setAnimation(null);
           this.timelineDiv.css({"opacity":"0.75"});
         },
@@ -368,9 +355,9 @@ function addEventsToMap(events){
           this.setIcon('http://icons.iconarchive.com/icons/everaldo/kids-icons/32/package-utilities-icon.png');
               this.setDraggable(true);
               this.editOn = true;
-            },
-            makeUneditable: function(){
-          this.setIcon(pinImage);
+        },
+        makeUneditable: function(){
+          this.setIcon(this.pinImage);
               this.setDraggable(false);
               this.editOn = false;
             },
@@ -501,6 +488,26 @@ function addEventsToMap(events){
 }
 //end addEventsToMap()
 
+function setMarkerImages(marker){
+      var pinColor = marker.fillColor.substring(1);
+      var pinImage =  new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+          null,
+          null,
+          null,
+          new google.maps.Size(21,34));
+      var largePinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+          null,
+          null,
+          null,
+          new google.maps.Size(42,68));
+          
+     marker.pinImage = pinImage;
+     marker.largePinImage = largePinImage;
+     marker.icon = pinImage;
+     //marker.setMap(null);
+     marker.setMap(map);
+}
+
 google.maps.MVCObject.prototype.onClick = function(){
   showEventPost(this);
   
@@ -600,7 +607,8 @@ function formatDateTime(date){
 }
 
 // clear the form for new events
-function clearNewEventForm(){
+function clearEventForm(){
+  console.log('clearing');
   clearErrorMessages();
   $('#new-modal-title span').text("New Event Details")  
   $('#collectionInput').val('null');
@@ -614,7 +622,7 @@ function clearNewEventForm(){
 
 // populate the edit modal with the existing information
 function populateEditModal(userEvent){
-  clearErrorMessages();
+  clearEventForm();
   $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
@@ -677,6 +685,8 @@ function eventSubmit(overlay){
       var newLatLng = new google.maps.LatLng(newPos.k,newPos.A);
       posArr.push(newLatLng);
       geometry = google.maps.geometry.encoding.encodePath(posArr);
+      
+      setMarkerImages(overlay);
     }
     else{
       geometry = google.maps.geometry.encoding.encodePath(overlay.getPath());
@@ -707,6 +717,9 @@ function newEventSubmit(){
       windowResize();
       newEvent.index = userOverlays.length -1;
       saveEvent(newEvent);
+    }
+    else{
+      console.log('aborting')
     }
 }
 
