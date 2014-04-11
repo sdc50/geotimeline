@@ -190,7 +190,7 @@ def login(request):
       firstName = request.params['first-name']
       lastName = request.params['last-name']
       email = request.params['email']
-      password = request.params['password']
+      newPassword = request.params['password']
       confirm = request.params['confirm']
       
       if firstName == '':
@@ -206,11 +206,11 @@ def login(request):
         if existing:
           messages.insert(3,"Account already exists for " + email)
   
-      if password == '' or password != confirm:
+      if newPassword == '' or newPassword != confirm:
         messages.insert(4,"Passwords don't match")
           
       if len(messages) == 0:
-        newUser = User(firstName, lastName, email, password)
+        newUser = User(firstName, lastName, email, newPassword)
         editor = DBSession.query(Group).filter_by(name='editor').first()
         newUser.groups.append(editor)
         DBSession.add(newUser)
