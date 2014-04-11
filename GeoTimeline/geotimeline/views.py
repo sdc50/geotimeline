@@ -83,7 +83,6 @@ def saveEvent(request):
         user = DBSession.query(User).filter(User.userName==userid).first()
         
         params = request.POST
-        #print('*******************************',params)
         name = params['name']
         content = params['content'] 
         shape = params['shape']
@@ -132,7 +131,6 @@ def saveCollection(request):
         userid = authenticated_userid(request)
         user = DBSession.query(User).filter(User.userName==userid).first()
         
-        print(request.params)
         name = request.params['name']
         color = request.params['color'] 
         c = Collection(name, color)
@@ -183,7 +181,6 @@ def login(request):
     login = ''
     password = ''
     if 'signup.submitted' in request.params:
-      print(request.params)
       
       firstName = request.params['first-name']
       lastName = request.params['last-name']
