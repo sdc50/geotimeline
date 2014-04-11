@@ -184,3 +184,12 @@ footer{
 	margin: 5px;
 } 
 
+
+.tutorial_img{
+	margin-bottom: 10px;
+	
+	box-shadow:2px 2px 10px 10px rgba(192,192,192,0.8);
+	 -webkit-box-shadow:2px 2px 10px 10px rgba(192,192,192,0.8);
+	 -moz-box-shadow:2px 2px 10px 10px rgba(192,192,192,0.8);
+}
+
