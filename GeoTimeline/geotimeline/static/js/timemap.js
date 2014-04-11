@@ -718,7 +718,7 @@ function newEventSubmit(){
       saveEvent(newEvent);
     }
     else{
-      console.log('aborting')
+      userOverlays.push(overlay);
     }
 }
 
