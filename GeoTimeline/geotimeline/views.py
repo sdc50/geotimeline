@@ -187,6 +187,8 @@ def login(request):
     
     if 'signup.submitted' in request.params:
       
+      valid = True
+      
       firstName = request.params['first-name']
       lastName = request.params['last-name']
       email = request.params['email']
@@ -194,22 +196,27 @@ def login(request):
       confirm = request.params['confirm']
       
       if firstName == '':
+        valid = False
         messages.insert(0,"First name is required")
         
       if lastName == '':
+        valid = False
         messages.insert(1,"Last name is required")
         
       if email == '':
+        valid = False
         messages.insert(2,"Email is required")
       else:
         existing = DBSession.query(User).filter_by(userName=email).first()      
         if existing:
+          valid = False
           messages.insert(3,"Account already exists for " + email)
   
       if newPassword == '' or newPassword != confirm:
+        valid = False
         messages.insert(4,"Passwords don't match")
           
-      if len(messages) == 0:
+      if valid:
         newUser = User(firstName, lastName, email, newPassword)
         editor = DBSession.query(Group).filter_by(name='editor').first()
         newUser.groups.append(editor)
