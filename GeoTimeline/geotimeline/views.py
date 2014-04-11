@@ -177,32 +177,47 @@ def login(request):
     if referrer == login_url:
         referrer = '/' # never use the login form itself as came_from
     came_from = request.params.get('came_from', referrer)
-    messages = ['','']
+    messages = ['']*5
+    
+    firstName = ''
+    lastName = ''
+    email = ''
     login = ''
     password = ''
+    
     if 'signup.submitted' in request.params:
       
       firstName = request.params['first-name']
       lastName = request.params['last-name']
-      login = request.params['email']
+      email = request.params['email']
       password = request.params['password']
+      confirm = request.params['confirm']
       
-      if login == '':
-        messages[0] = "Invalid email"
-      else:
-        existing = DBSession.query(User).filter_by(userName=login).first()
+      if firstName == '':
+        messages.insert(0,"First name is required")
         
+      if lastName == '':
+        messages.insert(1,"Last name is required")
+        
+      if email == '':
+        messages.insert(2,"Email is required")
+      else:
+        existing = DBSession.query(User).filter_by(userName=email).first()      
         if existing:
-          messages[0] = "Account already exists for " + login
-        else:
-          newUser = User(firstName, lastName, login, password)
-          editor = DBSession.query(Group).filter_by(name='editor').first()
-          newUser.groups.append(editor)
-          DBSession.add(newUser)
+          messages.insert(3,"Account already exists for " + email)
+  
+      if password == '' or password != confirm:
+        messages.insert(4,"Passwords don't match")
           
-          headers = remember(request, login)
-          return HTTPFound(location = came_from,
-                           headers = headers)
+      if len(messages) == 0:
+        newUser = User(firstName, lastName, email, password)
+        editor = DBSession.query(Group).filter_by(name='editor').first()
+        newUser.groups.append(editor)
+        DBSession.add(newUser)
+        
+        headers = remember(request, email)
+        return HTTPFound(location = came_from,
+                         headers = headers)
           
     elif 'login.submitted' in request.params:
         login = request.params['login']
@@ -214,12 +229,15 @@ def login(request):
             return HTTPFound(location = came_from,
                              headers = headers)
 
-        messages[1] = 'Failed login'
+        messages.insert(5,'Credentials did not match')
 
     return dict(
         messages = messages,
         url = request.application_url + '/login',
         came_from = came_from,
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
         login = login,
         password = password,
         )
