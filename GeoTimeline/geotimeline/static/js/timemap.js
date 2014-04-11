@@ -608,7 +608,6 @@ function formatDateTime(date){
 
 // clear the form for new events
 function clearEventForm(){
-  console.log('clearing');
   clearErrorMessages();
   $('#new-modal-title span').text("New Event Details")  
   $('#collectionInput').val('null');
