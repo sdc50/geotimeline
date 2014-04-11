@@ -614,10 +614,7 @@ function clearNewEventForm(){
 
 // populate the edit modal with the existing information
 function populateEditModal(userEvent){
-<<<<<<< HEAD
-=======
   clearErrorMessages();
->>>>>>> c9ddde42fd6a3fa4303a454aa47afc209b738b51
   $('#new-modal-title span').text("Edit Event Details")
   $('#collectionInput').val(userEvent.collectionId);
   $('#eventName').val(userEvent.content);
